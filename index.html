@@ -37,6 +37,149 @@
             font-size: 2em;
         }
 
+        .auth-container {
+            display: none;
+        }
+
+        .auth-container.active {
+            display: block;
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .user-email {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            padding: 8px 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
         .input-container {
             display: flex;
             margin-bottom: 25px;
@@ -76,6 +219,12 @@
 
         #addBtn:active {
             transform: translateY(0);
+        }
+
+        #addBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .todo-list {
@@ -155,6 +304,13 @@
             font-size: 16px;
         }
 
+        .loading-state {
+            text-align: center;
+            color: #667eea;
+            padding: 40px 20px;
+            font-size: 16px;
+        }
+
         .stats {
             margin-top: 20px;
             padding-top: 20px;
@@ -170,101 +326,345 @@
     <div class="container">
         <h1>📝 TodoList</h1>
 
-        <div class="input-container">
-            <input
-                type="text"
-                id="todoInput"
-                placeholder="What needs to be done?"
-                autocomplete="off"
-            >
-            <button id="addBtn">Add</button>
+        <!-- Authentication UI -->
+        <div id="authContainer" class="auth-container active">
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="signup">Sign Up</button>
+            </div>
+
+            <div id="authMessage"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="auth-btn">Login</button>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required autocomplete="new-password" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="signupPasswordConfirm">Confirm Password</label>
+                    <input type="password" id="signupPasswordConfirm" required autocomplete="new-password" minlength="6">
+                </div>
+                <button type="submit" class="auth-btn">Sign Up</button>
+            </form>
         </div>
 
-        <ul id="todoList" class="todo-list"></ul>
+        <!-- App UI (shown after login) -->
+        <div id="appContainer" class="app-container">
+            <div class="user-header">
+                <span class="user-email" id="userEmail"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
 
-        <div class="stats">
-            <span id="totalTodos">Total: 0</span>
-            <span id="completedTodos">Completed: 0</span>
+            <div class="input-container">
+                <input
+                    type="text"
+                    id="todoInput"
+                    placeholder="What needs to be done?"
+                    autocomplete="off"
+                >
+                <button id="addBtn">Add</button>
+            </div>
+
+            <ul id="todoList" class="todo-list"></ul>
+
+            <div class="stats">
+                <span id="totalTodos">Total: 0</span>
+                <span id="completedTodos">Completed: 0</span>
+            </div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+        // Initialize Supabase
+        const supabaseUrl = 'https://rkvmujdayjmszmyzbhal.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
+        const supabase = createClient(supabaseUrl, supabaseKey)
+
         class TodoApp {
             constructor() {
-                this.todos = this.loadTodos();
-                this.todoInput = document.getElementById('todoInput');
-                this.addBtn = document.getElementById('addBtn');
-                this.todoList = document.getElementById('todoList');
-                this.totalTodosEl = document.getElementById('totalTodos');
-                this.completedTodosEl = document.getElementById('completedTodos');
+                this.currentUser = null
+                this.todos = []
 
-                this.initEventListeners();
-                this.render();
+                // Get DOM elements
+                this.authContainer = document.getElementById('authContainer')
+                this.appContainer = document.getElementById('appContainer')
+                this.authMessage = document.getElementById('authMessage')
+                this.loginForm = document.getElementById('loginForm')
+                this.signupForm = document.getElementById('signupForm')
+                this.userEmail = document.getElementById('userEmail')
+                this.logoutBtn = document.getElementById('logoutBtn')
+                this.todoInput = document.getElementById('todoInput')
+                this.addBtn = document.getElementById('addBtn')
+                this.todoList = document.getElementById('todoList')
+                this.totalTodosEl = document.getElementById('totalTodos')
+                this.completedTodosEl = document.getElementById('completedTodos')
+
+                this.initAuth()
+                this.initEventListeners()
+            }
+
+            async initAuth() {
+                // Check current session
+                const { data: { session } } = await supabase.auth.getSession()
+
+                if (session) {
+                    this.handleAuthSuccess(session.user)
+                }
+
+                // Listen for auth changes
+                supabase.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN' && session) {
+                        this.handleAuthSuccess(session.user)
+                    } else if (event === 'SIGNED_OUT') {
+                        this.handleSignOut()
+                    }
+                })
             }
 
             initEventListeners() {
-                this.addBtn.addEventListener('click', () => this.addTodo());
+                // Auth tab switching
+                document.querySelectorAll('.auth-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        const tabName = e.target.dataset.tab
+                        this.switchAuthTab(tabName)
+                    })
+                })
+
+                // Login form
+                this.loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault()
+                    await this.handleLogin()
+                })
+
+                // Signup form
+                this.signupForm.addEventListener('submit', async (e) => {
+                    e.preventDefault()
+                    await this.handleSignup()
+                })
+
+                // Logout
+                this.logoutBtn.addEventListener('click', async () => {
+                    await this.handleLogout()
+                })
+
+                // Add todo
+                this.addBtn.addEventListener('click', () => this.addTodo())
                 this.todoInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.addTodo();
-                });
+                    if (e.key === 'Enter') this.addTodo()
+                })
             }
 
-            loadTodos() {
-                const stored = localStorage.getItem('todos');
-                return stored ? JSON.parse(stored) : [];
+            switchAuthTab(tabName) {
+                document.querySelectorAll('.auth-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === tabName)
+                })
+                document.querySelectorAll('.auth-form').forEach(form => {
+                    form.classList.toggle('active', form.id === `${tabName}Form`)
+                })
+                this.authMessage.innerHTML = ''
             }
 
-            saveTodos() {
-                localStorage.setItem('todos', JSON.stringify(this.todos));
+            showMessage(message, type = 'error') {
+                const className = type === 'error' ? 'error-message' : 'success-message'
+                this.authMessage.innerHTML = `<div class="${className}">${message}</div>`
             }
 
-            addTodo() {
-                const text = this.todoInput.value.trim();
-                if (!text) return;
+            async handleLogin() {
+                const email = document.getElementById('loginEmail').value
+                const password = document.getElementById('loginPassword').value
 
-                const todo = {
-                    id: Date.now(),
-                    text: text,
-                    completed: false
-                };
+                const submitBtn = this.loginForm.querySelector('button[type="submit"]')
+                submitBtn.disabled = true
+                submitBtn.textContent = 'Logging in...'
 
-                this.todos.push(todo);
-                this.saveTodos();
-                this.todoInput.value = '';
-                this.render();
-            }
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                })
 
-            toggleTodo(id) {
-                const todo = this.todos.find(t => t.id === id);
-                if (todo) {
-                    todo.completed = !todo.completed;
-                    this.saveTodos();
-                    this.render();
+                submitBtn.disabled = false
+                submitBtn.textContent = 'Login'
+
+                if (error) {
+                    this.showMessage(error.message, 'error')
+                } else {
+                    this.handleAuthSuccess(data.user)
                 }
             }
 
-            deleteTodo(id) {
-                this.todos = this.todos.filter(t => t.id !== id);
-                this.saveTodos();
-                this.render();
+            async handleSignup() {
+                const email = document.getElementById('signupEmail').value
+                const password = document.getElementById('signupPassword').value
+                const passwordConfirm = document.getElementById('signupPasswordConfirm').value
+
+                if (password !== passwordConfirm) {
+                    this.showMessage('Passwords do not match', 'error')
+                    return
+                }
+
+                const submitBtn = this.signupForm.querySelector('button[type="submit"]')
+                submitBtn.disabled = true
+                submitBtn.textContent = 'Signing up...'
+
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password
+                })
+
+                submitBtn.disabled = false
+                submitBtn.textContent = 'Sign Up'
+
+                if (error) {
+                    this.showMessage(error.message, 'error')
+                } else {
+                    this.showMessage('Account created! Please check your email to confirm your account. You can now login.', 'success')
+                    this.switchAuthTab('login')
+                }
+            }
+
+            async handleLogout() {
+                await supabase.auth.signOut()
+            }
+
+            handleAuthSuccess(user) {
+                this.currentUser = user
+                this.userEmail.textContent = user.email
+                this.authContainer.classList.remove('active')
+                this.appContainer.classList.add('active')
+                this.loadTodos()
+            }
+
+            handleSignOut() {
+                this.currentUser = null
+                this.todos = []
+                this.authContainer.classList.add('active')
+                this.appContainer.classList.remove('active')
+                this.loginForm.reset()
+                this.signupForm.reset()
+                this.authMessage.innerHTML = ''
+            }
+
+            async loadTodos() {
+                this.todoList.innerHTML = '<div class="loading-state">Loading todos...</div>'
+
+                const { data, error } = await supabase
+                    .from('todos')
+                    .select('*')
+                    .order('created_at', { ascending: true })
+
+                if (error) {
+                    console.error('Error loading todos:', error)
+                    this.todoList.innerHTML = '<div class="error-message">Failed to load todos</div>'
+                    return
+                }
+
+                this.todos = data
+                this.render()
+            }
+
+            async addTodo() {
+                const text = this.todoInput.value.trim()
+                if (!text) return
+
+                this.addBtn.disabled = true
+                this.addBtn.textContent = 'Adding...'
+
+                const { data, error } = await supabase
+                    .from('todos')
+                    .insert({
+                        user_id: this.currentUser.id,
+                        text: text,
+                        completed: false
+                    })
+                    .select()
+
+                this.addBtn.disabled = false
+                this.addBtn.textContent = 'Add'
+
+                if (error) {
+                    console.error('Error adding todo:', error)
+                    alert('Failed to add todo')
+                    return
+                }
+
+                this.todos.push(data[0])
+                this.todoInput.value = ''
+                this.render()
+            }
+
+            async toggleTodo(id) {
+                const todo = this.todos.find(t => t.id === id)
+                if (!todo) return
+
+                const newCompleted = !todo.completed
+
+                const { error } = await supabase
+                    .from('todos')
+                    .update({ completed: newCompleted })
+                    .eq('id', id)
+
+                if (error) {
+                    console.error('Error updating todo:', error)
+                    alert('Failed to update todo')
+                    return
+                }
+
+                todo.completed = newCompleted
+                this.render()
+            }
+
+            async deleteTodo(id) {
+                const { error } = await supabase
+                    .from('todos')
+                    .delete()
+                    .eq('id', id)
+
+                if (error) {
+                    console.error('Error deleting todo:', error)
+                    alert('Failed to delete todo')
+                    return
+                }
+
+                this.todos = this.todos.filter(t => t.id !== id)
+                this.render()
             }
 
             updateStats() {
-                const total = this.todos.length;
-                const completed = this.todos.filter(t => t.completed).length;
-                this.totalTodosEl.textContent = `Total: ${total}`;
-                this.completedTodosEl.textContent = `Completed: ${completed}`;
+                const total = this.todos.length
+                const completed = this.todos.filter(t => t.completed).length
+                this.totalTodosEl.textContent = `Total: ${total}`
+                this.completedTodosEl.textContent = `Completed: ${completed}`
             }
 
             render() {
-                this.todoList.innerHTML = '';
+                this.todoList.innerHTML = ''
 
                 if (this.todos.length === 0) {
-                    this.todoList.innerHTML = '<div class="empty-state">No todos yet. Add one above!</div>';
+                    this.todoList.innerHTML = '<div class="empty-state">No todos yet. Add one above!</div>'
                 } else {
                     this.todos.forEach(todo => {
-                        const li = document.createElement('li');
-                        li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                        const li = document.createElement('li')
+                        li.className = `todo-item ${todo.completed ? 'completed' : ''}`
 
                         li.innerHTML = `
                             <input
@@ -275,30 +675,30 @@
                             >
                             <span class="todo-text">${this.escapeHtml(todo.text)}</span>
                             <button class="delete-btn" data-id="${todo.id}">Delete</button>
-                        `;
+                        `
 
-                        const checkbox = li.querySelector('.todo-checkbox');
-                        checkbox.addEventListener('change', () => this.toggleTodo(todo.id));
+                        const checkbox = li.querySelector('.todo-checkbox')
+                        checkbox.addEventListener('change', () => this.toggleTodo(todo.id))
 
-                        const deleteBtn = li.querySelector('.delete-btn');
-                        deleteBtn.addEventListener('click', () => this.deleteTodo(todo.id));
+                        const deleteBtn = li.querySelector('.delete-btn')
+                        deleteBtn.addEventListener('click', () => this.deleteTodo(todo.id))
 
-                        this.todoList.appendChild(li);
-                    });
+                        this.todoList.appendChild(li)
+                    })
                 }
 
-                this.updateStats();
+                this.updateStats()
             }
 
             escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
+                const div = document.createElement('div')
+                div.textContent = text
+                return div.innerHTML
             }
         }
 
         // Initialize the app
-        new TodoApp();
+        new TodoApp()
     </script>
 </body>
 </html>
