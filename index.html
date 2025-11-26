@@ -847,7 +847,7 @@
                     li.className = `category-item ${this.selectedCategoryId === category.id ? 'active' : ''}`
                     li.innerHTML = `
                         <span class="category-name">
-                            <span class="category-color" style="background-color: ${category.color}"></span>
+                            <span class="category-color" style="background-color: ${this.validateColor(category.color)}"></span>
                             ${this.escapeHtml(category.name)}
                         </span>
                         <button class="category-delete" data-id="${category.id}">×</button>
@@ -1048,19 +1048,22 @@
                 const filteredTodos = this.getFilteredTodos()
 
                 if (filteredTodos.length === 0) {
-                    this.todoList.innerHTML = '<div class="empty-state">No todos yet. Add one above!</div>'
+                    const emptyMsg = this.selectedCategoryId === null
+                        ? 'No todos yet. Add one above!'
+                        : 'No todos in this category.'
+                    this.todoList.innerHTML = `<div class="empty-state">${emptyMsg}</div>`
                 } else {
                     filteredTodos.forEach(todo => {
                         const li = document.createElement('li')
                         li.className = `todo-item ${todo.completed ? 'completed' : ''}`
 
-                        const category = todo.category_id ? this.getCategoryById(todo.category_id) : null
+                        const category = todo.category_id ? (this.getCategoryById(todo.category_id) ?? null) : null
                         const categoryBadge = category
-                            ? `<span class="todo-category-badge" style="background-color: ${category.color}">${this.escapeHtml(category.name)}</span>`
+                            ? `<span class="todo-category-badge" style="background-color: ${this.validateColor(category.color)}">${this.escapeHtml(category.name)}</span>`
                             : ''
 
                         if (category) {
-                            li.style.borderLeftColor = category.color
+                            li.style.borderLeftColor = this.validateColor(category.color)
                         }
 
                         li.innerHTML = `
@@ -1092,6 +1095,12 @@
                 const div = document.createElement('div')
                 div.textContent = text
                 return div.innerHTML
+            }
+
+            validateColor(color) {
+                // Validate hex color format to prevent CSS injection
+                const hexColorRegex = /^#[0-9A-Fa-f]{6}$/
+                return hexColorRegex.test(color) ? color : '#667eea'
             }
         }
 
