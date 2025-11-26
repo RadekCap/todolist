@@ -349,6 +349,21 @@
             border-color: #667eea;
         }
 
+        #dueDateInput {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            background: white;
+            min-width: 150px;
+        }
+
+        #dueDateInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
         #addBtn {
             padding: 12px 25px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -440,6 +455,26 @@
             font-weight: 600;
             color: white;
             white-space: nowrap;
+        }
+
+        .todo-date {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            background: #f0f0f0;
+            white-space: nowrap;
+        }
+
+        .todo-date.overdue {
+            background: #fee;
+            color: #c33;
+        }
+
+        .todo-date.today {
+            background: #fff3cd;
+            color: #856404;
         }
 
         .delete-btn {
@@ -581,6 +616,12 @@
                             <select id="categorySelect">
                                 <option value="">No Category</option>
                             </select>
+                            <input
+                                type="date"
+                                id="dueDateInput"
+                                title="Due date (optional)"
+                                aria-label="Due date (optional)"
+                            >
                             <button id="addBtn">Add</button>
                         </div>
                     </div>
@@ -622,6 +663,7 @@
                 this.logoutBtn = document.getElementById('logoutBtn')
                 this.todoInput = document.getElementById('todoInput')
                 this.categorySelect = document.getElementById('categorySelect')
+                this.dueDateInput = document.getElementById('dueDateInput')
                 this.addBtn = document.getElementById('addBtn')
                 this.todoList = document.getElementById('todoList')
                 this.categoryList = document.getElementById('categoryList')
@@ -974,6 +1016,7 @@
                 this.addBtn.textContent = 'Adding...'
 
                 const categoryId = this.categorySelect.value || null
+                const dueDate = this.dueDateInput.value || null
 
                 const { data, error } = await supabase
                     .from('todos')
@@ -981,7 +1024,8 @@
                         user_id: this.currentUser.id,
                         text: text,
                         completed: false,
-                        category_id: categoryId
+                        category_id: categoryId,
+                        due_date: dueDate
                     })
                     .select()
 
@@ -996,6 +1040,7 @@
 
                 this.todos.push(data[0])
                 this.todoInput.value = ''
+                this.dueDateInput.value = ''
                 this.renderTodos()
             }
 
@@ -1077,6 +1122,8 @@
                             ? `<span class="todo-category-badge" style="background-color: ${this.validateColor(category.color)}">${this.escapeHtml(category.name)}</span>`
                             : ''
 
+                        const dateBadge = todo.due_date ? this.formatDateBadge(todo.due_date) : ''
+
                         if (category) {
                             li.style.borderLeftColor = this.validateColor(category.color)
                         }
@@ -1089,6 +1136,7 @@
                                 data-id="${todo.id}"
                             >
                             <span class="todo-text">${this.escapeHtml(todo.text)}</span>
+                            ${dateBadge}
                             ${categoryBadge}
                             <button class="delete-btn" data-id="${todo.id}">Delete</button>
                         `
@@ -1116,6 +1164,40 @@
                 // Validate hex color format to prevent CSS injection
                 const hexColorRegex = /^#[0-9A-Fa-f]{6}$/
                 return hexColorRegex.test(color) ? color : '#667eea'
+            }
+
+            formatDateBadge(dateString) {
+                // Parse dateString as YYYY-MM-DD in a timezone-agnostic way
+                const [year, month, day] = dateString.split('-')
+                const dueDate = new Date(year, month - 1, day)
+
+                const today = new Date()
+                today.setHours(0, 0, 0, 0)
+
+                const diffTime = dueDate - today
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+                let className = 'todo-date'
+                let label = ''
+
+                if (diffDays < 0) {
+                    className += ' overdue'
+                    label = diffDays === -1 ? 'Yesterday' : `${Math.abs(diffDays)} days ago`
+                } else if (diffDays === 0) {
+                    className += ' today'
+                    label = 'Today'
+                } else if (diffDays === 1) {
+                    label = 'Tomorrow'
+                } else if (diffDays <= 7) {
+                    label = `In ${diffDays} days`
+                } else {
+                    // Format as readable date with consistent format
+                    const monthName = dueDate.toLocaleDateString('en-US', { month: 'short' })
+                    const dayNum = dueDate.getDate()
+                    label = `${monthName} ${dayNum}`
+                }
+
+                return `<span class="${className}">${this.escapeHtml(label)}</span>`
             }
         }
 

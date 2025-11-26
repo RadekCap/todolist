@@ -10,6 +10,10 @@ A modern single-page todo list application with user authentication, categories,
   - Assign colors to categories for visual organization
   - Filter todos by category
   - View all todos or uncategorized items
+- **Due Dates**: Add optional due dates to todos
+  - Visual indicators for overdue, today, and upcoming tasks
+  - Smart date labels (Today, Tomorrow, In X days, etc.)
+  - Color-coded badges (red for overdue, yellow for today)
 - **Cross-device Sync**: Your todos sync across all your devices
 - **Cloud Storage**: Todos are stored in Supabase PostgreSQL database
 - **Private & Secure**: Each user has their own private todo list with Row Level Security
