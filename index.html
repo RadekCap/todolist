@@ -620,6 +620,7 @@
                                 type="date"
                                 id="dueDateInput"
                                 title="Due date (optional)"
+                                aria-label="Due date (optional)"
                             >
                             <button id="addBtn">Add</button>
                         </div>
@@ -1166,7 +1167,10 @@
             }
 
             formatDateBadge(dateString) {
-                const dueDate = new Date(dateString + 'T00:00:00')
+                // Parse dateString as YYYY-MM-DD in a timezone-agnostic way
+                const [year, month, day] = dateString.split('-')
+                const dueDate = new Date(year, month - 1, day)
+
                 const today = new Date()
                 today.setHours(0, 0, 0, 0)
 
@@ -1187,8 +1191,10 @@
                 } else if (diffDays <= 7) {
                     label = `In ${diffDays} days`
                 } else {
-                    // Format as readable date
-                    label = dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    // Format as readable date with consistent format
+                    const monthName = dueDate.toLocaleDateString('en-US', { month: 'short' })
+                    const dayNum = dueDate.getDate()
+                    label = `${monthName} ${dayNum}`
                 }
 
                 return `<span class="${className}">${this.escapeHtml(label)}</span>`
