@@ -847,7 +847,7 @@
                     li.className = `category-item ${this.selectedCategoryId === category.id ? 'active' : ''}`
                     li.innerHTML = `
                         <span class="category-name">
-                            <span class="category-color" style="background-color: ${category.color}"></span>
+                            <span class="category-color" style="background-color: ${this.sanitizeColor(category.color)}"></span>
                             ${this.escapeHtml(category.name)}
                         </span>
                         <button class="category-delete" data-id="${category.id}">×</button>
@@ -1056,11 +1056,11 @@
 
                         const category = todo.category_id ? this.getCategoryById(todo.category_id) : null
                         const categoryBadge = category
-                            ? `<span class="todo-category-badge" style="background-color: ${category.color}">${this.escapeHtml(category.name)}</span>`
+                            ? `<span class="todo-category-badge" style="background-color: ${this.sanitizeColor(category.color)}">${this.escapeHtml(category.name)}</span>`
                             : ''
 
                         if (category) {
-                            li.style.borderLeftColor = category.color
+                            li.style.borderLeftColor = this.sanitizeColor(category.color)
                         }
 
                         li.innerHTML = `
@@ -1092,6 +1092,15 @@
                 const div = document.createElement('div')
                 div.textContent = text
                 return div.innerHTML
+            }
+
+            sanitizeColor(color) {
+                // Validate that the color matches hex format (#RRGGBB)
+                if (typeof color === 'string' && /^#[0-9A-Fa-f]{6}$/.test(color)) {
+                    return color
+                }
+                // Return a default color if validation fails
+                return '#667eea'
             }
         }
 
