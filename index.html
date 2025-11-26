@@ -883,6 +883,14 @@
 
             selectCategory(categoryId) {
                 this.selectedCategoryId = categoryId
+
+                // Auto-select the category in the add todo form
+                if (categoryId === null || categoryId === 'uncategorized') {
+                    this.categorySelect.value = ''
+                } else {
+                    this.categorySelect.value = categoryId
+                }
+
                 this.renderCategories()
                 this.renderTodos()
             }
