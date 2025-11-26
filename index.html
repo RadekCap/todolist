@@ -745,7 +745,7 @@
 
             showMessage(message, type = 'error') {
                 const className = type === 'error' ? 'error-message' : 'success-message'
-                this.authMessage.innerHTML = `<div class="${className}">${message}</div>`
+                this.authMessage.innerHTML = `<div class="${className}">${this.escapeHtml(message)}</div>`
             }
 
             async handleLogin() {
