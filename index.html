@@ -934,14 +934,22 @@
                 this.selectedCategoryId = categoryId
 
                 // Auto-select the category in the add todo form
-                if (categoryId === null || categoryId === 'uncategorized') {
-                    this.categorySelect.value = ''
-                } else {
-                    this.categorySelect.value = categoryId
-                }
+                this.syncCategoryDropdown()
 
                 this.renderCategories()
                 this.renderTodos()
+            }
+
+            syncCategoryDropdown() {
+                // Update dropdown value with Safari-compatible approach
+                const targetValue = (this.selectedCategoryId === null || this.selectedCategoryId === 'uncategorized')
+                    ? ''
+                    : this.selectedCategoryId
+
+                // Use setTimeout to ensure DOM update happens after render cycle (Safari fix)
+                setTimeout(() => {
+                    this.categorySelect.value = targetValue
+                }, 0)
             }
 
             async addCategory() {
