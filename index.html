@@ -879,10 +879,25 @@
                     option.textContent = category.name
                     this.categorySelect.appendChild(option)
                 })
+
+                // Maintain sync with selected category after rebuilding dropdown
+                if (this.selectedCategoryId === null || this.selectedCategoryId === 'uncategorized') {
+                    this.categorySelect.value = ''
+                } else {
+                    this.categorySelect.value = this.selectedCategoryId
+                }
             }
 
             selectCategory(categoryId) {
                 this.selectedCategoryId = categoryId
+
+                // Auto-select the category in the add todo form
+                if (categoryId === null || categoryId === 'uncategorized') {
+                    this.categorySelect.value = ''
+                } else {
+                    this.categorySelect.value = categoryId
+                }
+
                 this.renderCategories()
                 this.renderTodos()
             }
