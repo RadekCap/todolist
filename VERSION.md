@@ -10,15 +10,31 @@ The application follows [Semantic Versioning](https://semver.org/):
 - **MINOR**: New features added in a backward-compatible manner
 - **PATCH**: Backward-compatible bug fixes
 
-### How to Update Version
+### How Versioning Works
 
-When preparing a new release:
+**Automatic Version Increment (PATCH):**
+- When a PR is merged to `main`, GitHub Actions automatically increments the PATCH version
+- Example: 1.0.0 → 1.0.1 → 1.0.2
+- The workflow updates both `index.html` and `VERSION.md`
+- Changes are committed automatically by `github-actions[bot]`
 
-1. **Bug fixes**: Increment PATCH version (e.g., 1.0.0 → 1.0.1)
-2. **New features**: Increment MINOR version (e.g., 1.0.1 → 1.1.0)
-3. **Breaking changes**: Increment MAJOR version (e.g., 1.1.0 → 2.0.0)
+**Manual Version Update (MINOR/MAJOR):**
+When preparing a feature release or breaking change:
 
-Update the `APP_VERSION` constant in `index.html` (line ~856) and document the change below.
+1. **New features**: Manually update to next MINOR version (e.g., 1.0.5 → 1.1.0)
+2. **Breaking changes**: Manually update to next MAJOR version (e.g., 1.5.0 → 2.0.0)
+
+**IMPORTANT - Handling Manual Version Bumps:**
+- ⚠️ **Do NOT include version bumps in your PR** - The auto-increment workflow will run after merge
+- ✅ **Correct workflow**: Merge PR → Auto-increment runs → Manually update to MINOR/MAJOR in a separate commit
+- ❌ **Incorrect**: Update to 1.1.0 in PR → Merge → Auto-increment to 1.1.1 (skips intended 1.1.0)
+
+To manually update version (AFTER PR merge):
+1. Wait for auto-increment commit to complete
+2. Edit `APP_VERSION` constant in `index.html` (line ~875)
+3. Update "Current Version" at the bottom of this file
+4. Commit with message: `chore: Bump version to X.Y.Z`
+5. Push directly to `main` (no PR needed for version-only changes)
 
 ---
 
@@ -75,14 +91,24 @@ Update the `APP_VERSION` constant in `index.html` (line ~856) and document the c
 
 ---
 
-## Version Update Checklist
+## Version Update Details
 
-When preparing a new release:
+### Automatic Updates (via GitHub Actions)
+- **PATCH versions** are incremented automatically when PRs merge to `main`
+- Workflow file: `.github/workflows/auto-version-bump.yml`
+- Updates: `index.html` (APP_VERSION) and `VERSION.md` (Current Version)
+- No manual intervention required
 
-- [ ] Update `APP_VERSION` constant in `index.html`
-- [ ] Update this `VERSION.md` file with changelog
-- [ ] Create a git tag: `git tag v1.0.0`
-- [ ] Push tag: `git push origin v1.0.0`
+### Manual Release Checklist (MINOR/MAJOR versions)
+
+When preparing a feature or breaking change release:
+
+- [ ] Manually update `APP_VERSION` constant in `index.html`
+- [ ] Update this `VERSION.md` file with changelog entry
+- [ ] Update "Current Version" at bottom of this file
+- [ ] Commit: `chore: Bump version to X.Y.Z`
+- [ ] Create git tag: `git tag vX.Y.Z`
+- [ ] Push tag: `git push origin vX.Y.Z`
 - [ ] Create GitHub release with release notes
 - [ ] Update README.md if needed
 
