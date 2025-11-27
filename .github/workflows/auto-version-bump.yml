@@ -1,14 +1,16 @@
 name: Auto Version Bump
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - main
 
 jobs:
   bump-version:
-    if: github.event.pull_request.merged == true && github.event.pull_request.user.login != 'github-actions[bot]'
+    # Only run if this is a merge commit and not from github-actions bot
+    if: |
+      github.event.head_commit.author.name != 'github-actions[bot]' &&
+      contains(github.event.head_commit.message, 'Merge pull request')
     runs-on: ubuntu-latest
     permissions:
       contents: write
