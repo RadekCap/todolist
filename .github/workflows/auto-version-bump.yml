@@ -46,7 +46,7 @@ jobs:
 
       - name: Update version in index.html
         run: |
-          sed -i "s/const APP_VERSION = '[0-9]\+\.[0-9]\+\.[0-9]\+'/const APP_VERSION = '${{ steps.new_version.outputs.version }}'/" index.html
+          sed -i "s/const APP_VERSION = '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*'/const APP_VERSION = '${{ steps.new_version.outputs.version }}'/" index.html
           if ! grep -q "const APP_VERSION = '${{ steps.new_version.outputs.version }}'" index.html; then
             echo "Error: Failed to update version in index.html"
             exit 1
@@ -56,7 +56,7 @@ jobs:
       - name: Update VERSION.md
         run: |
           TODAY=$(date +%Y-%m-%d)
-          sed -i "s/^**Current Version:** [0-9]\+\.[0-9]\+\.[0-9]\+/**Current Version:** ${{ steps.new_version.outputs.version }}/" VERSION.md
+          sed -i "s/^**Current Version:** [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/**Current Version:** ${{ steps.new_version.outputs.version }}/" VERSION.md
           if ! grep -q "^**Current Version:** ${{ steps.new_version.outputs.version }}" VERSION.md; then
             echo "Error: Failed to update version in VERSION.md"
             exit 1
