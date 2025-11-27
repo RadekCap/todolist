@@ -57,8 +57,8 @@ jobs:
         run: |
           TODAY=$(date +%Y-%m-%d)
           awk -v ver="${{ steps.new_version.outputs.version }}" -v date="$TODAY" '
-            /^\*\*Current Version:\*\*/ { print "**Current Version:** " ver; next }
-            /^\*\*Last Updated:\*\*/ { print "**Last Updated:** " date; next }
+            /^\*\*Current Version:\*\* / { print "**Current Version:** " ver; next }
+            /^\*\*Last Updated:\*\* / { print "**Last Updated:** " date; next }
             { print }
           ' VERSION.md > VERSION.md.tmp && mv VERSION.md.tmp VERSION.md
           if ! grep -q "**Current Version:** ${{ steps.new_version.outputs.version }}" VERSION.md; then
