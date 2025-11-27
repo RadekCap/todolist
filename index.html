@@ -5,6 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TodoList</title>
     <style>
+        /* CSS Variables for Theming */
+        :root {
+            --primary-start: #667eea;
+            --primary-end: #764ba2;
+            --accent-color: #667eea;
+            --accent-hover: #5568d3;
+        }
+
+        /* Purple Theme (Default) */
+        [data-theme="purple"] {
+            --primary-start: #667eea;
+            --primary-end: #764ba2;
+            --accent-color: #667eea;
+            --accent-hover: #5568d3;
+        }
+
+        /* Blue Theme */
+        [data-theme="blue"] {
+            --primary-start: #4facfe;
+            --primary-end: #00f2fe;
+            --accent-color: #4facfe;
+            --accent-hover: #3d8bcc;
+        }
+
+        /* Green Theme */
+        [data-theme="green"] {
+            --primary-start: #43e97b;
+            --primary-end: #38f9d7;
+            --accent-color: #43e97b;
+            --accent-hover: #36ba62;
+        }
+
+        /* Orange Theme */
+        [data-theme="orange"] {
+            --primary-start: #fa709a;
+            --primary-end: #fee140;
+            --accent-color: #fa709a;
+            --accent-hover: #c8597b;
+        }
+
+        /* Dark Theme */
+        [data-theme="dark"] {
+            --primary-start: #2c3e50;
+            --primary-end: #34495e;
+            --accent-color: #3498db;
+            --accent-hover: #2980b9;
+        }
+
+        /* Light Theme */
+        [data-theme="light"] {
+            --primary-start: #a8edea;
+            --primary-end: #fed6e3;
+            --accent-color: #a8edea;
+            --accent-hover: #89c5c3;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +69,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -68,7 +124,7 @@
         }
 
         .auth-tab.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
             color: white;
         }
 
@@ -102,13 +158,13 @@
 
         .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-color);
         }
 
         .auth-btn {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -197,13 +253,46 @@
             margin-bottom: 5px;
         }
 
+        .theme-selector {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .theme-selector label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .theme-selector select {
+            padding: 6px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        .theme-selector select:hover {
+            border-color: #ccc;
+        }
+
+        .theme-selector select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
         .app-footer-links {
             font-size: 11px;
             color: #aaa;
         }
 
         .app-footer-links a {
-            color: #667eea;
+            color: var(--accent-color);
             text-decoration: none;
         }
 
@@ -218,7 +307,7 @@
         }
 
         .app-footer-links a:focus {
-            outline: 2px solid #667eea;
+            outline: 2px solid var(--accent-color);
             outline-offset: 2px;
         }
 
@@ -261,7 +350,7 @@
         }
 
         .category-item.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
             color: white;
             font-weight: 600;
         }
@@ -316,13 +405,13 @@
 
         .add-category-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-color);
         }
 
         .add-category-btn {
             width: 100%;
             padding: 8px;
-            background: #667eea;
+            background: var(--accent-color);
             color: white;
             border: none;
             border-radius: 6px;
@@ -333,7 +422,7 @@
         }
 
         .add-category-btn:hover {
-            background: #5568d3;
+            background: var(--accent-hover);
         }
 
         .add-category-btn:disabled {
@@ -369,7 +458,7 @@
 
         #todoInput:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-color);
         }
 
         #categorySelect {
@@ -384,7 +473,7 @@
 
         #categorySelect:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-color);
         }
 
         #dueDateInput {
@@ -399,12 +488,12 @@
 
         #dueDateInput:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-color);
         }
 
         #addBtn {
             padding: 12px 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -471,7 +560,7 @@
             width: 20px;
             height: 20px;
             cursor: pointer;
-            accent-color: #667eea;
+            accent-color: var(--accent-color);
         }
 
         .todo-text {
@@ -548,7 +637,7 @@
 
         .loading-state {
             text-align: center;
-            color: #667eea;
+            color: var(--accent-color);
             padding: 40px 20px;
             font-size: 16px;
         }
@@ -565,7 +654,7 @@
 
         .add-todo-btn {
             padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -669,7 +758,7 @@
         .modal-form input:focus,
         .modal-form select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent-color);
         }
 
         .modal-actions {
@@ -690,7 +779,7 @@
         }
 
         .modal-btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
             color: white;
         }
 
@@ -822,6 +911,17 @@
                 <div class="app-version" id="appVersion">
                     Version <span id="versionNumber">0.0.0</span>
                 </div>
+                <div class="theme-selector">
+                    <label for="themeSelect">Theme:</label>
+                    <select id="themeSelect" aria-label="Color scheme selector">
+                        <option value="purple">Purple</option>
+                        <option value="blue">Blue</option>
+                        <option value="green">Green</option>
+                        <option value="orange">Orange</option>
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                    </select>
+                </div>
                 <div class="app-footer-links">
                     <a href="https://github.com/RadekCap/todolist" target="_blank" rel="noopener noreferrer">GitHub</a>
                     <a href="https://github.com/RadekCap/todolist/blob/main/VERSION.md" target="_blank" rel="noopener noreferrer">Changelog</a>
@@ -922,10 +1022,12 @@
                 this.totalTodosEl = document.getElementById('totalTodos')
                 this.completedTodosEl = document.getElementById('completedTodos')
                 this.versionNumberEl = document.getElementById('versionNumber')
+                this.themeSelect = document.getElementById('themeSelect')
 
                 this.initAuth()
                 this.initEventListeners()
                 this.setVersion()
+                this.initTheme()
             }
 
             setVersion() {
@@ -997,6 +1099,9 @@
                 this.newCategoryInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addCategory()
                 })
+
+                // Theme selector
+                this.themeSelect.addEventListener('change', () => this.changeTheme())
             }
 
             switchAuthTab(tabName) {
@@ -1080,6 +1185,7 @@
                 this.loadCategories()
                 this.loadPriorities()
                 this.loadTodos()
+                this.loadThemeFromDatabase()
             }
 
             handleSignOut() {
@@ -1552,6 +1658,68 @@
                 }
 
                 return `<span class="${className}">${this.escapeHtml(label)}</span>`
+            }
+
+            initTheme() {
+                // Load theme from localStorage first (instant)
+                const savedTheme = localStorage.getItem('colorTheme') || 'purple'
+                this.applyTheme(savedTheme)
+                this.themeSelect.value = savedTheme
+
+                // If user is logged in, load from database
+                if (this.currentUser) {
+                    this.loadThemeFromDatabase()
+                }
+            }
+
+            async loadThemeFromDatabase() {
+                const { data, error } = await supabase
+                    .from('user_settings')
+                    .select('color_theme')
+                    .eq('user_id', this.currentUser.id)
+                    .single()
+
+                if (data && data.color_theme) {
+                    const dbTheme = data.color_theme
+                    this.applyTheme(dbTheme)
+                    this.themeSelect.value = dbTheme
+                    localStorage.setItem('colorTheme', dbTheme)
+                }
+            }
+
+            async changeTheme() {
+                const selectedTheme = this.themeSelect.value
+                this.applyTheme(selectedTheme)
+
+                // Save to localStorage for instant loading
+                localStorage.setItem('colorTheme', selectedTheme)
+
+                // Save to database if user is logged in
+                if (this.currentUser) {
+                    await this.saveThemeToDatabase(selectedTheme)
+                }
+            }
+
+            async saveThemeToDatabase(theme) {
+                // Try to update existing setting
+                const { error: updateError } = await supabase
+                    .from('user_settings')
+                    .update({ color_theme: theme })
+                    .eq('user_id', this.currentUser.id)
+
+                // If no rows were updated, insert a new one
+                if (updateError || updateError?.code === 'PGRST116') {
+                    await supabase
+                        .from('user_settings')
+                        .insert({
+                            user_id: this.currentUser.id,
+                            color_theme: theme
+                        })
+                }
+            }
+
+            applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme)
             }
         }
 
