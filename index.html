@@ -364,6 +364,30 @@
             border-color: #667eea;
         }
 
+        #prioritySelect {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            background: white;
+            min-width: 150px;
+        }
+
+        #prioritySelect:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .todo-priority-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+
         #addBtn {
             padding: 12px 25px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -616,6 +640,9 @@
                             <select id="categorySelect">
                                 <option value="">No Category</option>
                             </select>
+                            <select id="prioritySelect">
+                                <option value="">No Priority</option>
+                            </select>
                             <input
                                 type="date"
                                 id="dueDateInput"
@@ -650,6 +677,7 @@
                 this.currentUser = null
                 this.todos = []
                 this.categories = []
+                this.priorities = []
                 this.selectedCategoryId = null
 
                 // Get DOM elements
@@ -663,6 +691,7 @@
                 this.logoutBtn = document.getElementById('logoutBtn')
                 this.todoInput = document.getElementById('todoInput')
                 this.categorySelect = document.getElementById('categorySelect')
+                this.prioritySelect = document.getElementById('prioritySelect')
                 this.dueDateInput = document.getElementById('dueDateInput')
                 this.addBtn = document.getElementById('addBtn')
                 this.todoList = document.getElementById('todoList')
@@ -812,6 +841,7 @@
                 this.appContainer.classList.add('active')
                 this.mainContainer.classList.remove('auth-mode')
                 this.loadCategories()
+                this.loadPriorities()
                 this.loadTodos()
             }
 
@@ -819,6 +849,7 @@
                 this.currentUser = null
                 this.todos = []
                 this.categories = []
+                this.priorities = []
                 this.selectedCategoryId = null
                 this.authContainer.classList.add('active')
                 this.appContainer.classList.remove('active')
@@ -842,6 +873,33 @@
                 this.categories = data
                 this.renderCategories()
                 this.updateCategorySelect()
+            }
+
+            async loadPriorities() {
+                const { data, error } = await supabase
+                    .from('priorities')
+                    .select('*')
+                    .order('level', { ascending: true })
+
+                if (error) {
+                    console.error('Error loading priorities:', error)
+                    return
+                }
+
+                this.priorities = data
+                this.updatePrioritySelect()
+            }
+
+            updatePrioritySelect() {
+                // Keep first option (No Priority)
+                this.prioritySelect.innerHTML = '<option value="">No Priority</option>'
+
+                this.priorities.forEach(priority => {
+                    const option = document.createElement('option')
+                    option.value = priority.id
+                    option.textContent = priority.name
+                    this.prioritySelect.appendChild(option)
+                })
             }
 
             async loadTodos() {
@@ -1020,6 +1078,7 @@
                 this.addBtn.textContent = 'Adding...'
 
                 const categoryId = this.categorySelect.value || null
+                const priorityId = this.prioritySelect.value || null
                 const dueDate = this.dueDateInput.value || null
 
                 const { data, error } = await supabase
@@ -1029,6 +1088,7 @@
                         text: text,
                         completed: false,
                         category_id: categoryId,
+                        priority_id: priorityId,
                         due_date: dueDate
                     })
                     .select()
@@ -1044,6 +1104,7 @@
 
                 this.todos.push(data[0])
                 this.todoInput.value = ''
+                this.prioritySelect.value = ''
                 this.dueDateInput.value = ''
                 this.renderTodos()
             }
@@ -1086,17 +1147,34 @@
             }
 
             getFilteredTodos() {
+                let filtered
                 if (this.selectedCategoryId === null) {
-                    return this.todos
+                    filtered = this.todos
                 } else if (this.selectedCategoryId === 'uncategorized') {
-                    return this.todos.filter(t => !t.category_id)
+                    filtered = this.todos.filter(t => !t.category_id)
                 } else {
-                    return this.todos.filter(t => t.category_id === this.selectedCategoryId)
+                    filtered = this.todos.filter(t => t.category_id === this.selectedCategoryId)
                 }
+
+                // Sort by priority level (lower level = higher priority)
+                return filtered.sort((a, b) => {
+                    const priorityA = a.priority_id ? this.getPriorityById(a.priority_id) : null
+                    const priorityB = b.priority_id ? this.getPriorityById(b.priority_id) : null
+
+                    if (!priorityA && !priorityB) return 0
+                    if (!priorityA) return 1
+                    if (!priorityB) return -1
+
+                    return priorityA.level - priorityB.level
+                })
             }
 
             getCategoryById(id) {
                 return this.categories.find(c => c.id === id)
+            }
+
+            getPriorityById(id) {
+                return this.priorities.find(p => p.id === id)
             }
 
             updateStats() {
@@ -1126,6 +1204,11 @@
                             ? `<span class="todo-category-badge" style="background-color: ${this.validateColor(category.color)}">${this.escapeHtml(category.name)}</span>`
                             : ''
 
+                        const priority = todo.priority_id ? (this.getPriorityById(todo.priority_id) ?? null) : null
+                        const priorityBadge = priority
+                            ? `<span class="todo-priority-badge" style="background-color: ${this.validateColor(priority.color)}">${this.escapeHtml(priority.name)}</span>`
+                            : ''
+
                         const dateBadge = todo.due_date ? this.formatDateBadge(todo.due_date) : ''
 
                         if (category) {
@@ -1140,6 +1223,7 @@
                                 data-id="${todo.id}"
                             >
                             <span class="todo-text">${this.escapeHtml(todo.text)}</span>
+                            ${priorityBadge}
                             ${dateBadge}
                             ${categoryBadge}
                             <button class="delete-btn" data-id="${todo.id}">Delete</button>
