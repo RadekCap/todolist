@@ -56,12 +56,12 @@ jobs:
       - name: Update VERSION.md
         run: |
           TODAY=$(date +%Y-%m-%d)
-          sed -i "s/^**Current Version:** [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/**Current Version:** ${{ steps.new_version.outputs.version }}/" VERSION.md
+          sed -i "s/^\*\*Current Version:\*\* [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/**Current Version:** ${{ steps.new_version.outputs.version }}/" VERSION.md
           if ! grep -q "^**Current Version:** ${{ steps.new_version.outputs.version }}" VERSION.md; then
             echo "Error: Failed to update version in VERSION.md"
             exit 1
           fi
-          sed -i "s/^**Last Updated:** .*/**Last Updated:** $TODAY/" VERSION.md
+          sed -i "s/^\*\*Last Updated:\*\* .*/**Last Updated:** $TODAY/" VERSION.md
           echo "Updated VERSION.md"
 
       - name: Commit and push version bump
