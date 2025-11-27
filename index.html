@@ -1679,6 +1679,11 @@
                     .eq('user_id', this.currentUser.id)
                     .single()
 
+                if (error) {
+                    console.error('Error loading theme:', error)
+                    return
+                }
+
                 if (data && data.color_theme) {
                     const dbTheme = data.color_theme
                     this.applyTheme(dbTheme)
@@ -1702,19 +1707,28 @@
 
             async saveThemeToDatabase(theme) {
                 // Try to update existing setting
-                const { error: updateError } = await supabase
+                const { data, error: updateError } = await supabase
                     .from('user_settings')
-                    .update({ color_theme: theme })
+                    .update({ color_theme: theme, updated_at: new Date().toISOString() })
                     .eq('user_id', this.currentUser.id)
+                    .select()
+
+                if (updateError) {
+                    console.error('Error updating user_settings:', updateError)
+                }
 
                 // If no rows were updated, insert a new one
-                if (updateError || updateError?.code === 'PGRST116') {
-                    await supabase
+                if (updateError || !data || data.length === 0) {
+                    const { error: insertError } = await supabase
                         .from('user_settings')
                         .insert({
                             user_id: this.currentUser.id,
-                            color_theme: theme
+                            color_theme: theme,
+                            updated_at: new Date().toISOString()
                         })
+                    if (insertError) {
+                        console.error('Error inserting into user_settings:', insertError)
+                    }
                 }
             }
 
