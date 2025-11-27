@@ -26,7 +26,7 @@
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 900px;
+            max-width: 1100px;
             padding: 30px;
         }
 
@@ -159,9 +159,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #e0e0e0;
         }
 
         .user-email {
@@ -364,30 +364,6 @@
             border-color: #667eea;
         }
 
-        #prioritySelect {
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            background: white;
-            min-width: 150px;
-        }
-
-        #prioritySelect:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .todo-priority-badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            color: white;
-            white-space: nowrap;
-        }
-
         #addBtn {
             padding: 12px 25px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -501,6 +477,15 @@
             color: #856404;
         }
 
+        .todo-priority-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+
         .delete-btn {
             background: #e74c3c;
             color: white;
@@ -538,6 +523,161 @@
             justify-content: space-between;
             color: #666;
             font-size: 14px;
+        }
+
+        .add-todo-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .add-todo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-form label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .modal-form input,
+        .modal-form select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .modal-form input:focus,
+        .modal-form select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal-btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .modal-btn-secondary {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #d0d0d0;
         }
 
         @media (max-width: 768px) {
@@ -605,11 +745,6 @@
 
         <!-- App UI (shown after login) -->
         <div id="appContainer" class="app-container">
-            <div class="user-header">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
-            </div>
-
             <div class="main-content">
                 <!-- Sidebar with categories -->
                 <div class="sidebar">
@@ -629,29 +764,7 @@
 
                 <!-- Main content area -->
                 <div class="content">
-                    <div class="input-container">
-                        <div class="input-row">
-                            <input
-                                type="text"
-                                id="todoInput"
-                                placeholder="What needs to be done?"
-                                autocomplete="off"
-                            >
-                            <select id="categorySelect">
-                                <option value="">No Category</option>
-                            </select>
-                            <select id="prioritySelect" title="Priority (optional)" aria-label="Priority (optional)">
-                                <option value="">No Priority</option>
-                            </select>
-                            <input
-                                type="date"
-                                id="dueDateInput"
-                                title="Due date (optional)"
-                                aria-label="Due date (optional)"
-                            >
-                            <button id="addBtn">Add</button>
-                        </div>
-                    </div>
+                    <button id="openAddTodoModal" class="add-todo-btn">+ Add New Todo</button>
 
                     <ul id="todoList" class="todo-list"></ul>
 
@@ -660,6 +773,56 @@
                         <span id="completedTodos">Completed: 0</span>
                     </div>
                 </div>
+            </div>
+
+            <div class="user-header">
+                <span class="user-email" id="userEmail"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+
+        <!-- Add Todo Modal -->
+        <div id="addTodoModal" class="modal-overlay">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Add New Todo</h2>
+                    <button id="closeModal" class="modal-close" aria-label="Close modal">&times;</button>
+                </div>
+                <form id="addTodoForm" class="modal-form">
+                    <div>
+                        <label for="modalTodoInput">What needs to be done?</label>
+                        <input
+                            type="text"
+                            id="modalTodoInput"
+                            placeholder="Enter todo description..."
+                            autocomplete="off"
+                            required
+                        >
+                    </div>
+                    <div>
+                        <label for="modalCategorySelect">Category (optional)</label>
+                        <select id="modalCategorySelect">
+                            <option value="">No Category</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="modalPrioritySelect">Priority (optional)</label>
+                        <select id="modalPrioritySelect" aria-label="Priority (optional)">
+                            <option value="">No Priority</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="modalDueDateInput">Due Date (optional)</label>
+                        <input
+                            type="date"
+                            id="modalDueDateInput"
+                        >
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelModal" class="modal-btn modal-btn-secondary">Cancel</button>
+                        <button type="submit" id="modalAddBtn" class="modal-btn modal-btn-primary">Add Todo</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -689,11 +852,16 @@
                 this.signupForm = document.getElementById('signupForm')
                 this.userEmail = document.getElementById('userEmail')
                 this.logoutBtn = document.getElementById('logoutBtn')
-                this.todoInput = document.getElementById('todoInput')
-                this.categorySelect = document.getElementById('categorySelect')
-                this.prioritySelect = document.getElementById('prioritySelect')
-                this.dueDateInput = document.getElementById('dueDateInput')
-                this.addBtn = document.getElementById('addBtn')
+                this.openAddTodoModalBtn = document.getElementById('openAddTodoModal')
+                this.addTodoModal = document.getElementById('addTodoModal')
+                this.closeModalBtn = document.getElementById('closeModal')
+                this.cancelModalBtn = document.getElementById('cancelModal')
+                this.addTodoForm = document.getElementById('addTodoForm')
+                this.modalTodoInput = document.getElementById('modalTodoInput')
+                this.modalCategorySelect = document.getElementById('modalCategorySelect')
+                this.modalPrioritySelect = document.getElementById('modalPrioritySelect')
+                this.modalDueDateInput = document.getElementById('modalDueDateInput')
+                this.modalAddBtn = document.getElementById('modalAddBtn')
                 this.todoList = document.getElementById('todoList')
                 this.categoryList = document.getElementById('categoryList')
                 this.newCategoryInput = document.getElementById('newCategoryInput')
@@ -749,10 +917,18 @@
                     await this.handleLogout()
                 })
 
-                // Add todo
-                this.addBtn.addEventListener('click', () => this.addTodo())
-                this.todoInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.addTodo()
+                // Modal controls
+                this.openAddTodoModalBtn.addEventListener('click', () => this.openModal())
+                this.closeModalBtn.addEventListener('click', () => this.closeModal())
+                this.cancelModalBtn.addEventListener('click', () => this.closeModal())
+                this.addTodoModal.addEventListener('click', (e) => {
+                    if (e.target === this.addTodoModal) this.closeModal()
+                })
+
+                // Add todo via modal form
+                this.addTodoForm.addEventListener('submit', (e) => {
+                    e.preventDefault()
+                    this.addTodo()
                 })
 
                 // Add category
@@ -892,13 +1068,13 @@
 
             updatePrioritySelect() {
                 // Keep first option (No Priority)
-                this.prioritySelect.innerHTML = '<option value="">No Priority</option>'
+                this.modalPrioritySelect.innerHTML = '<option value="">No Priority</option>'
 
                 this.priorities.forEach(priority => {
                     const option = document.createElement('option')
                     option.value = priority.id
                     option.textContent = priority.name
-                    this.prioritySelect.appendChild(option)
+                    this.modalPrioritySelect.appendChild(option)
                 })
             }
 
@@ -970,40 +1146,70 @@
             }
 
             updateCategorySelect() {
-                // Keep first option (No Category)
-                this.categorySelect.innerHTML = '<option value="">No Category</option>'
+                // Update modal category select
+                this.modalCategorySelect.innerHTML = '<option value="">No Category</option>'
 
                 this.categories.forEach(category => {
                     const option = document.createElement('option')
                     option.value = category.id
                     option.textContent = category.name
-                    this.categorySelect.appendChild(option)
+                    this.modalCategorySelect.appendChild(option)
                 })
-
-                // Maintain sync with selected category after rebuilding dropdown
-                this.syncCategoryDropdown()
             }
 
             selectCategory(categoryId) {
                 this.selectedCategoryId = categoryId
 
-                // Auto-select the category in the add todo form
-                this.syncCategoryDropdown()
+                // Pre-select category in modal when opening
+                if (categoryId && categoryId !== 'uncategorized') {
+                    this.modalCategorySelect.value = categoryId
+                } else {
+                    this.modalCategorySelect.value = ''
+                }
 
                 this.renderCategories()
                 this.renderTodos()
             }
 
-            syncCategoryDropdown() {
-                // Update dropdown value with Safari-compatible approach
-                const targetValue = (this.selectedCategoryId === null || this.selectedCategoryId === 'uncategorized')
-                    ? ''
-                    : this.selectedCategoryId
+            openModal() {
+                this.addTodoModal.classList.add('active')
+                this.modalTodoInput.value = ''
+                this.modalDueDateInput.value = ''
 
-                // Use setTimeout to ensure DOM update happens after render cycle (Safari fix)
-                setTimeout(() => {
-                    this.categorySelect.value = targetValue
-                }, 0)
+                // Pre-select the current category
+                if (this.selectedCategoryId && this.selectedCategoryId !== 'uncategorized') {
+                    this.modalCategorySelect.value = this.selectedCategoryId
+                } else {
+                    this.modalCategorySelect.value = ''
+                }
+
+                // Handle Escape key to close modal
+                this.handleEscapeKey = (e) => {
+                    if (e.key === 'Escape') this.closeModal()
+                }
+                document.addEventListener('keydown', this.handleEscapeKey)
+
+                // Focus on the input
+                setTimeout(() => this.modalTodoInput.focus(), 100)
+            }
+
+            closeModal() {
+                this.addTodoModal.classList.remove('active')
+
+                // Remove escape key listener
+                if (this.handleEscapeKey) {
+                    document.removeEventListener('keydown', this.handleEscapeKey)
+                }
+
+                this.modalTodoInput.value = ''
+                this.modalCategorySelect.value = ''
+                this.modalPrioritySelect.value = ''
+                this.modalDueDateInput.value = ''
+
+                // Return focus to the trigger button for accessibility
+                if (this.openAddTodoModalBtn && typeof this.openAddTodoModalBtn.focus === 'function') {
+                    this.openAddTodoModalBtn.focus()
+                }
             }
 
             async addCategory() {
@@ -1071,15 +1277,15 @@
             }
 
             async addTodo() {
-                const text = this.todoInput.value.trim()
+                const text = this.modalTodoInput.value.trim()
                 if (!text) return
 
-                this.addBtn.disabled = true
-                this.addBtn.textContent = 'Adding...'
+                this.modalAddBtn.disabled = true
+                this.modalAddBtn.textContent = 'Adding...'
 
-                const categoryId = this.categorySelect.value || null
-                const priorityId = this.prioritySelect.value || null
-                const dueDate = this.dueDateInput.value || null
+                const categoryId = this.modalCategorySelect.value || null
+                const priorityId = this.modalPrioritySelect.value || null
+                const dueDate = this.modalDueDateInput.value || null
 
                 const { data, error } = await supabase
                     .from('todos')
@@ -1093,8 +1299,8 @@
                     })
                     .select()
 
-                this.addBtn.disabled = false
-                this.addBtn.textContent = 'Add'
+                this.modalAddBtn.disabled = false
+                this.modalAddBtn.textContent = 'Add Todo'
 
                 if (error) {
                     console.error('Error adding todo:', error)
@@ -1103,12 +1309,7 @@
                 }
 
                 this.todos.push(data[0])
-                this.todoInput.value = ''
-                // Note: categorySelect is intentionally not reset - it persists via syncCategoryDropdown()
-                // to support batch-adding todos to the same category. Priority and date are reset as
-                // they're typically different for each todo.
-                this.prioritySelect.value = ''
-                this.dueDateInput.value = ''
+                this.closeModal()
                 this.renderTodos()
             }
 
