@@ -220,9 +220,41 @@
             border-top: 2px solid #e0e0e0;
         }
 
-        .user-email {
-            color: #666;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-display {
+            color: #333;
             font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-email {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .settings-btn {
+            padding: 8px 15px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .settings-btn:hover {
+            background: var(--accent-hover);
         }
 
         .logout-btn {
@@ -903,8 +935,14 @@
             </div>
 
             <div class="user-header">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
+                <div class="user-info">
+                    <span class="user-display" id="userDisplay"></span>
+                    <span class="user-email" id="userEmail"></span>
+                </div>
+                <div class="user-actions">
+                    <button id="settingsBtn" class="settings-btn">Settings</button>
+                    <button id="logoutBtn" class="logout-btn">Logout</button>
+                </div>
             </div>
 
             <footer class="app-footer">
@@ -975,6 +1013,35 @@
                 </form>
             </div>
         </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal-overlay">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+                <div class="modal-header">
+                    <h2 id="settingsModalTitle">User Settings</h2>
+                    <button id="closeSettingsModal" class="modal-close" aria-label="Close modal">&times;</button>
+                </div>
+                <form id="settingsForm" class="modal-form">
+                    <div>
+                        <label for="usernameInput">Display Name</label>
+                        <input
+                            type="text"
+                            id="usernameInput"
+                            placeholder="Enter your display name..."
+                            autocomplete="off"
+                            maxlength="50"
+                        >
+                        <small style="color: #999; font-size: 12px; display: block; margin-top: 5px;">
+                            This name will be displayed instead of your email. Leave empty to show email.
+                        </small>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelSettingsModal" class="modal-btn modal-btn-secondary">Cancel</button>
+                        <button type="submit" id="saveSettingsBtn" class="modal-btn modal-btn-primary">Save Settings</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -1003,8 +1070,16 @@
                 this.authMessage = document.getElementById('authMessage')
                 this.loginForm = document.getElementById('loginForm')
                 this.signupForm = document.getElementById('signupForm')
+                this.userDisplay = document.getElementById('userDisplay')
                 this.userEmail = document.getElementById('userEmail')
+                this.settingsBtn = document.getElementById('settingsBtn')
                 this.logoutBtn = document.getElementById('logoutBtn')
+                this.settingsModal = document.getElementById('settingsModal')
+                this.closeSettingsModalBtn = document.getElementById('closeSettingsModal')
+                this.cancelSettingsModalBtn = document.getElementById('cancelSettingsModal')
+                this.settingsForm = document.getElementById('settingsForm')
+                this.usernameInput = document.getElementById('usernameInput')
+                this.saveSettingsBtn = document.getElementById('saveSettingsBtn')
                 this.openAddTodoModalBtn = document.getElementById('openAddTodoModal')
                 this.addTodoModal = document.getElementById('addTodoModal')
                 this.closeModalBtn = document.getElementById('closeModal')
@@ -1078,6 +1153,20 @@
                 // Logout
                 this.logoutBtn.addEventListener('click', async () => {
                     await this.handleLogout()
+                })
+
+                // Settings modal controls
+                this.settingsBtn.addEventListener('click', () => this.openSettingsModal())
+                this.closeSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
+                this.cancelSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
+                this.settingsModal.addEventListener('click', (e) => {
+                    if (e.target === this.settingsModal) this.closeSettingsModal()
+                })
+
+                // Save settings via form
+                this.settingsForm.addEventListener('submit', (e) => {
+                    e.preventDefault()
+                    this.saveSettings()
                 })
 
                 // Modal controls
@@ -1178,7 +1267,7 @@
 
             handleAuthSuccess(user) {
                 this.currentUser = user
-                this.userEmail.textContent = user.email
+                this.userEmail.textContent = `(${user.email})`
                 this.authContainer.classList.remove('active')
                 this.appContainer.classList.add('active')
                 this.mainContainer.classList.remove('auth-mode')
@@ -1186,6 +1275,7 @@
                 this.loadPriorities()
                 this.loadTodos()
                 this.loadThemeFromDatabase()
+                this.loadUserSettings()
             }
 
             handleSignOut() {
@@ -1734,6 +1824,111 @@
 
             applyTheme(theme) {
                 document.documentElement.setAttribute('data-theme', theme)
+            }
+
+            async loadUserSettings() {
+                const { data, error } = await supabase
+                    .from('user_settings')
+                    .select('username')
+                    .eq('user_id', this.currentUser.id)
+                    .single()
+
+                if (error) {
+                    // No settings yet, use email as display
+                    this.userDisplay.textContent = this.currentUser.email
+                    return
+                }
+
+                if (data && data.username) {
+                    this.userDisplay.textContent = data.username
+                } else {
+                    this.userDisplay.textContent = this.currentUser.email
+                }
+            }
+
+            openSettingsModal() {
+                this.settingsModal.classList.add('active')
+
+                // Load current username into input
+                const currentUsername = this.userDisplay.textContent
+                if (currentUsername !== this.currentUser.email) {
+                    this.usernameInput.value = currentUsername
+                } else {
+                    this.usernameInput.value = ''
+                }
+
+                // Handle Escape key to close modal
+                this.handleSettingsEscapeKey = (e) => {
+                    if (e.key === 'Escape') this.closeSettingsModal()
+                }
+                document.addEventListener('keydown', this.handleSettingsEscapeKey)
+
+                // Focus on the input
+                setTimeout(() => this.usernameInput.focus(), 100)
+            }
+
+            closeSettingsModal() {
+                this.settingsModal.classList.remove('active')
+
+                // Remove escape key listener
+                if (this.handleSettingsEscapeKey) {
+                    document.removeEventListener('keydown', this.handleSettingsEscapeKey)
+                }
+
+                this.usernameInput.value = ''
+
+                // Return focus to settings button for accessibility
+                if (this.settingsBtn && typeof this.settingsBtn.focus === 'function') {
+                    this.settingsBtn.focus()
+                }
+            }
+
+            async saveSettings() {
+                const username = this.usernameInput.value.trim()
+
+                this.saveSettingsBtn.disabled = true
+                this.saveSettingsBtn.textContent = 'Saving...'
+
+                // Try to update existing settings
+                const { data, error: updateError } = await supabase
+                    .from('user_settings')
+                    .update({ username: username || null, updated_at: new Date().toISOString() })
+                    .eq('user_id', this.currentUser.id)
+                    .select()
+
+                if (updateError) {
+                    console.error('Error updating user_settings:', updateError)
+                }
+
+                // If no rows were updated, insert a new one
+                if (updateError || !data || data.length === 0) {
+                    const { error: insertError } = await supabase
+                        .from('user_settings')
+                        .insert({
+                            user_id: this.currentUser.id,
+                            username: username || null,
+                            updated_at: new Date().toISOString()
+                        })
+                    if (insertError) {
+                        console.error('Error inserting into user_settings:', insertError)
+                        alert('Failed to save settings')
+                        this.saveSettingsBtn.disabled = false
+                        this.saveSettingsBtn.textContent = 'Save Settings'
+                        return
+                    }
+                }
+
+                this.saveSettingsBtn.disabled = false
+                this.saveSettingsBtn.textContent = 'Save Settings'
+
+                // Update display
+                if (username) {
+                    this.userDisplay.textContent = username
+                } else {
+                    this.userDisplay.textContent = this.currentUser.email
+                }
+
+                this.closeSettingsModal()
             }
         }
 
