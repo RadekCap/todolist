@@ -159,9 +159,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e0e0e0;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #e0e0e0;
         }
 
         .user-email {
@@ -581,11 +581,6 @@
 
         <!-- App UI (shown after login) -->
         <div id="appContainer" class="app-container">
-            <div class="user-header">
-                <span class="user-email" id="userEmail"></span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
-            </div>
-
             <div class="main-content">
                 <!-- Sidebar with categories -->
                 <div class="sidebar">
@@ -633,6 +628,11 @@
                         <span id="completedTodos">Completed: 0</span>
                     </div>
                 </div>
+            </div>
+
+            <div class="user-header">
+                <span class="user-email" id="userEmail"></span>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
             </div>
         </div>
     </div>
