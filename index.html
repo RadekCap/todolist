@@ -184,13 +184,32 @@
             background: #c0392b;
         }
 
-        .app-version {
-            text-align: center;
-            color: #999;
-            font-size: 12px;
+        .app-footer {
             margin-top: 20px;
             padding-top: 15px;
             border-top: 1px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .app-version {
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .app-footer-links {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .app-footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+
+        .app-footer-links a:hover {
+            text-decoration: underline;
         }
 
         .main-content {
@@ -789,9 +808,18 @@
                 <button id="logoutBtn" class="logout-btn">Logout</button>
             </div>
 
-            <div class="app-version" id="appVersion">
-                Version <span id="versionNumber">0.0.0</span>
-            </div>
+            <footer class="app-footer">
+                <div class="app-version" id="appVersion">
+                    Version <span id="versionNumber">0.0.0</span>
+                </div>
+                <div class="app-footer-links">
+                    <a href="https://github.com/RadekCap/todolist" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    •
+                    <a href="https://github.com/RadekCap/todolist/blob/master/VERSION.md" target="_blank" rel="noopener noreferrer">Changelog</a>
+                    •
+                    <a href="https://github.com/RadekCap/todolist/issues" target="_blank" rel="noopener noreferrer">Report Issue</a>
+                </div>
+            </footer>
         </div>
 
         <!-- Add Todo Modal -->
