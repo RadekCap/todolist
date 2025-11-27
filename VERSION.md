@@ -12,7 +12,7 @@ The application follows [Semantic Versioning](https://semver.org/):
 
 ### How to Update Version
 
-When merging a pull request to master:
+When preparing a new release:
 
 1. **Bug fixes**: Increment PATCH version (e.g., 1.0.0 → 1.0.1)
 2. **New features**: Increment MINOR version (e.g., 1.0.1 → 1.1.0)
