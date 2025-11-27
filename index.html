@@ -640,7 +640,7 @@
                             <select id="categorySelect">
                                 <option value="">No Category</option>
                             </select>
-                            <select id="prioritySelect">
+                            <select id="prioritySelect" title="Priority (optional)" aria-label="Priority (optional)">
                                 <option value="">No Priority</option>
                             </select>
                             <input
@@ -1104,6 +1104,9 @@
 
                 this.todos.push(data[0])
                 this.todoInput.value = ''
+                // Note: categorySelect is intentionally not reset - it persists via syncCategoryDropdown()
+                // to support batch-adding todos to the same category. Priority and date are reset as
+                // they're typically different for each todo.
                 this.prioritySelect.value = ''
                 this.dueDateInput.value = ''
                 this.renderTodos()
@@ -1157,7 +1160,8 @@
                 }
 
                 // Sort by priority level (lower level = higher priority)
-                return filtered.sort((a, b) => {
+                // Use slice() to avoid mutating the original array
+                return filtered.slice().sort((a, b) => {
                     const priorityA = a.priority_id ? this.getPriorityById(a.priority_id) : null
                     const priorityB = b.priority_id ? this.getPriorityById(b.priority_id) : null
 
