@@ -192,8 +192,8 @@ element.textContent = userInput  // Safe - no HTML parsing
 ## Deployment
 
 **GitHub Pages:**
-- Deployed from `master` branch, root directory
-- Auto-deploys on push to master (configured in repo settings)
+- Deployed from `main` branch, root directory
+- Auto-deploys on push to main (configured in repo settings)
 - Deployment time: ~30-60 seconds after merge
 
 **No build step required** - it's a static HTML file
