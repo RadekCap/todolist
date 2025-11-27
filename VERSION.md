@@ -24,10 +24,17 @@ When preparing a feature release or breaking change:
 1. **New features**: Manually update to next MINOR version (e.g., 1.0.5 → 1.1.0)
 2. **Breaking changes**: Manually update to next MAJOR version (e.g., 1.5.0 → 2.0.0)
 
-To manually update version:
-- Edit `APP_VERSION` constant in `index.html` (line ~875)
-- Update "Current Version" at the bottom of this file
-- Commit with message: `chore: Bump version to X.Y.Z`
+**IMPORTANT - Handling Manual Version Bumps:**
+- ⚠️ **Do NOT include version bumps in your PR** - The auto-increment workflow will run after merge
+- ✅ **Correct workflow**: Merge PR → Auto-increment runs → Manually update to MINOR/MAJOR in a separate commit
+- ❌ **Incorrect**: Update to 1.1.0 in PR → Merge → Auto-increment to 1.1.1 (skips intended 1.1.0)
+
+To manually update version (AFTER PR merge):
+1. Wait for auto-increment commit to complete
+2. Edit `APP_VERSION` constant in `index.html` (line ~875)
+3. Update "Current Version" at the bottom of this file
+4. Commit with message: `chore: Bump version to X.Y.Z`
+5. Push directly to `main` (no PR needed for version-only changes)
 
 ---
 
