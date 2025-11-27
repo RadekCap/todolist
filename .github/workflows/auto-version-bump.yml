@@ -61,11 +61,7 @@ jobs:
             /^\*\*Last Updated:\*\* / { print "**Last Updated:** " date; next }
             { print }
           ' VERSION.md > VERSION.md.tmp && mv VERSION.md.tmp VERSION.md
-          echo "DEBUG: Checking file contents:"
-          tail -3 VERSION.md
-          echo "DEBUG: Grepping for version:"
-          grep "Current Version" VERSION.md || true
-          if ! grep -q "**Current Version:** ${{ steps.new_version.outputs.version }}" VERSION.md; then
+          if ! grep -F "**Current Version:** ${{ steps.new_version.outputs.version }}" VERSION.md; then
             echo "Error: Failed to update version in VERSION.md"
             exit 1
           fi
