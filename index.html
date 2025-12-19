@@ -1042,13 +1042,42 @@
                 </form>
             </div>
         </div>
+
+        <!-- Unlock Modal (for session restore) -->
+        <div id="unlockModal" class="modal-overlay">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="unlockModalTitle">
+                <div class="modal-header">
+                    <h2 id="unlockModalTitle">Unlock Your Data</h2>
+                </div>
+                <form id="unlockForm" class="modal-form">
+                    <div>
+                        <p style="color: #666; margin-bottom: 15px;">
+                            Enter your password to decrypt your data. Your password is used locally to unlock your encrypted todos and categories.
+                        </p>
+                        <label for="unlockPassword">Password</label>
+                        <input
+                            type="password"
+                            id="unlockPassword"
+                            placeholder="Enter your password..."
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+                    <div id="unlockError" class="error-message" style="display: none;"></div>
+                    <div class="modal-actions">
+                        <button type="button" id="unlockLogoutBtn" class="modal-btn modal-btn-secondary">Logout</button>
+                        <button type="submit" id="unlockBtn" class="modal-btn modal-btn-primary">Unlock</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
         // Application version - Update when preparing a new release
-        const APP_VERSION = '1.0.9'
+        const APP_VERSION = '1.0.10'
 
         // Initialize Supabase
         const supabaseUrl = 'https://rkvmujdayjmszmyzbhal.supabase.co'
@@ -1191,6 +1220,12 @@
                 this.completedTodosEl = document.getElementById('completedTodos')
                 this.versionNumberEl = document.getElementById('versionNumber')
                 this.themeSelect = document.getElementById('themeSelect')
+                this.unlockModal = document.getElementById('unlockModal')
+                this.unlockForm = document.getElementById('unlockForm')
+                this.unlockPassword = document.getElementById('unlockPassword')
+                this.unlockError = document.getElementById('unlockError')
+                this.unlockBtn = document.getElementById('unlockBtn')
+                this.unlockLogoutBtn = document.getElementById('unlockLogoutBtn')
 
                 this.initAuth()
                 this.initEventListeners()
@@ -1209,14 +1244,14 @@
                 const { data: { session } } = await supabase.auth.getSession()
 
                 if (session) {
-                    this.handleAuthSuccess(session.user)
+                    // Show unlock modal to get password for encryption key
+                    this.pendingUser = session.user
+                    this.showUnlockModal()
                 }
 
-                // Listen for auth changes
+                // Listen for auth changes (only for sign out, sign in handled by login form)
                 supabase.auth.onAuthStateChange((event, session) => {
-                    if (event === 'SIGNED_IN' && session) {
-                        this.handleAuthSuccess(session.user)
-                    } else if (event === 'SIGNED_OUT') {
+                    if (event === 'SIGNED_OUT') {
                         this.handleSignOut()
                     }
                 })
@@ -1281,6 +1316,13 @@
                 this.newCategoryInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addCategory()
                 })
+
+                // Unlock modal
+                this.unlockForm.addEventListener('submit', (e) => {
+                    e.preventDefault()
+                    this.handleUnlock()
+                })
+                this.unlockLogoutBtn.addEventListener('click', () => this.handleLogout())
 
                 // Theme selector
                 this.themeSelect.addEventListener('change', () => this.changeTheme())
@@ -1385,6 +1427,65 @@
                 this.loginForm.reset()
                 this.signupForm.reset()
                 this.authMessage.innerHTML = ''
+                this.closeUnlockModal()
+            }
+
+            showUnlockModal() {
+                this.unlockModal.classList.add('active')
+                this.unlockError.style.display = 'none'
+                this.unlockPassword.value = ''
+                setTimeout(() => this.unlockPassword.focus(), 100)
+            }
+
+            closeUnlockModal() {
+                this.unlockModal.classList.remove('active')
+                this.unlockPassword.value = ''
+                this.unlockError.style.display = 'none'
+                this.pendingUser = null
+            }
+
+            async handleUnlock() {
+                const password = this.unlockPassword.value
+
+                if (!password) {
+                    this.unlockError.textContent = 'Please enter your password'
+                    this.unlockError.style.display = 'block'
+                    return
+                }
+
+                this.unlockBtn.disabled = true
+                this.unlockBtn.textContent = 'Unlocking...'
+                this.unlockError.style.display = 'none'
+
+                try {
+                    // Verify password by attempting to sign in
+                    const { error } = await supabase.auth.signInWithPassword({
+                        email: this.pendingUser.email,
+                        password: password
+                    })
+
+                    if (error) {
+                        this.unlockError.textContent = 'Incorrect password'
+                        this.unlockError.style.display = 'block'
+                        this.unlockBtn.disabled = false
+                        this.unlockBtn.textContent = 'Unlock'
+                        return
+                    }
+
+                    // Initialize encryption with the verified password
+                    await this.initializeEncryption(this.pendingUser, password)
+
+                    // Close modal and proceed to app
+                    this.closeUnlockModal()
+                    this.handleAuthSuccess(this.pendingUser)
+                } catch (e) {
+                    console.error('Unlock error:', e)
+                    this.unlockError.textContent = 'Failed to unlock. Please try again.'
+                    this.unlockError.style.display = 'block'
+                } finally {
+                    this.unlockBtn.disabled = false
+                    this.unlockBtn.textContent = 'Unlock'
+                }
             }
 
             // Initialize encryption key from password
