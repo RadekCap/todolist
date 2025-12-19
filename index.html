@@ -1035,6 +1035,16 @@
                             This name will be displayed instead of your email. Leave empty to show email.
                         </small>
                     </div>
+                    <div style="border-top: 1px solid #e0e0e0; padding-top: 15px; margin-top: 15px;">
+                        <label>Data Encryption</label>
+                        <p style="color: #666; font-size: 13px; margin: 5px 0 10px 0;">
+                            Encrypt any existing unencrypted todos and categories. This is a one-time operation.
+                        </p>
+                        <button type="button" id="migrateDataBtn" class="modal-btn modal-btn-primary" style="width: 100%;">
+                            Encrypt Existing Data
+                        </button>
+                        <div id="migrateStatus" style="margin-top: 10px; font-size: 13px; display: none;"></div>
+                    </div>
                     <div class="modal-actions">
                         <button type="button" id="cancelSettingsModal" class="modal-btn modal-btn-secondary">Cancel</button>
                         <button type="submit" id="saveSettingsBtn" class="modal-btn modal-btn-primary">Save Settings</button>
@@ -1202,6 +1212,8 @@
                 this.settingsForm = document.getElementById('settingsForm')
                 this.usernameInput = document.getElementById('usernameInput')
                 this.saveSettingsBtn = document.getElementById('saveSettingsBtn')
+                this.migrateDataBtn = document.getElementById('migrateDataBtn')
+                this.migrateStatus = document.getElementById('migrateStatus')
                 this.openAddTodoModalBtn = document.getElementById('openAddTodoModal')
                 this.addTodoModal = document.getElementById('addTodoModal')
                 this.closeModalBtn = document.getElementById('closeModal')
@@ -1296,6 +1308,9 @@
                     e.preventDefault()
                     this.saveSettings()
                 })
+
+                // Migrate existing data
+                this.migrateDataBtn.addEventListener('click', () => this.migrateExistingData())
 
                 // Modal controls
                 this.openAddTodoModalBtn.addEventListener('click', () => this.openModal())
@@ -2199,6 +2214,125 @@
                 }
 
                 this.closeSettingsModal()
+            }
+
+            // Check if a string looks like encrypted data (base64 with IV prefix)
+            isEncrypted(text) {
+                if (!text || text.length < 24) return false
+                // Encrypted data is base64 with at least 12 bytes IV + some ciphertext
+                // Base64 of 24+ bytes = 32+ characters
+                const base64Regex = /^[A-Za-z0-9+/]+=*$/
+                return base64Regex.test(text) && text.length >= 32
+            }
+
+            async migrateExistingData() {
+                if (!this.encryptionKey) {
+                    this.migrateStatus.textContent = 'Error: Encryption key not available. Please log out and log in again.'
+                    this.migrateStatus.style.color = '#c33'
+                    this.migrateStatus.style.display = 'block'
+                    return
+                }
+
+                this.migrateDataBtn.disabled = true
+                this.migrateDataBtn.textContent = 'Encrypting...'
+                this.migrateStatus.style.display = 'none'
+
+                let todosEncrypted = 0
+                let categoriesEncrypted = 0
+                let errors = 0
+
+                try {
+                    // Load todos directly from database (not using cached decrypted data)
+                    const { data: todos, error: todosError } = await supabase
+                        .from('todos')
+                        .select('id, text')
+
+                    if (todosError) {
+                        throw new Error('Failed to load todos: ' + todosError.message)
+                    }
+
+                    // Encrypt unencrypted todos
+                    for (const todo of todos) {
+                        if (!this.isEncrypted(todo.text)) {
+                            try {
+                                const encryptedText = await CryptoUtils.encrypt(todo.text, this.encryptionKey)
+                                const { error } = await supabase
+                                    .from('todos')
+                                    .update({ text: encryptedText })
+                                    .eq('id', todo.id)
+
+                                if (error) {
+                                    console.error('Error encrypting todo:', error)
+                                    errors++
+                                } else {
+                                    todosEncrypted++
+                                }
+                            } catch (e) {
+                                console.error('Encryption error for todo:', e)
+                                errors++
+                            }
+                        }
+                    }
+
+                    // Load categories directly from database
+                    const { data: categories, error: categoriesError } = await supabase
+                        .from('categories')
+                        .select('id, name')
+
+                    if (categoriesError) {
+                        throw new Error('Failed to load categories: ' + categoriesError.message)
+                    }
+
+                    // Encrypt unencrypted categories
+                    for (const category of categories) {
+                        if (!this.isEncrypted(category.name)) {
+                            try {
+                                const encryptedName = await CryptoUtils.encrypt(category.name, this.encryptionKey)
+                                const { error } = await supabase
+                                    .from('categories')
+                                    .update({ name: encryptedName })
+                                    .eq('id', category.id)
+
+                                if (error) {
+                                    console.error('Error encrypting category:', error)
+                                    errors++
+                                } else {
+                                    categoriesEncrypted++
+                                }
+                            } catch (e) {
+                                console.error('Encryption error for category:', e)
+                                errors++
+                            }
+                        }
+                    }
+
+                    // Reload data to show encrypted versions
+                    await this.loadCategories()
+                    await this.loadTodos()
+
+                    // Show result
+                    if (todosEncrypted === 0 && categoriesEncrypted === 0) {
+                        this.migrateStatus.textContent = 'All data is already encrypted!'
+                        this.migrateStatus.style.color = '#3c3'
+                    } else {
+                        let message = `Encrypted ${todosEncrypted} todo(s) and ${categoriesEncrypted} category(ies).`
+                        if (errors > 0) {
+                            message += ` ${errors} error(s) occurred.`
+                            this.migrateStatus.style.color = '#f90'
+                        } else {
+                            this.migrateStatus.style.color = '#3c3'
+                        }
+                        this.migrateStatus.textContent = message
+                    }
+                } catch (e) {
+                    console.error('Migration error:', e)
+                    this.migrateStatus.textContent = 'Error: ' + e.message
+                    this.migrateStatus.style.color = '#c33'
+                } finally {
+                    this.migrateDataBtn.disabled = false
+                    this.migrateDataBtn.textContent = 'Encrypt Existing Data'
+                    this.migrateStatus.style.display = 'block'
+                }
             }
         }
 
