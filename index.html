@@ -1055,9 +1055,102 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
         const supabase = createClient(supabaseUrl, supabaseKey)
 
+        // Encryption utilities using Web Crypto API
+        const CryptoUtils = {
+            // Derive an encryption key from password and salt using PBKDF2
+            async deriveKey(password, salt) {
+                const encoder = new TextEncoder()
+                const passwordBuffer = encoder.encode(password)
+
+                // Import password as a key
+                const baseKey = await crypto.subtle.importKey(
+                    'raw',
+                    passwordBuffer,
+                    'PBKDF2',
+                    false,
+                    ['deriveKey']
+                )
+
+                // Derive AES-GCM key using PBKDF2
+                return await crypto.subtle.deriveKey(
+                    {
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: 100000,
+                        hash: 'SHA-256'
+                    },
+                    baseKey,
+                    { name: 'AES-GCM', length: 256 },
+                    false,
+                    ['encrypt', 'decrypt']
+                )
+            },
+
+            // Generate a random salt for key derivation
+            generateSalt() {
+                return crypto.getRandomValues(new Uint8Array(16))
+            },
+
+            // Convert Uint8Array to base64 string
+            arrayToBase64(array) {
+                return btoa(String.fromCharCode(...array))
+            },
+
+            // Convert base64 string to Uint8Array
+            base64ToArray(base64) {
+                const binary = atob(base64)
+                const bytes = new Uint8Array(binary.length)
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i)
+                }
+                return bytes
+            },
+
+            // Encrypt plaintext using AES-GCM
+            async encrypt(plaintext, key) {
+                const encoder = new TextEncoder()
+                const data = encoder.encode(plaintext)
+
+                // Generate random IV for each encryption
+                const iv = crypto.getRandomValues(new Uint8Array(12))
+
+                const ciphertext = await crypto.subtle.encrypt(
+                    { name: 'AES-GCM', iv: iv },
+                    key,
+                    data
+                )
+
+                // Combine IV + ciphertext and encode as base64
+                const combined = new Uint8Array(iv.length + ciphertext.byteLength)
+                combined.set(iv)
+                combined.set(new Uint8Array(ciphertext), iv.length)
+
+                return this.arrayToBase64(combined)
+            },
+
+            // Decrypt ciphertext using AES-GCM
+            async decrypt(encryptedBase64, key) {
+                const combined = this.base64ToArray(encryptedBase64)
+
+                // Extract IV (first 12 bytes) and ciphertext
+                const iv = combined.slice(0, 12)
+                const ciphertext = combined.slice(12)
+
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: iv },
+                    key,
+                    ciphertext
+                )
+
+                const decoder = new TextDecoder()
+                return decoder.decode(decrypted)
+            }
+        }
+
         class TodoApp {
             constructor() {
                 this.currentUser = null
+                this.encryptionKey = null
                 this.todos = []
                 this.categories = []
                 this.priorities = []
@@ -1227,6 +1320,7 @@
                 if (error) {
                     this.showMessage(error.message, 'error')
                 } else {
+                    await this.initializeEncryption(data.user, password)
                     this.handleAuthSuccess(data.user)
                 }
             }
@@ -1280,6 +1374,7 @@
 
             handleSignOut() {
                 this.currentUser = null
+                this.encryptionKey = null
                 this.todos = []
                 this.categories = []
                 this.priorities = []
@@ -1290,6 +1385,62 @@
                 this.loginForm.reset()
                 this.signupForm.reset()
                 this.authMessage.innerHTML = ''
+            }
+
+            // Initialize encryption key from password
+            async initializeEncryption(user, password) {
+                // Try to load existing salt from user_settings
+                const { data: settings } = await supabase
+                    .from('user_settings')
+                    .select('encryption_salt')
+                    .eq('user_id', user.id)
+                    .single()
+
+                let salt
+                if (settings && settings.encryption_salt) {
+                    // Use existing salt
+                    salt = CryptoUtils.base64ToArray(settings.encryption_salt)
+                } else {
+                    // Generate new salt for new users
+                    salt = CryptoUtils.generateSalt()
+                    const saltBase64 = CryptoUtils.arrayToBase64(salt)
+
+                    // Save salt to user_settings
+                    const { error: updateError } = await supabase
+                        .from('user_settings')
+                        .upsert({
+                            user_id: user.id,
+                            encryption_salt: saltBase64,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'user_id' })
+
+                    if (updateError) {
+                        console.error('Error saving encryption salt:', updateError)
+                    }
+                }
+
+                // Derive encryption key from password and salt
+                this.encryptionKey = await CryptoUtils.deriveKey(password, salt)
+            }
+
+            // Encrypt text if encryption is enabled
+            async encrypt(plaintext) {
+                if (!this.encryptionKey) return plaintext
+                return await CryptoUtils.encrypt(plaintext, this.encryptionKey)
+            }
+
+            // Decrypt text if encryption is enabled
+            async decrypt(ciphertext) {
+                if (!this.encryptionKey) return ciphertext
+                // Check if this looks like encrypted data (base64 with minimum length for IV + data)
+                if (!ciphertext || ciphertext.length < 20) return ciphertext
+                try {
+                    return await CryptoUtils.decrypt(ciphertext, this.encryptionKey)
+                } catch (e) {
+                    // If decryption fails, return original (might be unencrypted legacy data)
+                    console.warn('Decryption failed, returning original text:', e)
+                    return ciphertext
+                }
             }
 
             async loadCategories() {
@@ -1303,7 +1454,11 @@
                     return
                 }
 
-                this.categories = data
+                // Decrypt category names
+                this.categories = await Promise.all(data.map(async (category) => ({
+                    ...category,
+                    name: await this.decrypt(category.name)
+                })))
                 this.renderCategories()
                 this.updateCategorySelect()
             }
@@ -1349,7 +1504,11 @@
                     return
                 }
 
-                this.todos = data
+                // Decrypt todo texts
+                this.todos = await Promise.all(data.map(async (todo) => ({
+                    ...todo,
+                    text: await this.decrypt(todo.text)
+                })))
                 this.renderTodos()
             }
 
@@ -1480,11 +1639,14 @@
                 const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#feca57', '#ee5a6f', '#c471ed']
                 const color = colors[Math.floor(Math.random() * colors.length)]
 
+                // Encrypt category name before storing
+                const encryptedName = await this.encrypt(name)
+
                 const { data, error } = await supabase
                     .from('categories')
                     .insert({
                         user_id: this.currentUser.id,
-                        name: name,
+                        name: encryptedName,
                         color: color
                     })
                     .select()
@@ -1502,7 +1664,9 @@
                     return
                 }
 
-                this.categories.push(data[0])
+                // Store decrypted name in local state for rendering
+                const categoryWithDecryptedName = { ...data[0], name: name }
+                this.categories.push(categoryWithDecryptedName)
                 this.newCategoryInput.value = ''
                 this.renderCategories()
                 this.updateCategorySelect()
@@ -1544,11 +1708,14 @@
                 const priorityId = this.modalPrioritySelect.value || null
                 const dueDate = this.modalDueDateInput.value || null
 
+                // Encrypt todo text before storing
+                const encryptedText = await this.encrypt(text)
+
                 const { data, error } = await supabase
                     .from('todos')
                     .insert({
                         user_id: this.currentUser.id,
-                        text: text,
+                        text: encryptedText,
                         completed: false,
                         category_id: categoryId,
                         priority_id: priorityId,
@@ -1565,7 +1732,9 @@
                     return
                 }
 
-                this.todos.push(data[0])
+                // Store decrypted text in local state for rendering
+                const todoWithDecryptedText = { ...data[0], text: text }
+                this.todos.push(todoWithDecryptedText)
                 this.closeModal()
                 this.renderTodos()
             }
