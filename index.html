@@ -1085,6 +1085,16 @@
                         <p style="color: #666; margin-bottom: 15px;">
                             Enter your password to decrypt your data. Your password is used locally to unlock your encrypted todos and categories.
                         </p>
+                        <label for="unlockEmail">Email</label>
+                        <input
+                            type="email"
+                            id="unlockEmail"
+                            autocomplete="email"
+                            readonly
+                            style="background-color: #f5f5f5; color: #666;"
+                        >
+                    </div>
+                    <div>
                         <label for="unlockPassword">Password</label>
                         <input
                             type="password"
@@ -1256,6 +1266,7 @@
                 this.unlockModal = document.getElementById('unlockModal')
                 this.unlockForm = document.getElementById('unlockForm')
                 this.unlockPassword = document.getElementById('unlockPassword')
+                this.unlockEmail = document.getElementById('unlockEmail')
                 this.unlockError = document.getElementById('unlockError')
                 this.unlockBtn = document.getElementById('unlockBtn')
                 this.unlockLogoutBtn = document.getElementById('unlockLogoutBtn')
@@ -1469,6 +1480,7 @@
             showUnlockModal() {
                 this.unlockModal.classList.add('active')
                 this.unlockError.style.display = 'none'
+                this.unlockEmail.value = this.pendingUser?.email || ''
                 this.unlockPassword.value = ''
                 setTimeout(() => this.unlockPassword.focus(), 100)
             }
