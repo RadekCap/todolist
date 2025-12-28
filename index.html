@@ -272,6 +272,21 @@
             background: #c0392b;
         }
 
+        .lock-btn {
+            padding: 8px 12px;
+            background: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .lock-btn:hover {
+            background: #d68910;
+        }
+
         .app-footer {
             margin-top: 20px;
             padding-top: 15px;
@@ -961,6 +976,7 @@
                     <span class="user-email" id="userEmail"></span>
                 </div>
                 <div class="user-actions">
+                    <button id="lockBtn" class="lock-btn" aria-label="Lock application">🔒</button>
                     <button id="settingsBtn" class="settings-btn">Settings</button>
                     <button id="logoutBtn" class="logout-btn">Logout</button>
                 </div>
@@ -1236,6 +1252,7 @@
                 this.userDisplay = document.getElementById('userDisplay')
                 this.userEmail = document.getElementById('userEmail')
                 this.settingsBtn = document.getElementById('settingsBtn')
+                this.lockBtn = document.getElementById('lockBtn')
                 this.logoutBtn = document.getElementById('logoutBtn')
                 this.settingsModal = document.getElementById('settingsModal')
                 this.closeSettingsModalBtn = document.getElementById('closeSettingsModal')
@@ -1321,6 +1338,9 @@
                     e.preventDefault()
                     await this.handleSignup()
                 })
+
+                // Lock
+                this.lockBtn.addEventListener('click', () => this.lockApp())
 
                 // Logout
                 this.logoutBtn.addEventListener('click', async () => {
@@ -1475,6 +1495,26 @@
                 this.signupForm.reset()
                 this.authMessage.innerHTML = ''
                 this.closeUnlockModal()
+            }
+
+            lockApp() {
+                // Store current user for unlock verification
+                this.pendingUser = this.currentUser
+
+                // Clear sensitive data from memory
+                this.encryptionKey = null
+                this.todos = []
+                this.categories = []
+                this.priorities = []
+
+                // Clear the UI
+                this.todoList.innerHTML = ''
+                this.categoryList.innerHTML = ''
+
+                // Hide app and show unlock modal
+                this.appContainer.classList.remove('active')
+                this.mainContainer.classList.add('auth-mode')
+                this.showUnlockModal()
             }
 
             showUnlockModal() {
