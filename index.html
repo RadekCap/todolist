@@ -115,6 +115,16 @@
             box-sizing: border-box;
         }
 
+        /* Loading state - prevents flash of wrong content */
+        .container.loading {
+            opacity: 0;
+        }
+
+        .container.loaded {
+            opacity: 1;
+            transition: opacity 0.3s ease-in-out;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
@@ -1418,11 +1428,11 @@
     </style>
 </head>
 <body>
-    <div class="container auth-mode" id="mainContainer">
+    <div class="container auth-mode loading" id="mainContainer">
         <h1>📝 TodoList</h1>
 
         <!-- Authentication UI -->
-        <div id="authContainer" class="auth-container active">
+        <div id="authContainer" class="auth-container">
             <div class="auth-tabs">
                 <button class="auth-tab active" data-tab="login">Login</button>
                 <button class="auth-tab" data-tab="signup">Sign Up</button>
@@ -1846,7 +1856,14 @@
                         this.pendingUser = session.user
                         this.showUnlockModal()
                     }
+                } else {
+                    // No session, show auth container
+                    this.authContainer.classList.add('active')
                 }
+
+                // Remove loading state and show content with transition
+                this.mainContainer.classList.remove('loading')
+                this.mainContainer.classList.add('loaded')
 
                 // Listen for auth changes (only for sign out, sign in handled by login form)
                 supabase.auth.onAuthStateChange((event, session) => {
