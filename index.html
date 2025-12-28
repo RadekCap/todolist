@@ -760,6 +760,21 @@
             white-space: nowrap;
         }
 
+        .edit-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .edit-btn:hover {
+            background: var(--accent-hover);
+        }
+
         .delete-btn {
             background: #e74c3c;
             color: white;
@@ -1455,6 +1470,19 @@
             width: 22px;
             height: 22px;
             accent-color: var(--ios-blue);
+        }
+
+        [data-theme="glass"] .edit-btn {
+            background: var(--ios-blue);
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            padding: 6px 12px;
+            font-weight: 500;
+        }
+
+        [data-theme="glass"] .edit-btn:hover {
+            background: var(--ios-blue-hover);
         }
 
         [data-theme="glass"] .delete-btn {
@@ -2182,6 +2210,7 @@
                 this.selectedCategoryId = null
                 this.selectedContextId = null
                 this.selectedGtdStatus = 'all'
+                this.editingTodoId = null
 
                 // Get DOM elements
                 this.loadingScreen = document.getElementById('loadingScreen')
@@ -2216,6 +2245,7 @@
                 this.modalContextSelect = document.getElementById('modalContextSelect')
                 this.modalDueDateInput = document.getElementById('modalDueDateInput')
                 this.modalAddBtn = document.getElementById('modalAddBtn')
+                this.modalTitle = document.getElementById('modalTitle')
                 this.todoList = document.getElementById('todoList')
                 this.categoryList = document.getElementById('categoryList')
                 this.newCategoryInput = document.getElementById('newCategoryInput')
@@ -2343,10 +2373,14 @@
                     if (e.target === this.addTodoModal) this.closeModal()
                 })
 
-                // Add todo via modal form
+                // Add/Edit todo via modal form
                 this.addTodoForm.addEventListener('submit', (e) => {
                     e.preventDefault()
-                    this.addTodo()
+                    if (this.editingTodoId) {
+                        this.updateTodo()
+                    } else {
+                        this.addTodo()
+                    }
                 })
 
                 // Add category
@@ -2951,9 +2985,15 @@
             }
 
             openModal() {
+                this.editingTodoId = null
+                this.modalTitle.textContent = 'Add New Todo'
+                this.modalAddBtn.textContent = 'Add Todo'
                 this.addTodoModal.classList.add('active')
                 this.modalTodoInput.value = ''
                 this.modalDueDateInput.value = ''
+                this.modalPrioritySelect.value = ''
+                this.modalGtdStatusSelect.value = 'inbox'
+                this.modalContextSelect.value = ''
 
                 // Pre-select the current category
                 if (this.selectedCategoryId && this.selectedCategoryId !== 'uncategorized') {
@@ -2972,8 +3012,36 @@
                 setTimeout(() => this.modalTodoInput.focus(), 100)
             }
 
+            openEditModal(todoId) {
+                const todo = this.todos.find(t => t.id === todoId)
+                if (!todo) return
+
+                this.editingTodoId = todoId
+                this.modalTitle.textContent = 'Edit Todo'
+                this.modalAddBtn.textContent = 'Save Changes'
+                this.addTodoModal.classList.add('active')
+
+                // Pre-populate fields with existing todo data
+                this.modalTodoInput.value = todo.text
+                this.modalCategorySelect.value = todo.category_id || ''
+                this.modalPrioritySelect.value = todo.priority_id || ''
+                this.modalGtdStatusSelect.value = todo.gtd_status || 'inbox'
+                this.modalContextSelect.value = todo.context_id || ''
+                this.modalDueDateInput.value = todo.due_date || ''
+
+                // Handle Escape key to close modal
+                this.handleEscapeKey = (e) => {
+                    if (e.key === 'Escape') this.closeModal()
+                }
+                document.addEventListener('keydown', this.handleEscapeKey)
+
+                // Focus on the input
+                setTimeout(() => this.modalTodoInput.focus(), 100)
+            }
+
             closeModal() {
                 this.addTodoModal.classList.remove('active')
+                this.editingTodoId = null
 
                 // Remove escape key listener
                 if (this.handleEscapeKey) {
@@ -2986,6 +3054,10 @@
                 this.modalGtdStatusSelect.value = 'inbox'
                 this.modalContextSelect.value = ''
                 this.modalDueDateInput.value = ''
+
+                // Reset modal to add mode
+                this.modalTitle.textContent = 'Add New Todo'
+                this.modalAddBtn.textContent = 'Add Todo'
 
                 // Return focus to the trigger button for accessibility
                 if (this.openAddTodoModalBtn && typeof this.openAddTodoModalBtn.focus === 'function') {
@@ -3104,6 +3176,61 @@
                 // Store decrypted text in local state for rendering
                 const todoWithDecryptedText = { ...data[0], text: text }
                 this.todos.push(todoWithDecryptedText)
+                this.closeModal()
+                this.renderTodos()
+            }
+
+            async updateTodo() {
+                const text = this.modalTodoInput.value.trim()
+                if (!text || !this.editingTodoId) return
+
+                this.modalAddBtn.disabled = true
+                this.modalAddBtn.textContent = 'Saving...'
+
+                const categoryId = this.modalCategorySelect.value || null
+                const priorityId = this.modalPrioritySelect.value || null
+                const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
+                const contextId = this.modalContextSelect.value || null
+                const dueDate = this.modalDueDateInput.value || null
+
+                // Encrypt todo text before storing
+                const encryptedText = await this.encrypt(text)
+
+                const { error } = await supabase
+                    .from('todos')
+                    .update({
+                        text: encryptedText,
+                        category_id: categoryId,
+                        priority_id: priorityId,
+                        gtd_status: gtdStatus,
+                        context_id: contextId,
+                        due_date: dueDate
+                    })
+                    .eq('id', this.editingTodoId)
+
+                this.modalAddBtn.disabled = false
+                this.modalAddBtn.textContent = 'Save Changes'
+
+                if (error) {
+                    console.error('Error updating todo:', error)
+                    alert('Failed to update todo')
+                    return
+                }
+
+                // Update local state
+                const todoIndex = this.todos.findIndex(t => t.id === this.editingTodoId)
+                if (todoIndex !== -1) {
+                    this.todos[todoIndex] = {
+                        ...this.todos[todoIndex],
+                        text: text,
+                        category_id: categoryId,
+                        priority_id: priorityId,
+                        gtd_status: gtdStatus,
+                        context_id: contextId,
+                        due_date: dueDate
+                    }
+                }
+
                 this.closeModal()
                 this.renderTodos()
             }
@@ -3260,11 +3387,15 @@
                             ${contextBadge}
                             ${dateBadge}
                             ${categoryBadge}
+                            <button class="edit-btn" data-id="${todo.id}">Edit</button>
                             <button class="delete-btn" data-id="${todo.id}">Delete</button>
                         `
 
                         const checkbox = li.querySelector('.todo-checkbox')
                         checkbox.addEventListener('change', () => this.toggleTodo(todo.id))
+
+                        const editBtn = li.querySelector('.edit-btn')
+                        editBtn.addEventListener('click', () => this.openEditModal(todo.id))
 
                         const deleteBtn = li.querySelector('.delete-btn')
                         deleteBtn.addEventListener('click', () => this.deleteTodo(todo.id))
