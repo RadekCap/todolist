@@ -115,14 +115,56 @@
             box-sizing: border-box;
         }
 
-        /* Loading state - prevents flash of wrong content */
-        .container.loading {
+        /* Loading screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .loading-screen.hidden {
             opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top-color: #333;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 16px;
+            font-size: 15px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Container states */
+        .container.loading {
+            visibility: hidden;
         }
 
         .container.loaded {
-            opacity: 1;
-            transition: opacity 0.3s ease-in-out;
+            visibility: visible;
         }
 
         body {
@@ -1428,6 +1470,12 @@
     </style>
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
+    </div>
+
     <div class="container auth-mode loading" id="mainContainer">
         <h1>📝 TodoList</h1>
 
@@ -1775,6 +1823,7 @@
                 this.selectedCategoryId = null
 
                 // Get DOM elements
+                this.loadingScreen = document.getElementById('loadingScreen')
                 this.mainContainer = document.getElementById('mainContainer')
                 this.authContainer = document.getElementById('authContainer')
                 this.appContainer = document.getElementById('appContainer')
@@ -1843,27 +1892,27 @@
                         // Auto-unlock using stored password
                         try {
                             await this.initializeEncryption(session.user, storedPassword)
-                            this.handleAuthSuccess(session.user)
+                            await this.handleAuthSuccess(session.user)
+                            // handleAuthSuccess calls hideLoadingScreen after data loads
                         } catch (e) {
                             // If auto-unlock fails, clear stored password and show modal
                             console.error('Auto-unlock failed:', e)
                             sessionStorage.removeItem('_ep')
                             this.pendingUser = session.user
                             this.showUnlockModal()
+                            this.hideLoadingScreen()
                         }
                     } else {
                         // No stored password, show unlock modal
                         this.pendingUser = session.user
                         this.showUnlockModal()
+                        this.hideLoadingScreen()
                     }
                 } else {
                     // No session, show auth container
                     this.authContainer.classList.add('active')
+                    this.hideLoadingScreen()
                 }
-
-                // Remove loading state and show content with transition
-                this.mainContainer.classList.remove('loading')
-                this.mainContainer.classList.add('loaded')
 
                 // Listen for auth changes (only for sign out, sign in handled by login form)
                 supabase.auth.onAuthStateChange((event, session) => {
@@ -1987,7 +2036,11 @@
                     await this.initializeEncryption(data.user, password)
                     // Store password in sessionStorage for page reload persistence
                     sessionStorage.setItem('_ep', password)
-                    this.handleAuthSuccess(data.user)
+
+                    // Show loading screen while data loads
+                    this.loadingScreen.classList.remove('hidden')
+
+                    await this.handleAuthSuccess(data.user)
                 }
             }
 
@@ -2025,17 +2078,32 @@
                 await supabase.auth.signOut()
             }
 
-            handleAuthSuccess(user) {
+            async handleAuthSuccess(user) {
                 this.currentUser = user
                 this.userEmail.textContent = `(${user.email})`
                 this.authContainer.classList.remove('active')
                 this.appContainer.classList.add('active')
                 this.mainContainer.classList.remove('auth-mode')
-                this.loadCategories()
-                this.loadPriorities()
-                this.loadTodos()
+
+                // Load data and wait for essential items
+                await Promise.all([
+                    this.loadCategories(),
+                    this.loadPriorities(),
+                    this.loadTodos()
+                ])
+
+                // Load non-essential items without waiting
                 this.loadThemeFromDatabase()
                 this.loadUserSettings()
+
+                // Hide loading screen after data is ready
+                this.hideLoadingScreen()
+            }
+
+            hideLoadingScreen() {
+                this.loadingScreen.classList.add('hidden')
+                this.mainContainer.classList.remove('loading')
+                this.mainContainer.classList.add('loaded')
             }
 
             handleSignOut() {
@@ -2130,7 +2198,11 @@
 
                     // Close modal and proceed to app
                     this.closeUnlockModal()
-                    this.handleAuthSuccess(user)
+
+                    // Show loading screen while data loads
+                    this.loadingScreen.classList.remove('hidden')
+
+                    await this.handleAuthSuccess(user)
                 } catch (e) {
                     console.error('Unlock error:', e)
                     this.unlockError.textContent = 'Failed to unlock. Please try again.'
