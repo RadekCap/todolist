@@ -63,18 +63,50 @@
 
         /* Glass Theme - iOS 26 Style */
         [data-theme="glass"] {
-            --primary-start: #a8edea;
-            --primary-end: #fed6e3;
-            --primary-mid: #d299c2;
-            --accent-color: rgba(255, 255, 255, 0.9);
-            --accent-hover: rgba(255, 255, 255, 1);
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-bg-hover: rgba(255, 255, 255, 0.8);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            --glass-blur: 20px;
-            --text-primary: #1a1a2e;
-            --text-secondary: #4a4a6a;
+            /* iOS System Background Colors */
+            --ios-bg-primary: #f2f2f7;
+            --ios-bg-secondary: #ffffff;
+            --ios-bg-tertiary: #f2f2f7;
+            --ios-bg-grouped: #f2f2f7;
+
+            /* iOS System Colors */
+            --ios-blue: #007aff;
+            --ios-blue-hover: #0056b3;
+            --ios-gray: #8e8e93;
+            --ios-gray2: #aeaeb2;
+            --ios-gray3: #c7c7cc;
+            --ios-gray4: #d1d1d6;
+            --ios-gray5: #e5e5ea;
+            --ios-gray6: #f2f2f7;
+            --ios-red: #ff3b30;
+            --ios-orange: #ff9500;
+
+            /* iOS Label Colors */
+            --ios-label: #000000;
+            --ios-label-secondary: #3c3c43;
+            --ios-label-tertiary: #3c3c4399;
+            --ios-label-quaternary: #3c3c434d;
+
+            /* iOS Material - Thick */
+            --ios-material-thick: rgba(255, 255, 255, 0.92);
+            --ios-material-regular: rgba(255, 255, 255, 0.85);
+            --ios-material-thin: rgba(255, 255, 255, 0.75);
+            --ios-material-ultrathin: rgba(255, 255, 255, 0.55);
+
+            /* iOS Blur */
+            --ios-blur-thick: 50px;
+            --ios-blur-regular: 40px;
+            --ios-blur-thin: 30px;
+
+            /* iOS Separator */
+            --ios-separator: rgba(60, 60, 67, 0.12);
+            --ios-separator-opaque: #c6c6c8;
+
+            /* Theme mapping */
+            --primary-start: #e8eaed;
+            --primary-end: #f5f5f7;
+            --accent-color: var(--ios-blue);
+            --accent-hover: var(--ios-blue-hover);
         }
 
         * {
@@ -910,376 +942,478 @@
         }
 
         /* ========================================
-           Glass Theme Specific Styles
+           Glass Theme - iOS 26 Authentic Design
            ======================================== */
 
-        /* Glass theme body - vibrant mesh gradient */
+        /* iOS Background - Subtle light gradient */
         [data-theme="glass"] body {
-            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-mid) 50%, var(--primary-end) 100%);
+            background: var(--ios-bg-grouped);
+            background-image: linear-gradient(180deg, #ffffff 0%, var(--ios-gray6) 100%);
             background-attachment: fixed;
         }
 
-        /* Glass container */
+        /* iOS Container - Thick material */
         [data-theme="glass"] .container {
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur));
-            -webkit-backdrop-filter: blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-            border-radius: 24px;
+            background: var(--ios-material-thick);
+            backdrop-filter: blur(var(--ios-blur-thick));
+            -webkit-backdrop-filter: blur(var(--ios-blur-thick));
+            border: none;
+            box-shadow: 0 0 0 0.5px var(--ios-separator-opaque),
+                        0 2px 10px rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
         }
 
-        /* Glass h1 */
+        /* iOS Typography */
         [data-theme="glass"] h1 {
-            color: var(--text-primary);
-            font-weight: 600;
+            color: var(--ios-label);
+            font-weight: 700;
+            font-size: 28px;
+            letter-spacing: -0.5px;
         }
 
-        /* Glass auth tabs */
+        [data-theme="glass"] h2 {
+            color: var(--ios-label-secondary);
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* iOS Segmented Control (Auth tabs) */
+        [data-theme="glass"] .auth-tabs {
+            background: var(--ios-gray5);
+            border-radius: 9px;
+            padding: 2px;
+        }
+
         [data-theme="glass"] .auth-tab {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            border-radius: 7px;
+            color: var(--ios-label);
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.2s ease;
         }
 
         [data-theme="glass"] .auth-tab:hover {
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(0, 0, 0, 0.03);
         }
 
         [data-theme="glass"] .auth-tab.active {
-            background: rgba(255, 255, 255, 0.85);
-            color: var(--text-primary);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background: var(--ios-bg-secondary);
+            color: var(--ios-label);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                        0 0 0 0.5px var(--ios-separator);
         }
 
-        /* Glass form inputs */
+        /* iOS Form Inputs */
         [data-theme="glass"] .form-group input,
         [data-theme="glass"] .form-group select,
         [data-theme="glass"] .modal-form input,
         [data-theme="glass"] .modal-form select {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
+            background: var(--ios-bg-secondary);
+            border: none;
+            border-radius: 10px;
+            color: var(--ios-label);
+            font-size: 17px;
+            padding: 11px 16px;
+            box-shadow: inset 0 0 0 0.5px var(--ios-separator);
+            transition: box-shadow 0.2s ease;
         }
 
         [data-theme="glass"] .form-group input:focus,
         [data-theme="glass"] .form-group select:focus,
         [data-theme="glass"] .modal-form input:focus,
         [data-theme="glass"] .modal-form select:focus {
-            background: rgba(255, 255, 255, 0.85);
-            border-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            background: var(--ios-bg-secondary);
+            box-shadow: inset 0 0 0 0.5px var(--ios-separator),
+                        0 0 0 4px rgba(0, 122, 255, 0.15);
+            outline: none;
+        }
+
+        [data-theme="glass"] .form-group input::placeholder,
+        [data-theme="glass"] .modal-form input::placeholder {
+            color: var(--ios-label-tertiary);
         }
 
         [data-theme="glass"] .form-group label,
         [data-theme="glass"] .modal-form label {
-            color: var(--text-primary);
+            color: var(--ios-label);
+            font-weight: 400;
+            font-size: 15px;
         }
 
-        /* Glass buttons */
+        /* iOS Buttons - Filled style */
         [data-theme="glass"] .auth-btn,
         [data-theme="glass"] .modal-btn-primary,
         [data-theme="glass"] .add-todo-btn {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: var(--text-primary);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
+            background: var(--ios-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            font-size: 17px;
+            padding: 14px 20px;
+            box-shadow: none;
+            transition: all 0.15s ease;
         }
 
         [data-theme="glass"] .auth-btn:hover,
         [data-theme="glass"] .modal-btn-primary:hover,
         [data-theme="glass"] .add-todo-btn:hover {
-            background: rgba(255, 255, 255, 1);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            background: var(--ios-blue-hover);
+            transform: none;
+            box-shadow: none;
+        }
+
+        [data-theme="glass"] .auth-btn:active,
+        [data-theme="glass"] .modal-btn-primary:active,
+        [data-theme="glass"] .add-todo-btn:active {
+            transform: scale(0.98);
         }
 
         [data-theme="glass"] .modal-btn-secondary {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: var(--text-secondary);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
+            background: var(--ios-gray5);
+            color: var(--ios-label);
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 17px;
         }
 
         [data-theme="glass"] .modal-btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.6);
+            background: var(--ios-gray4);
         }
 
-        /* Glass sidebar */
+        /* iOS Sidebar */
+        [data-theme="glass"] .sidebar {
+            background: transparent;
+        }
+
         [data-theme="glass"] .sidebar h2 {
-            color: var(--text-primary);
+            color: var(--ios-label-secondary);
+            padding-left: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* iOS Grouped List (Categories) */
+        [data-theme="glass"] .category-list {
+            background: var(--ios-bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 0 0.5px var(--ios-separator);
         }
 
         [data-theme="glass"] .category-item {
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid transparent;
-            border-radius: 12px;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            color: var(--ios-label);
+            padding: 12px 16px;
+            margin-bottom: 0;
+            transition: background 0.15s ease;
+            border-bottom: 0.5px solid var(--ios-separator);
+        }
+
+        [data-theme="glass"] .category-item:last-child {
+            border-bottom: none;
         }
 
         [data-theme="glass"] .category-item:hover {
-            background: rgba(255, 255, 255, 0.5);
-            border-color: var(--glass-border);
+            background: var(--ios-gray6);
         }
 
         [data-theme="glass"] .category-item.active {
-            background: rgba(255, 255, 255, 0.75);
-            border-color: var(--glass-border);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            color: var(--text-primary);
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--ios-blue);
+            box-shadow: none;
+        }
+
+        [data-theme="glass"] .category-item.active .category-name {
+            font-weight: 600;
+        }
+
+        [data-theme="glass"] .add-category-form {
+            border-top: none;
+            padding-top: 20px;
         }
 
         [data-theme="glass"] .add-category-input {
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            background: var(--ios-bg-secondary);
+            border: none;
             border-radius: 10px;
-            color: var(--text-primary);
+            color: var(--ios-label);
+            font-size: 15px;
+            box-shadow: inset 0 0 0 0.5px var(--ios-separator);
         }
 
         [data-theme="glass"] .add-category-input:focus {
-            background: rgba(255, 255, 255, 0.75);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            background: var(--ios-bg-secondary);
+            box-shadow: inset 0 0 0 0.5px var(--ios-separator),
+                        0 0 0 4px rgba(0, 122, 255, 0.15);
         }
 
         [data-theme="glass"] .add-category-btn {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: var(--text-primary);
-            border: 1px solid var(--glass-border);
+            background: var(--ios-blue);
+            color: #ffffff;
+            border: none;
             border-radius: 10px;
-            transition: all 0.3s ease;
+            font-weight: 600;
+            transition: background 0.15s ease;
         }
 
         [data-theme="glass"] .add-category-btn:hover {
-            background: rgba(255, 255, 255, 0.9);
+            background: var(--ios-blue-hover);
         }
 
-        /* Glass todo items */
+        /* iOS Todo Items - Grouped list style */
+        [data-theme="glass"] .todo-list {
+            background: var(--ios-bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 0 0.5px var(--ios-separator);
+        }
+
         [data-theme="glass"] .todo-item {
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 14px;
-            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            border-left: none;
+            border-radius: 0;
+            margin-bottom: 0;
+            padding: 14px 16px;
+            border-bottom: 0.5px solid var(--ios-separator);
+            transition: background 0.15s ease;
+        }
+
+        [data-theme="glass"] .todo-item:last-child {
+            border-bottom: none;
         }
 
         [data-theme="glass"] .todo-item:hover {
-            background: rgba(255, 255, 255, 0.65);
-            transform: translateX(5px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background: var(--ios-gray6);
+            transform: none;
+            box-shadow: none;
         }
 
         [data-theme="glass"] .todo-item.completed {
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         [data-theme="glass"] .todo-text {
-            color: var(--text-primary);
+            color: var(--ios-label);
+            font-size: 17px;
         }
 
         [data-theme="glass"] .todo-item.completed .todo-text {
-            color: var(--text-secondary);
+            color: var(--ios-label-tertiary);
+        }
+
+        [data-theme="glass"] .todo-checkbox {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--ios-blue);
         }
 
         [data-theme="glass"] .delete-btn {
-            background: rgba(231, 76, 60, 0.8);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border-radius: 8px;
+            background: var(--ios-red);
             border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            padding: 6px 12px;
+            font-weight: 500;
         }
 
         [data-theme="glass"] .delete-btn:hover {
-            background: rgba(192, 57, 43, 0.9);
+            background: #e62e24;
         }
 
-        /* Glass badges */
+        /* iOS Badges */
         [data-theme="glass"] .todo-category-badge,
         [data-theme="glass"] .todo-priority-badge {
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border-radius: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 3px 8px;
         }
 
         [data-theme="glass"] .todo-date {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            color: var(--text-secondary);
-            border-radius: 10px;
+            background: var(--ios-gray5);
+            color: var(--ios-label-secondary);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 3px 8px;
         }
 
-        /* Glass stats */
+        [data-theme="glass"] .todo-date.overdue {
+            background: rgba(255, 59, 48, 0.15);
+            color: var(--ios-red);
+        }
+
+        [data-theme="glass"] .todo-date.today {
+            background: rgba(255, 149, 0, 0.15);
+            color: var(--ios-orange);
+        }
+
+        /* iOS Stats */
         [data-theme="glass"] .stats {
-            color: var(--text-secondary);
-            border-top-color: var(--glass-border);
+            color: var(--ios-label-secondary);
+            border-top-color: var(--ios-separator);
+            font-size: 13px;
         }
 
-        /* Glass user header */
+        /* iOS User Header */
         [data-theme="glass"] .user-header {
-            border-top-color: var(--glass-border);
+            border-top-color: var(--ios-separator);
         }
 
         [data-theme="glass"] .user-display {
-            color: var(--text-primary);
+            color: var(--ios-label);
+            font-weight: 600;
         }
 
         [data-theme="glass"] .user-email {
-            color: var(--text-secondary);
+            color: var(--ios-label-tertiary);
         }
 
         [data-theme="glass"] .settings-btn {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: var(--text-primary);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            transition: all 0.3s ease;
+            background: var(--ios-gray5);
+            color: var(--ios-label);
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.15s ease;
         }
 
         [data-theme="glass"] .settings-btn:hover {
-            background: rgba(255, 255, 255, 0.85);
+            background: var(--ios-gray4);
         }
 
         [data-theme="glass"] .lock-btn {
-            background: rgba(243, 156, 18, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(243, 156, 18, 0.3);
-            border-radius: 10px;
-            transition: all 0.3s ease;
+            background: var(--ios-orange);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            transition: background 0.15s ease;
         }
 
         [data-theme="glass"] .lock-btn:hover {
-            background: rgba(243, 156, 18, 0.9);
+            background: #e68600;
         }
 
         [data-theme="glass"] .logout-btn {
-            background: rgba(231, 76, 60, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(231, 76, 60, 0.3);
-            border-radius: 10px;
-            transition: all 0.3s ease;
+            background: var(--ios-red);
+            border: none;
+            border-radius: 8px;
+            transition: background 0.15s ease;
         }
 
         [data-theme="glass"] .logout-btn:hover {
-            background: rgba(231, 76, 60, 0.9);
+            background: #e62e24;
         }
 
-        /* Glass footer */
+        /* iOS Footer */
         [data-theme="glass"] .app-footer {
-            border-top-color: var(--glass-border);
+            border-top-color: var(--ios-separator);
         }
 
         [data-theme="glass"] .app-version {
-            color: var(--text-secondary);
+            color: var(--ios-label-tertiary);
         }
 
         [data-theme="glass"] .theme-selector label {
-            color: var(--text-secondary);
+            color: var(--ios-label-secondary);
         }
 
         [data-theme="glass"] .theme-selector select {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            color: var(--text-primary);
+            background: var(--ios-bg-secondary);
+            border: none;
+            border-radius: 8px;
+            color: var(--ios-label);
+            box-shadow: 0 0 0 0.5px var(--ios-separator);
+            padding: 8px 12px;
         }
 
         [data-theme="glass"] .app-footer-links a {
-            color: var(--text-secondary);
+            color: var(--ios-blue);
         }
 
         [data-theme="glass"] .app-footer-links a:hover {
-            color: var(--text-primary);
+            color: var(--ios-blue-hover);
         }
 
-        /* Glass modal overlay */
+        /* iOS Modal Overlay */
         [data-theme="glass"] .modal-overlay {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(var(--ios-blur-thin));
+            -webkit-backdrop-filter: blur(var(--ios-blur-thin));
         }
 
-        /* Glass modal */
+        /* iOS Modal - Sheet style */
         [data-theme="glass"] .modal {
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-            border-radius: 24px;
+            background: var(--ios-bg-grouped);
+            backdrop-filter: blur(var(--ios-blur-thick));
+            -webkit-backdrop-filter: blur(var(--ios-blur-thick));
+            border: none;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+            border-radius: 14px;
+        }
+
+        [data-theme="glass"] .modal-header {
+            border-bottom: 0.5px solid var(--ios-separator);
+            padding-bottom: 15px;
         }
 
         [data-theme="glass"] .modal-header h2 {
-            color: var(--text-primary);
+            color: var(--ios-label);
+            font-size: 17px;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0;
         }
 
         [data-theme="glass"] .modal-close {
-            color: var(--text-secondary);
+            color: var(--ios-gray);
+            background: var(--ios-gray5);
+            width: 30px;
+            height: 30px;
+            border-radius: 15px;
+            font-size: 20px;
         }
 
         [data-theme="glass"] .modal-close:hover {
-            background: rgba(255, 255, 255, 0.5);
-            color: var(--text-primary);
+            background: var(--ios-gray4);
+            color: var(--ios-label);
         }
 
-        /* Glass checkbox */
-        [data-theme="glass"] .todo-checkbox {
-            accent-color: var(--text-primary);
-        }
-
-        /* Glass empty state */
+        /* iOS Empty State */
         [data-theme="glass"] .empty-state {
-            color: var(--text-secondary);
+            color: var(--ios-label-tertiary);
+            font-size: 15px;
         }
 
-        /* Glass error/success messages */
+        /* iOS Messages */
         [data-theme="glass"] .error-message {
-            background: rgba(255, 200, 200, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 100, 100, 0.3);
+            background: rgba(255, 59, 48, 0.12);
+            color: var(--ios-red);
+            border: none;
             border-radius: 10px;
+            font-size: 14px;
         }
 
         [data-theme="glass"] .success-message {
-            background: rgba(200, 255, 200, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(100, 255, 100, 0.3);
+            background: rgba(52, 199, 89, 0.12);
+            color: #34c759;
+            border: none;
             border-radius: 10px;
+            font-size: 14px;
         }
 
-        /* Glass add-category-form border */
-        [data-theme="glass"] .add-category-form {
-            border-top-color: var(--glass-border);
+        /* iOS Category Colors */
+        [data-theme="glass"] .category-color {
+            width: 10px;
+            height: 10px;
         }
     </style>
 </head>
