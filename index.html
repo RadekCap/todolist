@@ -994,6 +994,196 @@
         }
 
         /* ========================================
+           GTD Tabs and Context Styles
+           ======================================== */
+
+        .gtd-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            padding: 4px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .gtd-tab {
+            flex: 1;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .gtd-tab:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        .gtd-tab.active {
+            background: white;
+            color: #333;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Contexts section in sidebar */
+        .contexts-header {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .context-list {
+            list-style: none;
+        }
+
+        .context-item {
+            padding: 10px 12px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .context-item:hover {
+            background: #f8f9fa;
+        }
+
+        .context-item.active {
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .context-name {
+            flex: 1;
+        }
+
+        .context-delete {
+            opacity: 0;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 2px 5px;
+            font-size: 16px;
+            transition: opacity 0.2s;
+        }
+
+        .context-item:hover .context-delete {
+            opacity: 0.7;
+        }
+
+        .context-delete:hover {
+            opacity: 1 !important;
+        }
+
+        .add-context-form {
+            margin-top: 15px;
+        }
+
+        .add-context-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .add-context-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .add-context-btn {
+            width: 100%;
+            padding: 8px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .add-context-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .add-context-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* GTD Status Badge Colors */
+        .todo-gtd-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .todo-gtd-badge.inbox {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .todo-gtd-badge.next_action {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .todo-gtd-badge.waiting_for {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .todo-gtd-badge.someday_maybe {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        /* Context Badge */
+        .todo-context-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #eceff1;
+            color: #546e7a;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .gtd-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .gtd-tab {
+                flex: 0 0 auto;
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* ========================================
            Glass Theme - iOS 26 Authentic Design
            ======================================== */
 
@@ -1467,6 +1657,137 @@
             width: 10px;
             height: 10px;
         }
+
+        /* ========================================
+           Glass Theme - GTD Elements
+           ======================================== */
+
+        /* iOS Segmented Control style for GTD tabs */
+        [data-theme="glass"] .gtd-tabs {
+            background: var(--ios-gray5);
+            border-radius: 9px;
+            padding: 2px;
+        }
+
+        [data-theme="glass"] .gtd-tab {
+            background: transparent;
+            color: var(--ios-label);
+            font-weight: 500;
+            font-size: 13px;
+            border-radius: 7px;
+            transition: all 0.2s ease;
+        }
+
+        [data-theme="glass"] .gtd-tab:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        [data-theme="glass"] .gtd-tab.active {
+            background: var(--ios-bg-secondary);
+            color: var(--ios-label);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                        0 0 0 0.5px var(--ios-separator);
+        }
+
+        /* iOS Contexts Section */
+        [data-theme="glass"] .contexts-header {
+            color: var(--ios-label-secondary);
+            border-top-color: var(--ios-separator);
+        }
+
+        [data-theme="glass"] .context-list {
+            background: var(--ios-bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 0 0.5px var(--ios-separator);
+        }
+
+        [data-theme="glass"] .context-item {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            color: var(--ios-label);
+            padding: 12px 16px;
+            margin-bottom: 0;
+            border-bottom: 0.5px solid var(--ios-separator);
+        }
+
+        [data-theme="glass"] .context-item:last-child {
+            border-bottom: none;
+        }
+
+        [data-theme="glass"] .context-item:hover {
+            background: var(--ios-gray6);
+        }
+
+        [data-theme="glass"] .context-item.active {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--ios-blue);
+        }
+
+        [data-theme="glass"] .add-context-input {
+            background: var(--ios-bg-secondary);
+            border: none;
+            border-radius: 10px;
+            color: var(--ios-label);
+            font-size: 15px;
+            box-shadow: inset 0 0 0 0.5px var(--ios-separator);
+        }
+
+        [data-theme="glass"] .add-context-input:focus {
+            box-shadow: inset 0 0 0 0.5px var(--ios-separator),
+                        0 0 0 4px rgba(0, 122, 255, 0.15);
+        }
+
+        [data-theme="glass"] .add-context-btn {
+            background: var(--ios-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        [data-theme="glass"] .add-context-btn:hover {
+            background: var(--ios-blue-hover);
+        }
+
+        /* iOS GTD Badges */
+        [data-theme="glass"] .todo-gtd-badge {
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 3px 8px;
+        }
+
+        [data-theme="glass"] .todo-gtd-badge.inbox {
+            background: rgba(0, 122, 255, 0.15);
+            color: var(--ios-blue);
+        }
+
+        [data-theme="glass"] .todo-gtd-badge.next_action {
+            background: rgba(52, 199, 89, 0.15);
+            color: #34c759;
+        }
+
+        [data-theme="glass"] .todo-gtd-badge.waiting_for {
+            background: rgba(255, 149, 0, 0.15);
+            color: var(--ios-orange);
+        }
+
+        [data-theme="glass"] .todo-gtd-badge.someday_maybe {
+            background: rgba(175, 82, 222, 0.15);
+            color: #af52de;
+        }
+
+        /* iOS Context Badge */
+        [data-theme="glass"] .todo-context-badge {
+            background: var(--ios-gray5);
+            color: var(--ios-label-secondary);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 3px 8px;
+        }
     </style>
 </head>
 <body>
@@ -1536,11 +1857,33 @@
                         >
                         <button id="addCategoryBtn" class="add-category-btn">Add Category</button>
                     </div>
+
+                    <h2 class="contexts-header">Contexts</h2>
+                    <ul id="contextList" class="context-list"></ul>
+                    <div class="add-context-form">
+                        <input
+                            type="text"
+                            id="newContextInput"
+                            class="add-context-input"
+                            placeholder="@context..."
+                            autocomplete="off"
+                        >
+                        <button id="addContextBtn" class="add-context-btn">Add Context</button>
+                    </div>
                 </div>
 
                 <!-- Main content area -->
                 <div class="content">
                     <button id="openAddTodoModal" class="add-todo-btn">+ Add New Todo</button>
+
+                    <!-- GTD Status Tabs -->
+                    <div class="gtd-tabs" id="gtdTabs" role="tablist" aria-label="GTD Status Filter">
+                        <button class="gtd-tab active" data-status="all" role="tab" aria-selected="true">All</button>
+                        <button class="gtd-tab" data-status="inbox" role="tab" aria-selected="false">Inbox</button>
+                        <button class="gtd-tab" data-status="next_action" role="tab" aria-selected="false">Next</button>
+                        <button class="gtd-tab" data-status="waiting_for" role="tab" aria-selected="false">Waiting</button>
+                        <button class="gtd-tab" data-status="someday_maybe" role="tab" aria-selected="false">Someday</button>
+                    </div>
 
                     <ul id="todoList" class="todo-list"></ul>
 
@@ -1616,6 +1959,21 @@
                         <label for="modalPrioritySelect">Priority (optional)</label>
                         <select id="modalPrioritySelect" aria-label="Priority (optional)">
                             <option value="">No Priority</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="modalGtdStatusSelect">GTD Status</label>
+                        <select id="modalGtdStatusSelect" aria-label="GTD Status">
+                            <option value="inbox">Inbox</option>
+                            <option value="next_action">Next Action</option>
+                            <option value="waiting_for">Waiting For</option>
+                            <option value="someday_maybe">Someday/Maybe</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="modalContextSelect">Context (optional)</label>
+                        <select id="modalContextSelect" aria-label="Context (optional)">
+                            <option value="">No Context</option>
                         </select>
                     </div>
                     <div>
@@ -1820,7 +2178,10 @@
                 this.todos = []
                 this.categories = []
                 this.priorities = []
+                this.contexts = []
                 this.selectedCategoryId = null
+                this.selectedContextId = null
+                this.selectedGtdStatus = 'all'
 
                 // Get DOM elements
                 this.loadingScreen = document.getElementById('loadingScreen')
@@ -1851,12 +2212,18 @@
                 this.modalTodoInput = document.getElementById('modalTodoInput')
                 this.modalCategorySelect = document.getElementById('modalCategorySelect')
                 this.modalPrioritySelect = document.getElementById('modalPrioritySelect')
+                this.modalGtdStatusSelect = document.getElementById('modalGtdStatusSelect')
+                this.modalContextSelect = document.getElementById('modalContextSelect')
                 this.modalDueDateInput = document.getElementById('modalDueDateInput')
                 this.modalAddBtn = document.getElementById('modalAddBtn')
                 this.todoList = document.getElementById('todoList')
                 this.categoryList = document.getElementById('categoryList')
                 this.newCategoryInput = document.getElementById('newCategoryInput')
                 this.addCategoryBtn = document.getElementById('addCategoryBtn')
+                this.contextList = document.getElementById('contextList')
+                this.newContextInput = document.getElementById('newContextInput')
+                this.addContextBtn = document.getElementById('addContextBtn')
+                this.gtdTabs = document.getElementById('gtdTabs')
                 this.totalTodosEl = document.getElementById('totalTodos')
                 this.completedTodosEl = document.getElementById('completedTodos')
                 this.versionNumberEl = document.getElementById('versionNumber')
@@ -1988,6 +2355,20 @@
                     if (e.key === 'Enter') this.addCategory()
                 })
 
+                // Add context
+                this.addContextBtn.addEventListener('click', () => this.addContext())
+                this.newContextInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addContext()
+                })
+
+                // GTD tabs
+                this.gtdTabs.querySelectorAll('.gtd-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => {
+                        const status = e.target.dataset.status
+                        this.selectGtdStatus(status)
+                    })
+                })
+
                 // Unlock modal
                 this.unlockForm.addEventListener('submit', (e) => {
                     e.preventDefault()
@@ -2089,6 +2470,7 @@
                 await Promise.all([
                     this.loadCategories(),
                     this.loadPriorities(),
+                    this.loadContexts(),
                     this.loadTodos()
                 ])
 
@@ -2112,7 +2494,10 @@
                 this.todos = []
                 this.categories = []
                 this.priorities = []
+                this.contexts = []
                 this.selectedCategoryId = null
+                this.selectedContextId = null
+                this.selectedGtdStatus = 'all'
                 sessionStorage.removeItem('_ep')
                 this.authContainer.classList.add('active')
                 this.appContainer.classList.remove('active')
@@ -2132,11 +2517,13 @@
                 this.todos = []
                 this.categories = []
                 this.priorities = []
+                this.contexts = []
                 sessionStorage.removeItem('_ep')
 
                 // Clear the UI
                 this.todoList.innerHTML = ''
                 this.categoryList.innerHTML = ''
+                this.contextList.innerHTML = ''
 
                 // Hide app and show unlock modal
                 this.appContainer.classList.remove('active')
@@ -2316,6 +2703,156 @@
                 })
             }
 
+            async loadContexts() {
+                const { data, error } = await supabase
+                    .from('contexts')
+                    .select('*')
+                    .order('created_at', { ascending: true })
+
+                if (error) {
+                    console.error('Error loading contexts:', error)
+                    return
+                }
+
+                // Decrypt context names
+                this.contexts = await Promise.all(data.map(async (context) => ({
+                    ...context,
+                    name: await this.decrypt(context.name)
+                })))
+                this.renderContexts()
+                this.updateContextSelect()
+            }
+
+            renderContexts() {
+                this.contextList.innerHTML = ''
+
+                // Add "All Contexts" option
+                const allItem = document.createElement('li')
+                allItem.className = `context-item ${this.selectedContextId === null ? 'active' : ''}`
+                allItem.innerHTML = `<span class="context-name">All Contexts</span>`
+                allItem.addEventListener('click', () => this.selectContext(null))
+                this.contextList.appendChild(allItem)
+
+                // Add user contexts
+                this.contexts.forEach(context => {
+                    const li = document.createElement('li')
+                    li.className = `context-item ${this.selectedContextId === context.id ? 'active' : ''}`
+                    li.innerHTML = `
+                        <span class="context-name">${this.escapeHtml(context.name)}</span>
+                        <button class="context-delete" data-id="${context.id}">×</button>
+                    `
+
+                    li.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('context-delete')) {
+                            this.selectContext(context.id)
+                        }
+                    })
+
+                    const deleteBtn = li.querySelector('.context-delete')
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation()
+                        this.deleteContext(context.id)
+                    })
+
+                    this.contextList.appendChild(li)
+                })
+            }
+
+            updateContextSelect() {
+                this.modalContextSelect.innerHTML = '<option value="">No Context</option>'
+
+                this.contexts.forEach(context => {
+                    const option = document.createElement('option')
+                    option.value = context.id
+                    option.textContent = context.name
+                    this.modalContextSelect.appendChild(option)
+                })
+            }
+
+            selectContext(contextId) {
+                this.selectedContextId = contextId
+                this.renderContexts()
+                this.renderTodos()
+            }
+
+            async addContext() {
+                let name = this.newContextInput.value.trim()
+                if (!name) return
+
+                // Auto-prefix with @ if not already prefixed
+                if (!name.startsWith('@')) {
+                    name = '@' + name
+                }
+
+                this.addContextBtn.disabled = true
+                this.addContextBtn.textContent = 'Adding...'
+
+                // Encrypt context name before storing
+                const encryptedName = await this.encrypt(name)
+
+                const { data, error } = await supabase
+                    .from('contexts')
+                    .insert({
+                        user_id: this.currentUser.id,
+                        name: encryptedName
+                    })
+                    .select()
+
+                this.addContextBtn.disabled = false
+                this.addContextBtn.textContent = 'Add Context'
+
+                if (error) {
+                    console.error('Error adding context:', error)
+                    alert('Failed to add context')
+                    return
+                }
+
+                // Store decrypted name in local state for rendering
+                const contextWithDecryptedName = { ...data[0], name: name }
+                this.contexts.push(contextWithDecryptedName)
+                this.newContextInput.value = ''
+                this.renderContexts()
+                this.updateContextSelect()
+            }
+
+            async deleteContext(contextId) {
+                if (!confirm('Delete this context? Todos with this context will become contextless.')) {
+                    return
+                }
+
+                const { error } = await supabase
+                    .from('contexts')
+                    .delete()
+                    .eq('id', contextId)
+
+                if (error) {
+                    console.error('Error deleting context:', error)
+                    alert('Failed to delete context')
+                    return
+                }
+
+                this.contexts = this.contexts.filter(c => c.id !== contextId)
+                if (this.selectedContextId === contextId) {
+                    this.selectedContextId = null
+                }
+                this.renderContexts()
+                this.updateContextSelect()
+                this.loadTodos()
+            }
+
+            selectGtdStatus(status) {
+                this.selectedGtdStatus = status
+
+                // Update active tab styling
+                this.gtdTabs.querySelectorAll('.gtd-tab').forEach(tab => {
+                    const isActive = tab.dataset.status === status
+                    tab.classList.toggle('active', isActive)
+                    tab.setAttribute('aria-selected', isActive ? 'true' : 'false')
+                })
+
+                this.renderTodos()
+            }
+
             async loadTodos() {
                 this.todoList.innerHTML = '<div class="loading-state">Loading todos...</div>'
 
@@ -2446,6 +2983,8 @@
                 this.modalTodoInput.value = ''
                 this.modalCategorySelect.value = ''
                 this.modalPrioritySelect.value = ''
+                this.modalGtdStatusSelect.value = 'inbox'
+                this.modalContextSelect.value = ''
                 this.modalDueDateInput.value = ''
 
                 // Return focus to the trigger button for accessibility
@@ -2532,6 +3071,8 @@
 
                 const categoryId = this.modalCategorySelect.value || null
                 const priorityId = this.modalPrioritySelect.value || null
+                const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
+                const contextId = this.modalContextSelect.value || null
                 const dueDate = this.modalDueDateInput.value || null
 
                 // Encrypt todo text before storing
@@ -2545,6 +3086,8 @@
                         completed: false,
                         category_id: categoryId,
                         priority_id: priorityId,
+                        gtd_status: gtdStatus,
+                        context_id: contextId,
                         due_date: dueDate
                     })
                     .select()
@@ -2603,13 +3146,23 @@
             }
 
             getFilteredTodos() {
-                let filtered
-                if (this.selectedCategoryId === null) {
-                    filtered = this.todos
-                } else if (this.selectedCategoryId === 'uncategorized') {
-                    filtered = this.todos.filter(t => !t.category_id)
-                } else {
-                    filtered = this.todos.filter(t => t.category_id === this.selectedCategoryId)
+                let filtered = this.todos
+
+                // Filter by category
+                if (this.selectedCategoryId === 'uncategorized') {
+                    filtered = filtered.filter(t => !t.category_id)
+                } else if (this.selectedCategoryId !== null) {
+                    filtered = filtered.filter(t => t.category_id === this.selectedCategoryId)
+                }
+
+                // Filter by context
+                if (this.selectedContextId !== null) {
+                    filtered = filtered.filter(t => t.context_id === this.selectedContextId)
+                }
+
+                // Filter by GTD status
+                if (this.selectedGtdStatus !== 'all') {
+                    filtered = filtered.filter(t => t.gtd_status === this.selectedGtdStatus)
                 }
 
                 // Sort by priority level (lower level = higher priority)
@@ -2632,6 +3185,20 @@
 
             getPriorityById(id) {
                 return this.priorities.find(p => p.id === id)
+            }
+
+            getContextById(id) {
+                return this.contexts.find(c => c.id === id)
+            }
+
+            getGtdStatusLabel(status) {
+                const labels = {
+                    'inbox': 'Inbox',
+                    'next_action': 'Next',
+                    'waiting_for': 'Waiting',
+                    'someday_maybe': 'Someday'
+                }
+                return labels[status] || status
             }
 
             updateStats() {
@@ -2666,6 +3233,14 @@
                             ? `<span class="todo-priority-badge" style="background-color: ${this.validateColor(priority.color)}">${this.escapeHtml(priority.name)}</span>`
                             : ''
 
+                        const gtdStatus = todo.gtd_status || 'inbox'
+                        const gtdBadge = `<span class="todo-gtd-badge ${gtdStatus}">${this.escapeHtml(this.getGtdStatusLabel(gtdStatus))}</span>`
+
+                        const context = todo.context_id ? (this.getContextById(todo.context_id) ?? null) : null
+                        const contextBadge = context
+                            ? `<span class="todo-context-badge">${this.escapeHtml(context.name)}</span>`
+                            : ''
+
                         const dateBadge = todo.due_date ? this.formatDateBadge(todo.due_date) : ''
 
                         if (category) {
@@ -2680,7 +3255,9 @@
                                 data-id="${todo.id}"
                             >
                             <span class="todo-text">${this.escapeHtml(todo.text)}</span>
+                            ${gtdBadge}
                             ${priorityBadge}
+                            ${contextBadge}
                             ${dateBadge}
                             ${categoryBadge}
                             <button class="delete-btn" data-id="${todo.id}">Delete</button>
