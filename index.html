@@ -1303,9 +1303,25 @@
                 const { data: { session } } = await supabase.auth.getSession()
 
                 if (session) {
-                    // Show unlock modal to get password for encryption key
-                    this.pendingUser = session.user
-                    this.showUnlockModal()
+                    // Check if we have a stored password from a previous page load
+                    const storedPassword = sessionStorage.getItem('_ep')
+                    if (storedPassword) {
+                        // Auto-unlock using stored password
+                        try {
+                            await this.initializeEncryption(session.user, storedPassword)
+                            this.handleAuthSuccess(session.user)
+                        } catch (e) {
+                            // If auto-unlock fails, clear stored password and show modal
+                            console.error('Auto-unlock failed:', e)
+                            sessionStorage.removeItem('_ep')
+                            this.pendingUser = session.user
+                            this.showUnlockModal()
+                        }
+                    } else {
+                        // No stored password, show unlock modal
+                        this.pendingUser = session.user
+                        this.showUnlockModal()
+                    }
                 }
 
                 // Listen for auth changes (only for sign out, sign in handled by login form)
@@ -1428,6 +1444,8 @@
                     this.showMessage(error.message, 'error')
                 } else {
                     await this.initializeEncryption(data.user, password)
+                    // Store password in sessionStorage for page reload persistence
+                    sessionStorage.setItem('_ep', password)
                     this.handleAuthSuccess(data.user)
                 }
             }
@@ -1486,6 +1504,7 @@
                 this.categories = []
                 this.priorities = []
                 this.selectedCategoryId = null
+                sessionStorage.removeItem('_ep')
                 this.authContainer.classList.add('active')
                 this.appContainer.classList.remove('active')
                 this.mainContainer.classList.add('auth-mode')
@@ -1499,11 +1518,12 @@
                 // Store current user for unlock verification
                 this.pendingUser = this.currentUser
 
-                // Clear sensitive data from memory
+                // Clear sensitive data from memory and storage
                 this.encryptionKey = null
                 this.todos = []
                 this.categories = []
                 this.priorities = []
+                sessionStorage.removeItem('_ep')
 
                 // Clear the UI
                 this.todoList.innerHTML = ''
@@ -1560,6 +1580,9 @@
 
                     // Initialize encryption with the verified password
                     await this.initializeEncryption(this.pendingUser, password)
+
+                    // Store password in sessionStorage for page reload persistence
+                    sessionStorage.setItem('_ep', password)
 
                     // Save user reference before closing modal (closeUnlockModal clears pendingUser)
                     const user = this.pendingUser
