@@ -703,6 +703,25 @@
             opacity: 0.6;
         }
 
+        .todo-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .todo-item[draggable="true"] {
+            cursor: grab;
+        }
+
+        /* Drop target styles */
+        .category-item.drag-over,
+        .context-item.drag-over,
+        .gtd-tab.drag-over {
+            background: var(--accent-color) !important;
+            color: white !important;
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
         .todo-checkbox {
             width: 20px;
             height: 20px;
@@ -1753,6 +1772,16 @@
             color: var(--ios-blue);
         }
 
+        /* Glass theme drag-over states */
+        [data-theme="glass"] .category-item.drag-over,
+        [data-theme="glass"] .context-item.drag-over,
+        [data-theme="glass"] .gtd-tab.drag-over {
+            background: var(--ios-blue) !important;
+            color: white !important;
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+        }
+
         [data-theme="glass"] .add-context-input {
             background: var(--ios-bg-secondary);
             border: none;
@@ -2401,6 +2430,27 @@
                         const status = e.target.dataset.status
                         this.selectGtdStatus(status)
                     })
+
+                    // Drop target for assigning GTD status (except 'all' tab)
+                    const status = tab.dataset.status
+                    if (status !== 'all') {
+                        tab.addEventListener('dragover', (e) => {
+                            e.preventDefault()
+                            e.dataTransfer.dropEffect = 'move'
+                            tab.classList.add('drag-over')
+                        })
+                        tab.addEventListener('dragleave', () => {
+                            tab.classList.remove('drag-over')
+                        })
+                        tab.addEventListener('drop', (e) => {
+                            e.preventDefault()
+                            tab.classList.remove('drag-over')
+                            const todoId = e.dataTransfer.getData('text/plain')
+                            if (todoId) {
+                                this.updateTodoGtdStatus(todoId, status)
+                            }
+                        })
+                    }
                 })
 
                 // Unlock modal
@@ -2760,11 +2810,29 @@
             renderContexts() {
                 this.contextList.innerHTML = ''
 
-                // Add "All Contexts" option
+                // Add "All Contexts" option (also acts as "No Context" drop target)
                 const allItem = document.createElement('li')
                 allItem.className = `context-item ${this.selectedContextId === null ? 'active' : ''}`
                 allItem.innerHTML = `<span class="context-name">All Contexts</span>`
                 allItem.addEventListener('click', () => this.selectContext(null))
+
+                // Drop target for removing context
+                allItem.addEventListener('dragover', (e) => {
+                    e.preventDefault()
+                    e.dataTransfer.dropEffect = 'move'
+                    allItem.classList.add('drag-over')
+                })
+                allItem.addEventListener('dragleave', () => {
+                    allItem.classList.remove('drag-over')
+                })
+                allItem.addEventListener('drop', (e) => {
+                    e.preventDefault()
+                    allItem.classList.remove('drag-over')
+                    const todoId = e.dataTransfer.getData('text/plain')
+                    if (todoId) {
+                        this.updateTodoContext(todoId, null)
+                    }
+                })
                 this.contextList.appendChild(allItem)
 
                 // Add user contexts
@@ -2779,6 +2847,24 @@
                     li.addEventListener('click', (e) => {
                         if (!e.target.classList.contains('context-delete')) {
                             this.selectContext(context.id)
+                        }
+                    })
+
+                    // Drop target for assigning context
+                    li.addEventListener('dragover', (e) => {
+                        e.preventDefault()
+                        e.dataTransfer.dropEffect = 'move'
+                        li.classList.add('drag-over')
+                    })
+                    li.addEventListener('dragleave', () => {
+                        li.classList.remove('drag-over')
+                    })
+                    li.addEventListener('drop', (e) => {
+                        e.preventDefault()
+                        li.classList.remove('drag-over')
+                        const todoId = e.dataTransfer.getData('text/plain')
+                        if (todoId) {
+                            this.updateTodoContext(todoId, context.id)
                         }
                     })
 
@@ -2921,13 +3007,31 @@
                 allItem.addEventListener('click', () => this.selectCategory(null))
                 this.categoryList.appendChild(allItem)
 
-                // Add "Uncategorized" category
+                // Add "Uncategorized" as drop target to remove category
                 const uncategorizedItem = document.createElement('li')
                 uncategorizedItem.className = `category-item ${this.selectedCategoryId === 'uncategorized' ? 'active' : ''}`
                 uncategorizedItem.innerHTML = `
                     <span class="category-name">Uncategorized</span>
                 `
                 uncategorizedItem.addEventListener('click', () => this.selectCategory('uncategorized'))
+
+                // Drop target for removing category
+                uncategorizedItem.addEventListener('dragover', (e) => {
+                    e.preventDefault()
+                    e.dataTransfer.dropEffect = 'move'
+                    uncategorizedItem.classList.add('drag-over')
+                })
+                uncategorizedItem.addEventListener('dragleave', () => {
+                    uncategorizedItem.classList.remove('drag-over')
+                })
+                uncategorizedItem.addEventListener('drop', (e) => {
+                    e.preventDefault()
+                    uncategorizedItem.classList.remove('drag-over')
+                    const todoId = e.dataTransfer.getData('text/plain')
+                    if (todoId) {
+                        this.updateTodoCategory(todoId, null)
+                    }
+                })
                 this.categoryList.appendChild(uncategorizedItem)
 
                 // Add user categories
@@ -2945,6 +3049,24 @@
                     li.addEventListener('click', (e) => {
                         if (!e.target.classList.contains('category-delete')) {
                             this.selectCategory(category.id)
+                        }
+                    })
+
+                    // Drop target for assigning category
+                    li.addEventListener('dragover', (e) => {
+                        e.preventDefault()
+                        e.dataTransfer.dropEffect = 'move'
+                        li.classList.add('drag-over')
+                    })
+                    li.addEventListener('dragleave', () => {
+                        li.classList.remove('drag-over')
+                    })
+                    li.addEventListener('drop', (e) => {
+                        e.preventDefault()
+                        li.classList.remove('drag-over')
+                        const todoId = e.dataTransfer.getData('text/plain')
+                        if (todoId) {
+                            this.updateTodoCategory(todoId, category.id)
                         }
                     })
 
@@ -3272,6 +3394,67 @@
                 this.renderTodos()
             }
 
+            // Drag-and-drop update methods
+            async updateTodoCategory(todoId, categoryId) {
+                const { error } = await supabase
+                    .from('todos')
+                    .update({ category_id: categoryId })
+                    .eq('id', todoId)
+
+                if (error) {
+                    console.error('Error updating todo category:', error)
+                    alert('Failed to update todo category')
+                    return
+                }
+
+                // Update local state
+                const todo = this.todos.find(t => t.id === todoId)
+                if (todo) {
+                    todo.category_id = categoryId
+                }
+                this.renderTodos()
+            }
+
+            async updateTodoContext(todoId, contextId) {
+                const { error } = await supabase
+                    .from('todos')
+                    .update({ context_id: contextId })
+                    .eq('id', todoId)
+
+                if (error) {
+                    console.error('Error updating todo context:', error)
+                    alert('Failed to update todo context')
+                    return
+                }
+
+                // Update local state
+                const todo = this.todos.find(t => t.id === todoId)
+                if (todo) {
+                    todo.context_id = contextId
+                }
+                this.renderTodos()
+            }
+
+            async updateTodoGtdStatus(todoId, gtdStatus) {
+                const { error } = await supabase
+                    .from('todos')
+                    .update({ gtd_status: gtdStatus })
+                    .eq('id', todoId)
+
+                if (error) {
+                    console.error('Error updating todo GTD status:', error)
+                    alert('Failed to update todo GTD status')
+                    return
+                }
+
+                // Update local state
+                const todo = this.todos.find(t => t.id === todoId)
+                if (todo) {
+                    todo.gtd_status = gtdStatus
+                }
+                this.renderTodos()
+            }
+
             getFilteredTodos() {
                 let filtered = this.todos
 
@@ -3349,6 +3532,18 @@
                     filteredTodos.forEach(todo => {
                         const li = document.createElement('li')
                         li.className = `todo-item ${todo.completed ? 'completed' : ''}`
+                        li.draggable = true
+                        li.dataset.todoId = todo.id
+
+                        // Drag event handlers
+                        li.addEventListener('dragstart', (e) => {
+                            e.dataTransfer.setData('text/plain', todo.id)
+                            e.dataTransfer.effectAllowed = 'move'
+                            li.classList.add('dragging')
+                        })
+                        li.addEventListener('dragend', () => {
+                            li.classList.remove('dragging')
+                        })
 
                         const category = todo.category_id ? (this.getCategoryById(todo.category_id) ?? null) : null
                         const categoryBadge = category
