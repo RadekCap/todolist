@@ -1105,9 +1105,7 @@
                         <input
                             type="email"
                             id="unlockEmail"
-                            autocomplete="email"
-                            readonly
-                            style="background-color: #f5f5f5; color: #666;"
+                            autocomplete="username email"
                         >
                     </div>
                     <div>
@@ -1563,9 +1561,12 @@
                     // Initialize encryption with the verified password
                     await this.initializeEncryption(this.pendingUser, password)
 
+                    // Save user reference before closing modal (closeUnlockModal clears pendingUser)
+                    const user = this.pendingUser
+
                     // Close modal and proceed to app
                     this.closeUnlockModal()
-                    this.handleAuthSuccess(this.pendingUser)
+                    this.handleAuthSuccess(user)
                 } catch (e) {
                     console.error('Unlock error:', e)
                     this.unlockError.textContent = 'Failed to unlock. Please try again.'
