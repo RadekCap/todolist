@@ -2890,7 +2890,12 @@
             }
 
             selectContext(contextId) {
-                this.selectedContextId = contextId
+                // Toggle: clicking already-selected context deselects it (shows all)
+                if (this.selectedContextId === contextId) {
+                    this.selectedContextId = null
+                } else {
+                    this.selectedContextId = contextId
+                }
                 this.renderContexts()
                 this.renderTodos()
             }
@@ -3093,11 +3098,16 @@
             }
 
             selectCategory(categoryId) {
-                this.selectedCategoryId = categoryId
+                // Toggle: clicking already-selected category deselects it (shows all)
+                if (this.selectedCategoryId === categoryId) {
+                    this.selectedCategoryId = null
+                } else {
+                    this.selectedCategoryId = categoryId
+                }
 
                 // Pre-select category in modal when opening
-                if (categoryId && categoryId !== 'uncategorized') {
-                    this.modalCategorySelect.value = categoryId
+                if (this.selectedCategoryId && this.selectedCategoryId !== 'uncategorized') {
+                    this.modalCategorySelect.value = this.selectedCategoryId
                 } else {
                     this.modalCategorySelect.value = ''
                 }
