@@ -3407,12 +3407,8 @@
                     return
                 }
 
-                // Update local state
-                const todo = this.todos.find(t => t.id === todoId)
-                if (todo) {
-                    todo.category_id = categoryId
-                }
-                this.renderTodos()
+                // Reload todos to ensure UI is in sync
+                await this.loadTodos()
             }
 
             async updateTodoContext(todoId, contextId) {
@@ -3427,12 +3423,8 @@
                     return
                 }
 
-                // Update local state
-                const todo = this.todos.find(t => t.id === todoId)
-                if (todo) {
-                    todo.context_id = contextId
-                }
-                this.renderTodos()
+                // Reload todos to ensure UI is in sync
+                await this.loadTodos()
             }
 
             async updateTodoGtdStatus(todoId, gtdStatus) {
@@ -3447,12 +3439,8 @@
                     return
                 }
 
-                // Update local state
-                const todo = this.todos.find(t => t.id === todoId)
-                if (todo) {
-                    todo.gtd_status = gtdStatus
-                }
-                this.renderTodos()
+                // Reload todos to ensure UI is in sync
+                await this.loadTodos()
             }
 
             getFilteredTodos() {
