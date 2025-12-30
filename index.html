@@ -1192,6 +1192,11 @@
             color: #7b1fa2;
         }
 
+        .todo-gtd-badge.done {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
         /* Context Badge */
         .todo-context-badge {
             padding: 4px 10px;
@@ -1836,6 +1841,11 @@
             color: #af52de;
         }
 
+        [data-theme="glass"] .todo-gtd-badge.done {
+            background: rgba(52, 199, 89, 0.15);
+            color: #34c759;
+        }
+
         /* iOS Context Badge */
         [data-theme="glass"] .todo-context-badge {
             background: var(--ios-gray5);
@@ -1940,6 +1950,7 @@
                         <button class="gtd-tab" data-status="next_action" role="tab" aria-selected="false">Next</button>
                         <button class="gtd-tab" data-status="waiting_for" role="tab" aria-selected="false">Waiting</button>
                         <button class="gtd-tab" data-status="someday_maybe" role="tab" aria-selected="false">Someday</button>
+                        <button class="gtd-tab" data-status="done" role="tab" aria-selected="false">Done</button>
                     </div>
 
                     <ul id="todoList" class="todo-list"></ul>
@@ -2025,6 +2036,7 @@
                             <option value="next_action">Next Action</option>
                             <option value="waiting_for">Waiting For</option>
                             <option value="someday_maybe">Someday/Maybe</option>
+                            <option value="done">Done</option>
                         </select>
                     </div>
                     <div>
@@ -3469,8 +3481,15 @@
                 }
 
                 // Filter by GTD status
-                if (this.selectedGtdStatus !== 'all') {
+                if (this.selectedGtdStatus === 'done') {
+                    // Show only done items when Done tab is selected
+                    filtered = filtered.filter(t => t.gtd_status === 'done')
+                } else if (this.selectedGtdStatus !== 'all') {
+                    // Show items matching the selected status (excludes done)
                     filtered = filtered.filter(t => t.gtd_status === this.selectedGtdStatus)
+                } else {
+                    // 'all' - exclude done items from the normal view
+                    filtered = filtered.filter(t => t.gtd_status !== 'done')
                 }
 
                 // Sort by priority level (lower level = higher priority)
@@ -3504,7 +3523,8 @@
                     'inbox': 'Inbox',
                     'next_action': 'Next',
                     'waiting_for': 'Waiting',
-                    'someday_maybe': 'Someday'
+                    'someday_maybe': 'Someday',
+                    'done': 'Done'
                 }
                 return labels[status] || status
             }
