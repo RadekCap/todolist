@@ -1532,6 +1532,11 @@
             background: var(--ios-blue-hover);
         }
 
+        /* iOS Content Area - padding to prevent box-shadow clipping */
+        [data-theme="glass"] .content {
+            padding-left: 1px;
+        }
+
         /* iOS Todo Items - Grouped list style */
         [data-theme="glass"] .todo-list {
             background: var(--ios-bg-secondary);
