@@ -3294,12 +3294,15 @@
                 // Encrypt todo text before storing
                 const encryptedText = await this.encrypt(text)
 
+                // Sync completed with gtd_status (unified status)
+                const isCompleted = gtdStatus === 'done'
+
                 const { data, error } = await supabase
                     .from('todos')
                     .insert({
                         user_id: this.currentUser.id,
                         text: encryptedText,
-                        completed: false,
+                        completed: isCompleted,
                         category_id: categoryId,
                         priority_id: priorityId,
                         gtd_status: gtdStatus,
@@ -3340,6 +3343,9 @@
                 // Encrypt todo text before storing
                 const encryptedText = await this.encrypt(text)
 
+                // Sync completed with gtd_status (unified status)
+                const isCompleted = gtdStatus === 'done'
+
                 const { error } = await supabase
                     .from('todos')
                     .update({
@@ -3347,6 +3353,7 @@
                         category_id: categoryId,
                         priority_id: priorityId,
                         gtd_status: gtdStatus,
+                        completed: isCompleted,
                         context_id: contextId,
                         due_date: dueDate
                     })
@@ -3370,6 +3377,7 @@
                         category_id: categoryId,
                         priority_id: priorityId,
                         gtd_status: gtdStatus,
+                        completed: isCompleted,
                         context_id: contextId,
                         due_date: dueDate
                     }
@@ -3383,11 +3391,14 @@
                 const todo = this.todos.find(t => t.id === id)
                 if (!todo) return
 
-                const newCompleted = !todo.completed
+                // Unify completed and gtd_status: checking marks as 'done', unchecking restores to 'inbox'
+                const isDone = todo.gtd_status === 'done'
+                const newGtdStatus = isDone ? 'inbox' : 'done'
+                const newCompleted = !isDone
 
                 const { error } = await supabase
                     .from('todos')
-                    .update({ completed: newCompleted })
+                    .update({ completed: newCompleted, gtd_status: newGtdStatus })
                     .eq('id', id)
 
                 if (error) {
@@ -3397,6 +3408,7 @@
                 }
 
                 todo.completed = newCompleted
+                todo.gtd_status = newGtdStatus
                 this.renderTodos()
             }
 
@@ -3450,9 +3462,12 @@
             }
 
             async updateTodoGtdStatus(todoId, gtdStatus) {
+                // Sync completed with gtd_status (unified status)
+                const isCompleted = gtdStatus === 'done'
+
                 const { error } = await supabase
                     .from('todos')
-                    .update({ gtd_status: gtdStatus })
+                    .update({ gtd_status: gtdStatus, completed: isCompleted })
                     .eq('id', todoId)
 
                 if (error) {
@@ -3532,7 +3547,8 @@
             updateStats() {
                 const filteredTodos = this.getFilteredTodos()
                 const total = filteredTodos.length
-                const completed = filteredTodos.filter(t => t.completed).length
+                // Use gtd_status for completed count (unified status)
+                const completed = filteredTodos.filter(t => t.gtd_status === 'done').length
                 this.totalTodosEl.textContent = `Total: ${total}`
                 this.completedTodosEl.textContent = `Completed: ${completed}`
             }
@@ -3549,7 +3565,9 @@
                 } else {
                     filteredTodos.forEach(todo => {
                         const li = document.createElement('li')
-                        li.className = `todo-item ${todo.completed ? 'completed' : ''}`
+                        // Derive completed state from gtd_status (unified status)
+                        const isCompleted = todo.gtd_status === 'done'
+                        li.className = `todo-item ${isCompleted ? 'completed' : ''}`
                         li.draggable = true
                         li.dataset.todoId = todo.id
 
@@ -3591,7 +3609,7 @@
                             <input
                                 type="checkbox"
                                 class="todo-checkbox"
-                                ${todo.completed ? 'checked' : ''}
+                                ${isCompleted ? 'checked' : ''}
                                 data-id="${todo.id}"
                             >
                             <span class="todo-text">${this.escapeHtml(todo.text)}</span>
