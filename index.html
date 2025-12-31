@@ -1945,12 +1945,12 @@
 
                     <!-- GTD Status Tabs -->
                     <div class="gtd-tabs" id="gtdTabs" role="tablist" aria-label="GTD Status Filter">
-                        <button class="gtd-tab active" data-status="all" role="tab" aria-selected="true">All</button>
-                        <button class="gtd-tab" data-status="inbox" role="tab" aria-selected="false">Inbox</button>
+                        <button class="gtd-tab active" data-status="inbox" role="tab" aria-selected="true">Inbox</button>
                         <button class="gtd-tab" data-status="next_action" role="tab" aria-selected="false">Next</button>
                         <button class="gtd-tab" data-status="waiting_for" role="tab" aria-selected="false">Waiting</button>
                         <button class="gtd-tab" data-status="someday_maybe" role="tab" aria-selected="false">Someday</button>
                         <button class="gtd-tab" data-status="done" role="tab" aria-selected="false">Done</button>
+                        <button class="gtd-tab" data-status="all" role="tab" aria-selected="false">All</button>
                     </div>
 
                     <ul id="todoList" class="todo-list"></ul>
@@ -2250,7 +2250,7 @@
                 this.contexts = []
                 this.selectedCategoryId = null
                 this.selectedContextId = null
-                this.selectedGtdStatus = 'all'
+                this.selectedGtdStatus = 'inbox'
                 this.editingTodoId = null
 
                 // Get DOM elements
@@ -2593,7 +2593,7 @@
                 this.contexts = []
                 this.selectedCategoryId = null
                 this.selectedContextId = null
-                this.selectedGtdStatus = 'all'
+                this.selectedGtdStatus = 'inbox'
                 sessionStorage.removeItem('_ep')
                 this.authContainer.classList.add('active')
                 this.appContainer.classList.remove('active')
