@@ -476,6 +476,53 @@
             letter-spacing: 0.5px;
         }
 
+        /* Collapsible sidebar sections */
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 5px 0;
+            user-select: none;
+        }
+
+        .sidebar-section-header h2 {
+            margin-bottom: 0;
+        }
+
+        .sidebar-section-toggle {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .sidebar-section.collapsed .sidebar-section-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .sidebar-section-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.2s ease;
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 15px;
+        }
+
+        .sidebar-section.collapsed .sidebar-section-content {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+
         .category-list {
             list-style: none;
         }
@@ -1407,6 +1454,14 @@
             margin-bottom: 8px;
         }
 
+        [data-theme="glass"] .sidebar-section-header {
+            padding: 5px 16px 5px 0;
+        }
+
+        [data-theme="glass"] .sidebar-section-toggle {
+            color: var(--ios-label-tertiary);
+        }
+
         /* iOS Grouped List (Categories) */
         [data-theme="glass"] .category-list {
             background: var(--ios-bg-secondary);
@@ -1953,30 +2008,46 @@
             <div class="main-content">
                 <!-- Sidebar with categories -->
                 <div class="sidebar">
-                    <h2>Categories</h2>
-                    <ul id="categoryList" class="category-list"></ul>
-                    <div class="add-category-form">
-                        <input
-                            type="text"
-                            id="newCategoryInput"
-                            class="add-category-input"
-                            placeholder="New category..."
-                            autocomplete="off"
-                        >
-                        <button id="addCategoryBtn" class="add-category-btn">Add Category</button>
+                    <!-- Categories Section -->
+                    <div class="sidebar-section" id="categoriesSection">
+                        <div class="sidebar-section-header" role="button" aria-expanded="true" aria-controls="categoriesContent">
+                            <h2>Categories</h2>
+                            <span class="sidebar-section-toggle" aria-hidden="true">▼</span>
+                        </div>
+                        <div class="sidebar-section-content" id="categoriesContent">
+                            <ul id="categoryList" class="category-list"></ul>
+                            <div class="add-category-form">
+                                <input
+                                    type="text"
+                                    id="newCategoryInput"
+                                    class="add-category-input"
+                                    placeholder="New category..."
+                                    autocomplete="off"
+                                >
+                                <button id="addCategoryBtn" class="add-category-btn">Add Category</button>
+                            </div>
+                        </div>
                     </div>
 
-                    <h2 class="contexts-header">Contexts</h2>
-                    <ul id="contextList" class="context-list"></ul>
-                    <div class="add-context-form">
-                        <input
-                            type="text"
-                            id="newContextInput"
-                            class="add-context-input"
-                            placeholder="@context..."
-                            autocomplete="off"
-                        >
-                        <button id="addContextBtn" class="add-context-btn">Add Context</button>
+                    <!-- Contexts Section -->
+                    <div class="sidebar-section" id="contextsSection">
+                        <div class="sidebar-section-header" role="button" aria-expanded="true" aria-controls="contextsContent">
+                            <h2 class="contexts-header">Contexts</h2>
+                            <span class="sidebar-section-toggle" aria-hidden="true">▼</span>
+                        </div>
+                        <div class="sidebar-section-content" id="contextsContent">
+                            <ul id="contextList" class="context-list"></ul>
+                            <div class="add-context-form">
+                                <input
+                                    type="text"
+                                    id="newContextInput"
+                                    class="add-context-input"
+                                    placeholder="@context..."
+                                    autocomplete="off"
+                                >
+                                <button id="addContextBtn" class="add-context-btn">Add Context</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2335,6 +2406,8 @@
                 this.contextList = document.getElementById('contextList')
                 this.newContextInput = document.getElementById('newContextInput')
                 this.addContextBtn = document.getElementById('addContextBtn')
+                this.categoriesSection = document.getElementById('categoriesSection')
+                this.contextsSection = document.getElementById('contextsSection')
                 this.gtdTabs = document.getElementById('gtdTabs')
                 this.totalTodosEl = document.getElementById('totalTodos')
                 this.completedTodosEl = document.getElementById('completedTodos')
@@ -2475,6 +2548,14 @@
                 this.addContextBtn.addEventListener('click', () => this.addContext())
                 this.newContextInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addContext()
+                })
+
+                // Collapsible sidebar sections
+                this.categoriesSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
+                    this.toggleSidebarSection(this.categoriesSection)
+                })
+                this.contextsSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
+                    this.toggleSidebarSection(this.contextsSection)
                 })
 
                 // GTD tabs
@@ -2929,6 +3010,12 @@
 
                     this.contextList.appendChild(li)
                 })
+            }
+
+            toggleSidebarSection(section) {
+                const header = section.querySelector('.sidebar-section-header')
+                const isCollapsed = section.classList.toggle('collapsed')
+                header.setAttribute('aria-expanded', !isCollapsed)
             }
 
             updateContextSelect() {
