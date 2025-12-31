@@ -816,6 +816,35 @@
             font-size: 16px;
         }
 
+        .inbox-zen-state {
+            text-align: center;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .inbox-zen-state .zen-illustration {
+            width: 120px;
+            height: 120px;
+            opacity: 0.8;
+        }
+
+        .inbox-zen-state .zen-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #667eea;
+            margin: 0;
+        }
+
+        .inbox-zen-state .zen-message {
+            font-size: 14px;
+            color: #888;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
         .loading-state {
             text-align: center;
             color: var(--accent-color);
@@ -1685,6 +1714,18 @@
         [data-theme="glass"] .empty-state {
             color: var(--ios-label-tertiary);
             font-size: 15px;
+        }
+
+        [data-theme="glass"] .inbox-zen-state .zen-title {
+            color: var(--ios-blue);
+        }
+
+        [data-theme="glass"] .inbox-zen-state .zen-message {
+            color: var(--ios-label-secondary);
+        }
+
+        [data-theme="glass"] .inbox-zen-state .zen-illustration {
+            opacity: 0.9;
         }
 
         /* iOS Messages */
@@ -3558,10 +3599,50 @@
                 const filteredTodos = this.getFilteredTodos()
 
                 if (filteredTodos.length === 0) {
-                    const emptyMsg = this.selectedCategoryId === null
-                        ? 'No todos yet. Add one above!'
-                        : 'No todos in this category.'
-                    this.todoList.innerHTML = `<div class="empty-state">${emptyMsg}</div>`
+                    // Special zen state for empty Inbox
+                    if (this.selectedGtdStatus === 'inbox') {
+                        this.todoList.innerHTML = `
+                            <div class="inbox-zen-state">
+                                <svg class="zen-illustration" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <!-- Calm water ripples -->
+                                    <ellipse cx="60" cy="95" rx="50" ry="8" fill="url(#waterGradient)" opacity="0.3"/>
+                                    <ellipse cx="60" cy="95" rx="35" ry="5" fill="url(#waterGradient)" opacity="0.5"/>
+                                    <ellipse cx="60" cy="95" rx="20" ry="3" fill="url(#waterGradient)" opacity="0.7"/>
+                                    <!-- Lotus flower -->
+                                    <g transform="translate(60, 70)">
+                                        <!-- Back petals -->
+                                        <ellipse cx="-18" cy="-5" rx="12" ry="20" fill="#E8B4D8" transform="rotate(-30)"/>
+                                        <ellipse cx="18" cy="-5" rx="12" ry="20" fill="#E8B4D8" transform="rotate(30)"/>
+                                        <!-- Middle petals -->
+                                        <ellipse cx="-10" cy="-8" rx="10" ry="22" fill="#F0C4E4" transform="rotate(-15)"/>
+                                        <ellipse cx="10" cy="-8" rx="10" ry="22" fill="#F0C4E4" transform="rotate(15)"/>
+                                        <!-- Front petal -->
+                                        <ellipse cx="0" cy="-10" rx="9" ry="24" fill="#F8D8EE"/>
+                                        <!-- Center -->
+                                        <circle cx="0" cy="0" r="6" fill="#FFE4A0"/>
+                                        <circle cx="-2" cy="-1" r="1" fill="#E8C870"/>
+                                        <circle cx="2" cy="-1" r="1" fill="#E8C870"/>
+                                        <circle cx="0" cy="2" r="1" fill="#E8C870"/>
+                                    </g>
+                                    <!-- Gradient definitions -->
+                                    <defs>
+                                        <linearGradient id="waterGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:0.3"/>
+                                            <stop offset="50%" style="stop-color:#764ba2;stop-opacity:0.5"/>
+                                            <stop offset="100%" style="stop-color:#667eea;stop-opacity:0.3"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <h3 class="zen-title">Inbox Zero</h3>
+                                <p class="zen-message">Your mind is clear. All items have been processed. Take a moment to breathe.</p>
+                            </div>
+                        `
+                    } else {
+                        const emptyMsg = this.selectedCategoryId === null
+                            ? 'No todos yet. Add one above!'
+                            : 'No todos in this category.'
+                        this.todoList.innerHTML = `<div class="empty-state">${emptyMsg}</div>`
+                    }
                 } else {
                     filteredTodos.forEach(todo => {
                         const li = document.createElement('li')
