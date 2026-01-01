@@ -2366,8 +2366,8 @@
                 this.categories = []
                 this.priorities = []
                 this.contexts = []
-                this.selectedCategoryId = null
-                this.selectedContextId = null
+                this.selectedCategoryIds = new Set()
+                this.selectedContextIds = new Set()
                 this.selectedGtdStatus = 'inbox'
                 this.editingTodoId = null
 
@@ -2719,8 +2719,8 @@
                 this.categories = []
                 this.priorities = []
                 this.contexts = []
-                this.selectedCategoryId = null
-                this.selectedContextId = null
+                this.selectedCategoryIds = new Set()
+                this.selectedContextIds = new Set()
                 this.selectedGtdStatus = 'inbox'
                 sessionStorage.removeItem('_ep')
                 this.authContainer.classList.add('active')
@@ -2950,9 +2950,9 @@
             renderContexts() {
                 this.contextList.innerHTML = ''
 
-                // Add "All Contexts" option (also acts as "No Context" drop target)
+                // Add "All Contexts" option (shown as active when no filter is applied)
                 const allItem = document.createElement('li')
-                allItem.className = `context-item ${this.selectedContextId === null ? 'active' : ''}`
+                allItem.className = `context-item ${this.selectedContextIds.size === 0 ? 'active' : ''}`
                 allItem.innerHTML = `<span class="context-name">All Contexts</span>`
                 allItem.addEventListener('click', () => this.selectContext(null))
 
@@ -2978,7 +2978,7 @@
                 // Add user contexts
                 this.contexts.forEach(context => {
                     const li = document.createElement('li')
-                    li.className = `context-item ${this.selectedContextId === context.id ? 'active' : ''}`
+                    li.className = `context-item ${this.selectedContextIds.has(context.id) ? 'active' : ''}`
                     li.innerHTML = `
                         <span class="context-name">${this.escapeHtml(context.name)}</span>
                         <button class="context-delete" data-id="${context.id}">×</button>
@@ -3036,11 +3036,14 @@
             }
 
             selectContext(contextId) {
-                // Toggle: clicking already-selected context deselects it (shows all)
-                if (this.selectedContextId === contextId) {
-                    this.selectedContextId = null
+                // Toggle: clicking a context adds/removes it from the selection
+                if (contextId === null) {
+                    // "All Contexts" clears the selection
+                    this.selectedContextIds.clear()
+                } else if (this.selectedContextIds.has(contextId)) {
+                    this.selectedContextIds.delete(contextId)
                 } else {
-                    this.selectedContextId = contextId
+                    this.selectedContextIds.add(contextId)
                 }
                 this.renderContexts()
                 this.renderTodos()
@@ -3103,9 +3106,7 @@
                 }
 
                 this.contexts = this.contexts.filter(c => c.id !== contextId)
-                if (this.selectedContextId === contextId) {
-                    this.selectedContextId = null
-                }
+                this.selectedContextIds.delete(contextId)
                 this.renderContexts()
                 this.updateContextSelect()
                 this.loadTodos()
@@ -3149,9 +3150,9 @@
             renderCategories() {
                 this.categoryList.innerHTML = ''
 
-                // Add "All" category
+                // Add "All" category (shown as active when no filter is applied)
                 const allItem = document.createElement('li')
-                allItem.className = `category-item ${this.selectedCategoryId === null ? 'active' : ''}`
+                allItem.className = `category-item ${this.selectedCategoryIds.size === 0 ? 'active' : ''}`
                 allItem.innerHTML = `
                     <span class="category-name">All Todos</span>
                 `
@@ -3160,7 +3161,7 @@
 
                 // Add "Uncategorized" as drop target to remove category
                 const uncategorizedItem = document.createElement('li')
-                uncategorizedItem.className = `category-item ${this.selectedCategoryId === 'uncategorized' ? 'active' : ''}`
+                uncategorizedItem.className = `category-item ${this.selectedCategoryIds.has('uncategorized') ? 'active' : ''}`
                 uncategorizedItem.innerHTML = `
                     <span class="category-name">Uncategorized</span>
                 `
@@ -3188,7 +3189,7 @@
                 // Add user categories
                 this.categories.forEach(category => {
                     const li = document.createElement('li')
-                    li.className = `category-item ${this.selectedCategoryId === category.id ? 'active' : ''}`
+                    li.className = `category-item ${this.selectedCategoryIds.has(category.id) ? 'active' : ''}`
                     li.innerHTML = `
                         <span class="category-name">
                             <span class="category-color" style="background-color: ${this.validateColor(category.color)}"></span>
@@ -3244,18 +3245,14 @@
             }
 
             selectCategory(categoryId) {
-                // Toggle: clicking already-selected category deselects it (shows all)
-                if (this.selectedCategoryId === categoryId) {
-                    this.selectedCategoryId = null
+                // Toggle: clicking a category adds/removes it from the selection
+                if (categoryId === null) {
+                    // "All Todos" clears the selection
+                    this.selectedCategoryIds.clear()
+                } else if (this.selectedCategoryIds.has(categoryId)) {
+                    this.selectedCategoryIds.delete(categoryId)
                 } else {
-                    this.selectedCategoryId = categoryId
-                }
-
-                // Pre-select category in modal when opening
-                if (this.selectedCategoryId && this.selectedCategoryId !== 'uncategorized') {
-                    this.modalCategorySelect.value = this.selectedCategoryId
-                } else {
-                    this.modalCategorySelect.value = ''
+                    this.selectedCategoryIds.add(categoryId)
                 }
 
                 this.renderCategories()
@@ -3273,9 +3270,14 @@
                 this.modalGtdStatusSelect.value = 'inbox'
                 this.modalContextSelect.value = ''
 
-                // Pre-select the current category
-                if (this.selectedCategoryId && this.selectedCategoryId !== 'uncategorized') {
-                    this.modalCategorySelect.value = this.selectedCategoryId
+                // Pre-select category if exactly one is selected (not 'uncategorized')
+                if (this.selectedCategoryIds.size === 1) {
+                    const selectedId = [...this.selectedCategoryIds][0]
+                    if (selectedId !== 'uncategorized') {
+                        this.modalCategorySelect.value = selectedId
+                    } else {
+                        this.modalCategorySelect.value = ''
+                    }
                 } else {
                     this.modalCategorySelect.value = ''
                 }
@@ -3404,9 +3406,7 @@
                 }
 
                 this.categories = this.categories.filter(c => c.id !== categoryId)
-                if (this.selectedCategoryId === categoryId) {
-                    this.selectedCategoryId = null
-                }
+                this.selectedCategoryIds.delete(categoryId)
                 this.renderCategories()
                 this.updateCategorySelect()
                 this.loadTodos()
@@ -3617,16 +3617,21 @@
             getFilteredTodos() {
                 let filtered = this.todos
 
-                // Filter by category
-                if (this.selectedCategoryId === 'uncategorized') {
-                    filtered = filtered.filter(t => !t.category_id)
-                } else if (this.selectedCategoryId !== null) {
-                    filtered = filtered.filter(t => t.category_id === this.selectedCategoryId)
+                // Filter by categories (if any selected)
+                if (this.selectedCategoryIds.size > 0) {
+                    filtered = filtered.filter(t => {
+                        // 'uncategorized' matches todos with no category
+                        if (this.selectedCategoryIds.has('uncategorized') && !t.category_id) {
+                            return true
+                        }
+                        // Match any selected category
+                        return t.category_id && this.selectedCategoryIds.has(t.category_id)
+                    })
                 }
 
-                // Filter by context
-                if (this.selectedContextId !== null) {
-                    filtered = filtered.filter(t => t.context_id === this.selectedContextId)
+                // Filter by contexts (if any selected)
+                if (this.selectedContextIds.size > 0) {
+                    filtered = filtered.filter(t => t.context_id && this.selectedContextIds.has(t.context_id))
                 }
 
                 // Filter by GTD status
@@ -3731,9 +3736,9 @@
                             </div>
                         `
                     } else {
-                        const emptyMsg = this.selectedCategoryId === null
+                        const emptyMsg = this.selectedCategoryIds.size === 0
                             ? 'No todos yet. Add one above!'
-                            : 'No todos in this category.'
+                            : 'No todos in selected categories.'
                         this.todoList.innerHTML = `<div class="empty-state">${emptyMsg}</div>`
                     }
                 } else {
