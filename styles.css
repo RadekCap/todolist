@@ -1038,8 +1038,25 @@ h1 {
     border-top: 2px solid #e0e0e0;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     color: #666;
     font-size: 14px;
+}
+
+.export-btn {
+    padding: 6px 12px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.export-btn:hover {
+    background: var(--accent-hover);
 }
 
 .add-todo-btn {
@@ -2060,6 +2077,16 @@ h1 {
     color: var(--ios-label-secondary);
     border-top-color: var(--ios-separator);
     font-size: 13px;
+}
+
+[data-theme="glass"] .export-btn {
+    background: var(--ios-blue);
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+[data-theme="glass"] .export-btn:hover {
+    background: var(--ios-blue-hover);
 }
 
 /* iOS User Header */
