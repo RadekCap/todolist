@@ -1613,6 +1613,11 @@ h1 {
     color: #388e3c;
 }
 
+.todo-gtd-badge.scheduled {
+    background: #fce4ec;
+    color: #c2185b;
+}
+
 .todo-gtd-badge.waiting_for {
     background: #fff3e0;
     color: #f57c00;
@@ -2495,6 +2500,11 @@ h1 {
 [data-theme="glass"] .todo-gtd-badge.next_action {
     background: rgba(52, 199, 89, 0.15);
     color: #34c759;
+}
+
+[data-theme="glass"] .todo-gtd-badge.scheduled {
+    background: rgba(255, 45, 85, 0.15);
+    color: #ff2d55;
 }
 
 [data-theme="glass"] .todo-gtd-badge.waiting_for {

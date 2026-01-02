@@ -1697,10 +1697,13 @@ class TodoApp {
 
         // Filter by GTD status
         if (this.selectedGtdStatus === 'scheduled') {
-            // Show all non-done items with a due date, sorted by date
-            filtered = filtered.filter(t => t.due_date && t.gtd_status !== 'done')
-            // Sort by due date (earliest first)
+            // Show items with 'scheduled' GTD status, sorted by due date
+            filtered = filtered.filter(t => t.gtd_status === 'scheduled')
+            // Sort by due date (earliest first), items without dates go last
             return filtered.slice().sort((a, b) => {
+                if (!a.due_date && !b.due_date) return 0
+                if (!a.due_date) return 1
+                if (!b.due_date) return -1
                 return a.due_date.localeCompare(b.due_date)
             })
         } else if (this.selectedGtdStatus === 'done') {
@@ -1744,6 +1747,7 @@ class TodoApp {
         const labels = {
             'inbox': 'Inbox',
             'next_action': 'Next',
+            'scheduled': 'Scheduled',
             'waiting_for': 'Waiting',
             'someday_maybe': 'Someday',
             'done': 'Done'
