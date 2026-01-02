@@ -1125,14 +1125,50 @@ h1 {
 .modal-form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
+}
+
+/* Form Sections */
+.form-section {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.form-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    margin-bottom: 12px;
+    padding: 0;
+}
+
+.form-field {
+    margin-bottom: 12px;
+}
+
+.form-field:last-child {
+    margin-bottom: 0;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-field {
+    flex: 1;
+    margin-bottom: 12px;
 }
 
 .modal-form label {
-    font-weight: 600;
+    font-weight: 500;
     color: #333;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     display: block;
+    font-size: 14px;
 }
 
 .modal-form input,
@@ -1266,6 +1302,11 @@ h1 {
 
     .user-actions {
         flex-shrink: 0;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
     }
 }
 
@@ -1601,6 +1642,35 @@ h1 {
     color: var(--ios-label);
     font-weight: 400;
     font-size: 15px;
+}
+
+/* iOS Form Sections */
+[data-theme="glass"] .form-section {
+    background: var(--ios-bg-secondary);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .form-section-title {
+    color: var(--ios-label-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+}
+
+[data-theme="glass"] .form-field {
+    margin-bottom: 16px;
+}
+
+[data-theme="glass"] .form-row {
+    gap: 16px;
+}
+
+[data-theme="glass"] .form-row .form-field {
+    margin-bottom: 16px;
 }
 
 /* iOS Buttons - Filled style */
@@ -2031,12 +2101,19 @@ h1 {
     -webkit-backdrop-filter: blur(var(--ios-blur-thick));
     border: none;
     box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
-    border-radius: 14px;
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 520px;
+}
+
+[data-theme="glass"] .modal-form {
+    gap: 16px;
 }
 
 [data-theme="glass"] .modal-header {
     border-bottom: 0.5px solid var(--ios-separator);
-    padding-bottom: 15px;
+    padding-bottom: 16px;
+    margin-bottom: 8px;
 }
 
 [data-theme="glass"] .modal-header h2 {
