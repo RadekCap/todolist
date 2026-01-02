@@ -112,6 +112,7 @@ class TodoApp {
         this.selectedCategoryIds = new Set()
         this.selectedContextIds = new Set()
         this.selectedProjectId = null
+        this.showProjectsView = false  // When true, show project list instead of todos
         this.selectedGtdStatus = 'inbox'
         this.editingTodoId = null
 
@@ -973,15 +974,14 @@ class TodoApp {
     }
 
     selectProject(projectId) {
-        // Toggle: clicking a project adds/removes it from the selection
         if (projectId === null) {
-            // "All Projects" clears the selection
+            // "All Projects" shows the project list view
             this.selectedProjectId = null
-        } else if (this.selectedProjectId === projectId) {
-            // Clicking the same project deselects it
-            this.selectedProjectId = null
+            this.showProjectsView = true
         } else {
+            // Clicking a specific project shows its todos
             this.selectedProjectId = projectId
+            this.showProjectsView = false
         }
         this.renderProjects()
         this.renderTodos()
@@ -1786,6 +1786,14 @@ class TodoApp {
         return labels[status] || status
     }
 
+    getProjectById(id) {
+        return this.projects.find(p => p.id === id)
+    }
+
+    getProjectTodoCount(projectId) {
+        return this.todos.filter(t => t.project_id === projectId && t.gtd_status !== 'done').length
+    }
+
     updateStats() {
         const filteredTodos = this.getFilteredTodos()
         const total = filteredTodos.length
@@ -1795,8 +1803,44 @@ class TodoApp {
         this.completedTodosEl.textContent = `Completed: ${completed}`
     }
 
+    renderProjectsView() {
+        if (this.projects.length === 0) {
+            this.todoList.innerHTML = '<div class="empty-state">No projects yet. Create one in the sidebar!</div>'
+            this.updateProjectsViewStats()
+            return
+        }
+
+        this.projects.forEach(project => {
+            const count = this.getProjectTodoCount(project.id)
+            const li = document.createElement('li')
+            li.className = 'project-card'
+            li.innerHTML = `
+                <span class="project-card-color" style="background-color: ${this.validateColor(project.color)}"></span>
+                <span class="project-card-name">${this.escapeHtml(project.name)}</span>
+                <span class="project-card-count">${count} ${count === 1 ? 'item' : 'items'}</span>
+            `
+            li.addEventListener('click', () => this.selectProject(project.id))
+            this.todoList.appendChild(li)
+        })
+
+        this.updateProjectsViewStats()
+    }
+
+    updateProjectsViewStats() {
+        const totalItems = this.projects.reduce((sum, p) => sum + this.getProjectTodoCount(p.id), 0)
+        this.totalTodosEl.textContent = `Projects: ${this.projects.length}`
+        this.completedTodosEl.textContent = `Items: ${totalItems}`
+    }
+
     renderTodos() {
         this.todoList.innerHTML = ''
+
+        // Show projects view when "All Projects" is selected
+        if (this.showProjectsView) {
+            this.renderProjectsView()
+            return
+        }
+
         const filteredTodos = this.getFilteredTodos()
 
         if (filteredTodos.length === 0) {
