@@ -892,17 +892,33 @@ h1 {
     accent-color: var(--accent-color);
 }
 
-.todo-text {
+.todo-content {
     flex: 1;
+    min-width: 0;
+}
+
+.todo-text {
     color: #333;
     font-size: 16px;
     word-break: break-word;
     cursor: pointer;
 }
 
+.todo-comment {
+    font-size: 13px;
+    color: #666;
+    margin-top: 4px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
 .todo-item.completed .todo-text {
     text-decoration: line-through;
     color: #999;
+}
+
+.todo-item.completed .todo-comment {
+    color: #aaa;
 }
 
 .todo-category-badge {
@@ -1120,7 +1136,8 @@ h1 {
 }
 
 .modal-form input,
-.modal-form select {
+.modal-form select,
+.modal-form textarea {
     width: 100%;
     padding: 12px 15px;
     border: 2px solid #e0e0e0;
@@ -1129,8 +1146,15 @@ h1 {
     box-sizing: border-box;
 }
 
+.modal-form textarea {
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+}
+
 .modal-form input:focus,
-.modal-form select:focus {
+.modal-form select:focus,
+.modal-form textarea:focus {
     outline: none;
     border-color: var(--accent-color);
 }
@@ -1519,7 +1543,8 @@ h1 {
 [data-theme="glass"] .form-group input,
 [data-theme="glass"] .form-group select,
 [data-theme="glass"] .modal-form input,
-[data-theme="glass"] .modal-form select {
+[data-theme="glass"] .modal-form select,
+[data-theme="glass"] .modal-form textarea {
     background: var(--ios-bg-secondary);
     border: 1px solid var(--ios-separator);
     border-radius: 10px;
@@ -1532,7 +1557,8 @@ h1 {
 [data-theme="glass"] .form-group input:focus,
 [data-theme="glass"] .form-group select:focus,
 [data-theme="glass"] .modal-form input:focus,
-[data-theme="glass"] .modal-form select:focus {
+[data-theme="glass"] .modal-form select:focus,
+[data-theme="glass"] .modal-form textarea:focus {
     background: var(--ios-bg-secondary);
     border-color: var(--ios-blue);
     outline: 4px solid rgba(0, 122, 255, 0.15);
@@ -1540,7 +1566,8 @@ h1 {
 }
 
 [data-theme="glass"] .form-group input::placeholder,
-[data-theme="glass"] .modal-form input::placeholder {
+[data-theme="glass"] .modal-form input::placeholder,
+[data-theme="glass"] .modal-form textarea::placeholder {
     color: var(--ios-label-tertiary);
 }
 
@@ -1796,7 +1823,16 @@ h1 {
     font-size: 17px;
 }
 
+[data-theme="glass"] .todo-comment {
+    color: var(--ios-label-secondary);
+    font-size: 14px;
+}
+
 [data-theme="glass"] .todo-item.completed .todo-text {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .todo-item.completed .todo-comment {
     color: var(--ios-label-tertiary);
 }
 
