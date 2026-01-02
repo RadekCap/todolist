@@ -954,7 +954,16 @@ class TodoApp {
     }
 
     selectProject(projectId) {
-        this.selectedProjectId = projectId
+        // Toggle: clicking a project adds/removes it from the selection
+        if (projectId === null) {
+            // "All Projects" clears the selection
+            this.selectedProjectId = null
+        } else if (this.selectedProjectId === projectId) {
+            // Clicking the same project deselects it
+            this.selectedProjectId = null
+        } else {
+            this.selectedProjectId = projectId
+        }
         this.renderProjects()
         this.renderTodos()
     }
