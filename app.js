@@ -1810,7 +1810,22 @@ class TodoApp {
                 this.todoList.innerHTML = `<div class="empty-state">${emptyMsg}</div>`
             }
         } else {
+            // Track current date group for section headers in Scheduled view
+            let currentDateGroup = null
+
             filteredTodos.forEach(todo => {
+                // Add section header for Scheduled view
+                if (this.selectedGtdStatus === 'scheduled' && todo.due_date) {
+                    const dateGroup = this.getDateGroup(todo.due_date)
+                    if (dateGroup !== currentDateGroup) {
+                        currentDateGroup = dateGroup
+                        const header = document.createElement('li')
+                        header.className = `scheduled-section-header ${dateGroup}`
+                        header.innerHTML = `<span class="section-header-text">${this.escapeHtml(this.getDateGroupLabel(dateGroup))}</span>`
+                        this.todoList.appendChild(header)
+                    }
+                }
+
                 const li = document.createElement('li')
                 // Derive completed state from gtd_status (unified status)
                 const isCompleted = todo.gtd_status === 'done'
@@ -1940,6 +1955,48 @@ class TodoApp {
         }
 
         return `<span class="${className}">${this.escapeHtml(label)}</span>`
+    }
+
+    // Get date group for Scheduled view section headers
+    getDateGroup(dateString) {
+        const [year, month, day] = dateString.split('-')
+        const dueDate = new Date(year, month - 1, day)
+
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        const diffTime = dueDate - today
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+        // Calculate end of this week (Sunday)
+        const dayOfWeek = today.getDay()
+        const daysUntilEndOfWeek = 7 - dayOfWeek
+
+        if (diffDays < 0) {
+            return 'overdue'
+        } else if (diffDays === 0) {
+            return 'today'
+        } else if (diffDays === 1) {
+            return 'tomorrow'
+        } else if (diffDays <= daysUntilEndOfWeek) {
+            return 'this-week'
+        } else if (diffDays <= daysUntilEndOfWeek + 7) {
+            return 'next-week'
+        } else {
+            return 'later'
+        }
+    }
+
+    getDateGroupLabel(group) {
+        const labels = {
+            'overdue': 'Overdue',
+            'today': 'Today',
+            'tomorrow': 'Tomorrow',
+            'this-week': 'This Week',
+            'next-week': 'Next Week',
+            'later': 'Later'
+        }
+        return labels[group] || group
     }
 
     initTheme() {
