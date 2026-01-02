@@ -738,6 +738,48 @@ h1 {
     cursor: not-allowed;
 }
 
+/* Project View Cards */
+.project-card {
+    background: #f8f9fa;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+}
+
+.project-card:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.project-card-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.project-card-name {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
+.project-card-count {
+    font-size: 14px;
+    color: #666;
+    background: #e0e0e0;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
 .content {
     flex: 1;
     min-width: 0;
@@ -1974,6 +2016,32 @@ h1 {
 [data-theme="glass"] .add-project-form {
     border-top: none;
     padding: 20px 5px 0 5px; /* Horizontal padding for input focus outline */
+}
+
+/* iOS Project View Cards */
+[data-theme="glass"] .project-card {
+    background: var(--ios-bg-secondary);
+    border: 1px solid var(--ios-separator);
+    border-left: none;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 8px;
+}
+
+[data-theme="glass"] .project-card:hover {
+    background: var(--ios-gray6);
+    transform: none;
+}
+
+[data-theme="glass"] .project-card-name {
+    color: var(--ios-label);
+    font-size: 17px;
+}
+
+[data-theme="glass"] .project-card-count {
+    background: var(--ios-gray5);
+    color: var(--ios-label-secondary);
+    font-size: 13px;
 }
 
 [data-theme="glass"] .add-project-input {
