@@ -1,0 +1,2174 @@
+/* CSS Variables for Theming */
+:root {
+    --primary-start: #b8c5f2;
+    --primary-end: #c5b3d9;
+    --accent-color: #b8c5f2;
+    --accent-hover: #a0aee6;
+}
+
+/* Purple Theme (Default) */
+[data-theme="purple"] {
+    --primary-start: #b8c5f2;
+    --primary-end: #c5b3d9;
+    --accent-color: #b8c5f2;
+    --accent-hover: #a0aee6;
+}
+
+/* Blue Theme */
+[data-theme="blue"] {
+    --primary-start: #a8d5f7;
+    --primary-end: #b3e5fc;
+    --accent-color: #a8d5f7;
+    --accent-hover: #8fc3e8;
+}
+
+/* Green Theme */
+[data-theme="green"] {
+    --primary-start: #a8e6c1;
+    --primary-end: #b8f0da;
+    --accent-color: #a8e6c1;
+    --accent-hover: #8ed4a8;
+}
+
+/* Orange Theme */
+[data-theme="orange"] {
+    --primary-start: #fcc5d3;
+    --primary-end: #fff0b8;
+    --accent-color: #fcc5d3;
+    --accent-hover: #f5a9bc;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --primary-start: #546e7a;
+    --primary-end: #607d8b;
+    --accent-color: #81b3d2;
+    --accent-hover: #6a9fc4;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+    --primary-start: #d4f5f3;
+    --primary-end: #fef0f5;
+    --accent-color: #d4f5f3;
+    --accent-hover: #b8e3e0;
+}
+
+/* Glass Theme - iOS 26 Style */
+[data-theme="glass"] {
+    /* iOS System Background Colors */
+    --ios-bg-primary: #f2f2f7;
+    --ios-bg-secondary: #ffffff;
+    --ios-bg-tertiary: #f2f2f7;
+    --ios-bg-grouped: #f2f2f7;
+
+    /* iOS System Colors */
+    --ios-blue: #007aff;
+    --ios-blue-hover: #0056b3;
+    --ios-gray: #8e8e93;
+    --ios-gray2: #aeaeb2;
+    --ios-gray3: #c7c7cc;
+    --ios-gray4: #d1d1d6;
+    --ios-gray5: #e5e5ea;
+    --ios-gray6: #f2f2f7;
+    --ios-red: #ff3b30;
+    --ios-orange: #ff9500;
+
+    /* iOS Label Colors */
+    --ios-label: #000000;
+    --ios-label-secondary: #3c3c43;
+    --ios-label-tertiary: #3c3c4399;
+    --ios-label-quaternary: #3c3c434d;
+
+    /* iOS Material - Thick */
+    --ios-material-thick: rgba(255, 255, 255, 0.92);
+    --ios-material-regular: rgba(255, 255, 255, 0.85);
+    --ios-material-thin: rgba(255, 255, 255, 0.75);
+    --ios-material-ultrathin: rgba(255, 255, 255, 0.55);
+
+    /* iOS Blur */
+    --ios-blur-thick: 50px;
+    --ios-blur-regular: 40px;
+    --ios-blur-thin: 30px;
+
+    /* iOS Separator */
+    --ios-separator: rgba(60, 60, 67, 0.12);
+    --ios-separator-opaque: #c6c6c8;
+
+    /* Theme mapping */
+    --primary-start: #e8eaed;
+    --primary-end: #f5f5f7;
+    --accent-color: var(--ios-blue);
+    --accent-hover: var(--ios-blue-hover);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Loading screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #333;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+    margin-top: 16px;
+    font-size: 15px;
+    color: #666;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Container states */
+.container.loading {
+    visibility: hidden;
+}
+
+.container.loaded {
+    visibility: visible;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 1100px;
+    padding: 30px;
+}
+
+.container.auth-mode {
+    max-width: 500px;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 25px;
+    text-align: center;
+    font-size: 2em;
+}
+
+.auth-container {
+    display: none;
+}
+
+.auth-container.active {
+    display: block;
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 12px;
+    background: #f8f9fa;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.auth-tab.active {
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.auth-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.error-message {
+    background: #fee;
+    color: #c33;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.success-message {
+    background: #efe;
+    color: #3c3;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.app-container {
+    display: none;
+}
+
+.app-container.active {
+    display: block;
+}
+
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid #e0e0e0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-display {
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.user-email {
+    color: #999;
+    font-size: 12px;
+}
+
+.user-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.settings-btn {
+    padding: 8px 15px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.settings-btn:hover {
+    background: var(--accent-hover);
+}
+
+.logout-btn {
+    padding: 8px 15px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.logout-btn:hover {
+    background: #c0392b;
+}
+
+.lock-btn {
+    padding: 8px 12px;
+    background: #f39c12;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.lock-btn:hover {
+    background: #d68910;
+}
+
+.app-footer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.app-version {
+    color: #999;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.theme-selector {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 13px;
+}
+
+.theme-selector label {
+    color: #666;
+    font-weight: 500;
+}
+
+.theme-selector select {
+    padding: 6px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    background: white;
+    transition: border-color 0.3s;
+}
+
+.theme-selector select:hover {
+    border-color: #ccc;
+}
+
+.theme-selector select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.app-footer-links {
+    font-size: 11px;
+    color: #aaa;
+}
+
+.app-footer-links a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+.app-footer-links a:not(:last-child)::after {
+    content: " • ";
+    color: #aaa;
+    margin: 0 8px;
+}
+
+.app-footer-links a:hover {
+    text-decoration: underline;
+}
+
+.app-footer-links a:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.main-content {
+    display: flex;
+    gap: 20px;
+}
+
+.sidebar {
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.sidebar h2 {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Collapsible sidebar sections */
+.sidebar-section {
+    margin-bottom: 20px;
+}
+
+.sidebar-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 5px 0;
+    user-select: none;
+}
+
+.sidebar-section-header h2 {
+    margin-bottom: 0;
+}
+
+.sidebar-section-toggle {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    color: #666;
+    font-size: 12px;
+}
+
+.sidebar-section.collapsed .sidebar-section-toggle {
+    transform: rotate(-90deg);
+}
+
+.sidebar-section-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 15px;
+}
+
+.sidebar-section.collapsed .sidebar-section-content {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.category-list {
+    list-style: none;
+}
+
+.category-item {
+    padding: 10px 12px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.category-item:hover {
+    background: #f8f9fa;
+}
+
+.category-item.active {
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+    font-weight: 600;
+}
+
+.category-name {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.category-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.category-delete {
+    opacity: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 2px 5px;
+    font-size: 16px;
+    transition: opacity 0.2s;
+}
+
+.category-item:hover .category-delete {
+    opacity: 0.7;
+}
+
+.category-delete:hover {
+    opacity: 1 !important;
+}
+
+.add-category-form {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.add-category-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.add-category-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.add-category-btn {
+    width: 100%;
+    padding: 8px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.add-category-btn:hover {
+    background: var(--accent-hover);
+}
+
+.add-category-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Projects Section */
+.project-list {
+    list-style: none;
+}
+
+.project-item {
+    padding: 10px 12px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.project-item:hover {
+    background: #f8f9fa;
+}
+
+.project-item.active {
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+    font-weight: 600;
+}
+
+.project-name {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.project-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.project-delete {
+    opacity: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 2px 5px;
+    font-size: 16px;
+    transition: opacity 0.2s;
+}
+
+.project-item:hover .project-delete {
+    opacity: 0.7;
+}
+
+.project-delete:hover {
+    opacity: 1 !important;
+}
+
+.add-project-form {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.add-project-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.add-project-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.add-project-btn {
+    width: 100%;
+    padding: 8px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.add-project-btn:hover {
+    background: var(--accent-hover);
+}
+
+.add-project-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.content {
+    flex: 1;
+    min-width: 0;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 25px;
+    gap: 10px;
+}
+
+.input-row {
+    display: flex;
+    gap: 10px;
+}
+
+#todoInput {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+#todoInput:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+#categorySelect {
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    background: white;
+    min-width: 150px;
+}
+
+#categorySelect:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+#dueDateInput {
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    background: white;
+    min-width: 150px;
+}
+
+#dueDateInput:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+#addBtn {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+    white-space: nowrap;
+}
+
+#addBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+#addBtn:active {
+    transform: translateY(0);
+}
+
+#addBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.todo-list {
+    list-style: none;
+    min-height: 360px;
+}
+
+.todo-item {
+    background: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s;
+    animation: slideIn 0.3s ease-out;
+    border-left: 4px solid transparent;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.todo-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.todo-item.completed {
+    opacity: 0.6;
+}
+
+.todo-item.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.todo-item[draggable="true"] {
+    cursor: grab;
+}
+
+/* Drop target styles */
+.category-item.drag-over,
+.context-item.drag-over,
+.gtd-item.drag-over,
+.project-item.drag-over {
+    background: var(--accent-color) !important;
+    color: white !important;
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.todo-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--accent-color);
+}
+
+.todo-text {
+    flex: 1;
+    color: #333;
+    font-size: 16px;
+    word-break: break-word;
+    cursor: pointer;
+}
+
+.todo-item.completed .todo-text {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.todo-category-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+}
+
+.todo-date {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    background: #f0f0f0;
+    white-space: nowrap;
+}
+
+.todo-date.overdue {
+    background: #fee;
+    color: #c33;
+}
+
+.todo-date.today {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.todo-priority-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+}
+
+.edit-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.edit-btn:hover {
+    background: var(--accent-hover);
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+.empty-state {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+    font-size: 16px;
+}
+
+.inbox-zen-state {
+    text-align: center;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.inbox-zen-state .zen-illustration {
+    width: 120px;
+    height: 120px;
+    opacity: 0.8;
+}
+
+.inbox-zen-state .zen-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #667eea;
+    margin: 0;
+}
+
+.inbox-zen-state .zen-message {
+    font-size: 14px;
+    color: #888;
+    max-width: 280px;
+    line-height: 1.5;
+}
+
+.loading-state {
+    text-align: center;
+    color: var(--accent-color);
+    padding: 40px 20px;
+    font-size: 16px;
+}
+
+.stats {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    color: #666;
+    font-size: 14px;
+}
+
+.add-todo-btn {
+    padding: 15px 30px;
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
+
+.add-todo-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.modal-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-form label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.modal-form input,
+.modal-form select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.modal-form input:focus,
+.modal-form select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.modal-btn-primary {
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+}
+
+.modal-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.modal-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.modal-btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.modal-btn-secondary {
+    background: #e0e0e0;
+    color: #666;
+}
+
+.modal-btn-secondary:hover {
+    background: #d0d0d0;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .input-row {
+        flex-direction: column;
+    }
+
+    #categorySelect {
+        min-width: auto;
+    }
+
+    .user-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .user-info {
+        flex-wrap: wrap;
+        min-width: 0;
+    }
+
+    .user-email {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 150px;
+    }
+
+    .user-actions {
+        flex-shrink: 0;
+    }
+}
+
+/* ========================================
+   GTD Sidebar Section
+   ======================================== */
+
+.gtd-section {
+    margin-bottom: 25px;
+}
+
+.gtd-list {
+    list-style: none;
+    padding-left: 1px; /* Prevents Safari from clipping left border of items with border-radius */
+}
+
+.gtd-item {
+    padding: 10px 12px;
+    margin-bottom: 2px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+}
+
+.gtd-item:hover {
+    background: #f8f9fa;
+    color: #333;
+}
+
+.gtd-item.active {
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+    font-weight: 600;
+}
+
+.gtd-icon {
+    width: 20px;
+    margin-right: 10px;
+    text-align: center;
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.gtd-item.active .gtd-icon {
+    opacity: 1;
+}
+
+.gtd-label {
+    flex: 1;
+}
+
+.gtd-count {
+    font-size: 12px;
+    color: #999;
+    min-width: 24px;
+    text-align: right;
+}
+
+.gtd-item.active .gtd-count {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.gtd-item.inbox .gtd-icon { color: #1976d2; }
+.gtd-item.next_action .gtd-icon { color: #388e3c; }
+.gtd-item.waiting_for .gtd-icon { color: #f57c00; }
+.gtd-item.someday_maybe .gtd-icon { color: #7b1fa2; }
+.gtd-item.done .gtd-icon { color: #2e7d32; }
+.gtd-item.all .gtd-icon { color: #666; }
+
+.gtd-item.active .gtd-icon {
+    color: white;
+}
+
+/* Context Styles */
+
+/* Contexts section in sidebar */
+.contexts-header {
+    /* No special styling needed - sections have margin via .sidebar-section */
+}
+
+.context-list {
+    list-style: none;
+}
+
+.context-item {
+    padding: 10px 12px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.context-item:hover {
+    background: #f8f9fa;
+}
+
+.context-item.active {
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+    font-weight: 600;
+}
+
+.context-name {
+    flex: 1;
+}
+
+.context-delete {
+    opacity: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 2px 5px;
+    font-size: 16px;
+    transition: opacity 0.2s;
+}
+
+.context-item:hover .context-delete {
+    opacity: 0.7;
+}
+
+.context-delete:hover {
+    opacity: 1 !important;
+}
+
+.add-context-form {
+    margin-top: 15px;
+}
+
+.add-context-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.add-context-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.add-context-btn {
+    width: 100%;
+    padding: 8px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.add-context-btn:hover {
+    background: var(--accent-hover);
+}
+
+.add-context-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* GTD Status Badge Colors */
+.todo-gtd-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.todo-gtd-badge.inbox {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.todo-gtd-badge.next_action {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.todo-gtd-badge.waiting_for {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.todo-gtd-badge.someday_maybe {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.todo-gtd-badge.done {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+/* Context Badge */
+.todo-context-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #eceff1;
+    color: #546e7a;
+    white-space: nowrap;
+}
+
+/* ========================================
+   Glass Theme - iOS 26 Authentic Design
+   ======================================== */
+
+/* iOS Background - Subtle light gradient */
+[data-theme="glass"] body {
+    background: var(--ios-bg-grouped);
+    background-image: linear-gradient(180deg, #ffffff 0%, var(--ios-gray6) 100%);
+    background-attachment: fixed;
+}
+
+/* iOS Container - Thick material */
+[data-theme="glass"] .container {
+    background: var(--ios-material-thick);
+    backdrop-filter: blur(var(--ios-blur-thick));
+    -webkit-backdrop-filter: blur(var(--ios-blur-thick));
+    border: none;
+    box-shadow: 0 0 0 0.5px var(--ios-separator-opaque),
+                0 2px 10px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+}
+
+/* iOS Typography */
+[data-theme="glass"] h1 {
+    color: var(--ios-label);
+    font-weight: 700;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+}
+
+[data-theme="glass"] h2 {
+    color: var(--ios-label-secondary);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* iOS Segmented Control (Auth tabs) */
+[data-theme="glass"] .auth-tabs {
+    background: var(--ios-gray5);
+    border-radius: 9px;
+    padding: 2px;
+}
+
+[data-theme="glass"] .auth-tab {
+    background: transparent;
+    border: none;
+    border-radius: 7px;
+    color: var(--ios-label);
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+[data-theme="glass"] .auth-tab:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="glass"] .auth-tab.active {
+    background: var(--ios-bg-secondary);
+    color: var(--ios-label);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                0 0 0 0.5px var(--ios-separator);
+}
+
+/* iOS Form Inputs */
+[data-theme="glass"] .form-group input,
+[data-theme="glass"] .form-group select,
+[data-theme="glass"] .modal-form input,
+[data-theme="glass"] .modal-form select {
+    background: var(--ios-bg-secondary);
+    border: 1px solid var(--ios-separator);
+    border-radius: 10px;
+    color: var(--ios-label);
+    font-size: 17px;
+    padding: 11px 16px;
+    transition: border-color 0.2s ease, outline 0.2s ease;
+}
+
+[data-theme="glass"] .form-group input:focus,
+[data-theme="glass"] .form-group select:focus,
+[data-theme="glass"] .modal-form input:focus,
+[data-theme="glass"] .modal-form select:focus {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-blue);
+    outline: 4px solid rgba(0, 122, 255, 0.15);
+    outline-offset: -1px;
+}
+
+[data-theme="glass"] .form-group input::placeholder,
+[data-theme="glass"] .modal-form input::placeholder {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .form-group label,
+[data-theme="glass"] .modal-form label {
+    color: var(--ios-label);
+    font-weight: 400;
+    font-size: 15px;
+}
+
+/* iOS Buttons - Filled style */
+[data-theme="glass"] .auth-btn,
+[data-theme="glass"] .modal-btn-primary,
+[data-theme="glass"] .add-todo-btn {
+    background: var(--ios-blue);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 17px;
+    padding: 14px 20px;
+    box-shadow: none;
+    transition: all 0.15s ease;
+}
+
+[data-theme="glass"] .auth-btn:hover,
+[data-theme="glass"] .modal-btn-primary:hover,
+[data-theme="glass"] .add-todo-btn:hover {
+    background: var(--ios-blue-hover);
+    transform: none;
+    box-shadow: none;
+}
+
+[data-theme="glass"] .auth-btn:active,
+[data-theme="glass"] .modal-btn-primary:active,
+[data-theme="glass"] .add-todo-btn:active {
+    transform: scale(0.98);
+}
+
+[data-theme="glass"] .modal-btn-secondary {
+    background: var(--ios-gray5);
+    color: var(--ios-label);
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 17px;
+}
+
+[data-theme="glass"] .modal-btn-secondary:hover {
+    background: var(--ios-gray4);
+}
+
+/* iOS Sidebar */
+[data-theme="glass"] .sidebar {
+    background: transparent;
+    padding: 1px; /* Prevents Safari from clipping box-shadow on child lists */
+}
+
+[data-theme="glass"] .sidebar h2 {
+    color: var(--ios-label-secondary);
+    padding-left: 16px;
+    margin-bottom: 8px;
+}
+
+[data-theme="glass"] .sidebar-section-header {
+    padding: 5px 16px 5px 0;
+}
+
+[data-theme="glass"] .sidebar-section-toggle {
+    color: var(--ios-label-tertiary);
+}
+
+/* iOS Grouped List (Categories) */
+[data-theme="glass"] .category-list {
+    background: var(--ios-bg-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .category-item {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: var(--ios-label);
+    padding: 12px 16px;
+    margin-bottom: 0;
+    transition: background 0.15s ease;
+    border-bottom: 0.5px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .category-item:last-child {
+    border-bottom: none;
+}
+
+[data-theme="glass"] .category-item:hover {
+    background: var(--ios-gray6);
+}
+
+[data-theme="glass"] .category-item.active {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--ios-blue);
+    box-shadow: none;
+}
+
+[data-theme="glass"] .category-item.active .category-name {
+    font-weight: 600;
+}
+
+[data-theme="glass"] .add-category-form {
+    border-top: none;
+    padding: 20px 5px 0 5px; /* Horizontal padding for input focus outline */
+}
+
+[data-theme="glass"] .add-category-input {
+    background: var(--ios-bg-secondary);
+    border: 1px solid var(--ios-separator);
+    border-radius: 10px;
+    color: var(--ios-label);
+    font-size: 15px;
+}
+
+[data-theme="glass"] .add-category-input:focus {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-blue);
+    outline: 4px solid rgba(0, 122, 255, 0.15);
+    outline-offset: -1px;
+}
+
+[data-theme="glass"] .add-category-btn {
+    background: var(--ios-blue);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: background 0.15s ease;
+}
+
+[data-theme="glass"] .add-category-btn:hover {
+    background: var(--ios-blue-hover);
+}
+
+/* iOS Projects Section */
+[data-theme="glass"] .project-list {
+    background: var(--ios-bg-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .project-item {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: var(--ios-label);
+    padding: 12px 16px;
+    margin-bottom: 0;
+    transition: background 0.15s ease;
+    border-bottom: 0.5px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .project-item:last-child {
+    border-bottom: none;
+}
+
+[data-theme="glass"] .project-item:hover {
+    background: var(--ios-gray6);
+}
+
+[data-theme="glass"] .project-item.active {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--ios-blue);
+    box-shadow: none;
+}
+
+[data-theme="glass"] .project-item.active .project-name {
+    font-weight: 600;
+}
+
+[data-theme="glass"] .add-project-form {
+    border-top: none;
+    padding: 20px 5px 0 5px; /* Horizontal padding for input focus outline */
+}
+
+[data-theme="glass"] .add-project-input {
+    background: var(--ios-bg-secondary);
+    border: 1px solid var(--ios-separator);
+    border-radius: 10px;
+    color: var(--ios-label);
+    font-size: 15px;
+}
+
+[data-theme="glass"] .add-project-input:focus {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-blue);
+    outline: 4px solid rgba(0, 122, 255, 0.15);
+    outline-offset: -1px;
+}
+
+[data-theme="glass"] .add-project-btn {
+    background: var(--ios-blue);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: background 0.15s ease;
+}
+
+[data-theme="glass"] .add-project-btn:hover {
+    background: var(--ios-blue-hover);
+}
+
+/* iOS Content Area - padding to prevent box-shadow clipping */
+[data-theme="glass"] .content {
+    padding-left: 1px;
+}
+
+/* iOS Todo Items - Grouped list style */
+[data-theme="glass"] .todo-list {
+    background: var(--ios-bg-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .todo-item {
+    background: transparent;
+    border: none;
+    border-left: none;
+    border-radius: 0;
+    margin-bottom: 0;
+    padding: 14px 16px;
+    border-bottom: 0.5px solid var(--ios-separator);
+    transition: background 0.15s ease;
+}
+
+[data-theme="glass"] .todo-item:last-child {
+    border-bottom: none;
+}
+
+[data-theme="glass"] .todo-item:hover {
+    background: var(--ios-gray6);
+    transform: none;
+    box-shadow: none;
+}
+
+[data-theme="glass"] .todo-item.completed {
+    opacity: 0.5;
+}
+
+[data-theme="glass"] .todo-text {
+    color: var(--ios-label);
+    font-size: 17px;
+}
+
+[data-theme="glass"] .todo-item.completed .todo-text {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .todo-checkbox {
+    width: 22px;
+    height: 22px;
+    accent-color: var(--ios-blue);
+}
+
+[data-theme="glass"] .edit-btn {
+    background: var(--ios-blue);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    padding: 6px 12px;
+    font-weight: 500;
+}
+
+[data-theme="glass"] .edit-btn:hover {
+    background: var(--ios-blue-hover);
+}
+
+[data-theme="glass"] .delete-btn {
+    background: var(--ios-red);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    padding: 6px 12px;
+    font-weight: 500;
+}
+
+[data-theme="glass"] .delete-btn:hover {
+    background: #e62e24;
+}
+
+/* iOS Badges */
+[data-theme="glass"] .todo-category-badge,
+[data-theme="glass"] .todo-priority-badge {
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 8px;
+}
+
+[data-theme="glass"] .todo-date {
+    background: var(--ios-gray5);
+    color: var(--ios-label-secondary);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 8px;
+}
+
+[data-theme="glass"] .todo-date.overdue {
+    background: rgba(255, 59, 48, 0.15);
+    color: var(--ios-red);
+}
+
+[data-theme="glass"] .todo-date.today {
+    background: rgba(255, 149, 0, 0.15);
+    color: var(--ios-orange);
+}
+
+/* iOS Stats */
+[data-theme="glass"] .stats {
+    color: var(--ios-label-secondary);
+    border-top-color: var(--ios-separator);
+    font-size: 13px;
+}
+
+/* iOS User Header */
+[data-theme="glass"] .user-header {
+    border-top-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .user-display {
+    color: var(--ios-label);
+    font-weight: 600;
+}
+
+[data-theme="glass"] .user-email {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .settings-btn {
+    background: var(--ios-gray5);
+    color: var(--ios-label);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background 0.15s ease;
+}
+
+[data-theme="glass"] .settings-btn:hover {
+    background: var(--ios-gray4);
+}
+
+[data-theme="glass"] .lock-btn {
+    background: var(--ios-gray5);
+    color: var(--ios-label);
+    border: none;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+}
+
+[data-theme="glass"] .lock-btn:hover {
+    background: var(--ios-gray4);
+}
+
+[data-theme="glass"] .logout-btn {
+    background: var(--ios-red);
+    border: none;
+    border-radius: 8px;
+    transition: background 0.15s ease;
+}
+
+[data-theme="glass"] .logout-btn:hover {
+    background: #e62e24;
+}
+
+/* iOS Footer */
+[data-theme="glass"] .app-footer {
+    border-top-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .app-version {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .theme-selector label {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .theme-selector select {
+    background: var(--ios-bg-secondary);
+    border: 1px solid var(--ios-separator);
+    border-radius: 8px;
+    color: var(--ios-label);
+    padding: 8px 12px;
+}
+
+[data-theme="glass"] .app-footer-links a {
+    color: var(--ios-blue);
+}
+
+[data-theme="glass"] .app-footer-links a:hover {
+    color: var(--ios-blue-hover);
+}
+
+/* iOS Modal Overlay */
+[data-theme="glass"] .modal-overlay {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(var(--ios-blur-thin));
+    -webkit-backdrop-filter: blur(var(--ios-blur-thin));
+}
+
+/* iOS Modal - Sheet style */
+[data-theme="glass"] .modal {
+    background: var(--ios-bg-grouped);
+    backdrop-filter: blur(var(--ios-blur-thick));
+    -webkit-backdrop-filter: blur(var(--ios-blur-thick));
+    border: none;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+    border-radius: 14px;
+}
+
+[data-theme="glass"] .modal-header {
+    border-bottom: 0.5px solid var(--ios-separator);
+    padding-bottom: 15px;
+}
+
+[data-theme="glass"] .modal-header h2 {
+    color: var(--ios-label);
+    font-size: 17px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+[data-theme="glass"] .modal-close {
+    color: var(--ios-gray);
+    background: var(--ios-gray5);
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    font-size: 20px;
+}
+
+[data-theme="glass"] .modal-close:hover {
+    background: var(--ios-gray4);
+    color: var(--ios-label);
+}
+
+/* iOS Empty State */
+[data-theme="glass"] .empty-state {
+    color: var(--ios-label-tertiary);
+    font-size: 15px;
+}
+
+[data-theme="glass"] .inbox-zen-state .zen-title {
+    color: var(--ios-blue);
+}
+
+[data-theme="glass"] .inbox-zen-state .zen-message {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .inbox-zen-state .zen-illustration {
+    opacity: 0.9;
+}
+
+/* iOS Messages */
+[data-theme="glass"] .error-message {
+    background: rgba(255, 59, 48, 0.12);
+    color: var(--ios-red);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+[data-theme="glass"] .success-message {
+    background: rgba(52, 199, 89, 0.12);
+    color: #34c759;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+/* iOS Category Colors */
+[data-theme="glass"] .category-color {
+    width: 10px;
+    height: 10px;
+}
+
+/* ========================================
+   Glass Theme - GTD Elements
+   ======================================== */
+
+/* iOS GTD Section */
+[data-theme="glass"] .gtd-section {
+    margin-bottom: 20px;
+}
+
+[data-theme="glass"] .gtd-list {
+    background: var(--ios-bg-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .gtd-item {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: var(--ios-label);
+    padding: 12px 16px;
+    margin-bottom: 0;
+    border-bottom: 0.5px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .gtd-item:last-child {
+    border-bottom: none;
+}
+
+[data-theme="glass"] .gtd-item:hover {
+    background: var(--ios-gray6);
+}
+
+[data-theme="glass"] .gtd-item.active {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--ios-blue);
+}
+
+[data-theme="glass"] .gtd-item.active .gtd-icon {
+    color: var(--ios-blue);
+}
+
+[data-theme="glass"] .gtd-item.active .gtd-count {
+    color: var(--ios-blue);
+    opacity: 0.7;
+}
+
+[data-theme="glass"] .gtd-icon {
+    opacity: 0.8;
+}
+
+[data-theme="glass"] .gtd-count {
+    color: var(--ios-label-tertiary);
+}
+
+/* iOS Contexts Section */
+[data-theme="glass"] .contexts-header {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .context-list {
+    background: var(--ios-bg-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .context-item {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: var(--ios-label);
+    padding: 12px 16px;
+    margin-bottom: 0;
+    border-bottom: 0.5px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .context-item:last-child {
+    border-bottom: none;
+}
+
+[data-theme="glass"] .context-item:hover {
+    background: var(--ios-gray6);
+}
+
+[data-theme="glass"] .context-item.active {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--ios-blue);
+}
+
+/* Glass theme drag-over states */
+[data-theme="glass"] .category-item.drag-over,
+[data-theme="glass"] .context-item.drag-over,
+[data-theme="glass"] .gtd-item.drag-over,
+[data-theme="glass"] .project-item.drag-over {
+    background: var(--ios-blue) !important;
+    color: white !important;
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+[data-theme="glass"] .add-context-form {
+    padding: 0 5px; /* Horizontal padding for input focus outline */
+}
+
+[data-theme="glass"] .add-context-input {
+    background: var(--ios-bg-secondary);
+    border: 1px solid var(--ios-separator);
+    border-radius: 10px;
+    color: var(--ios-label);
+    font-size: 15px;
+}
+
+[data-theme="glass"] .add-context-input:focus {
+    border-color: var(--ios-blue);
+    outline: 4px solid rgba(0, 122, 255, 0.15);
+    outline-offset: -1px;
+}
+
+[data-theme="glass"] .add-context-btn {
+    background: var(--ios-blue);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+[data-theme="glass"] .add-context-btn:hover {
+    background: var(--ios-blue-hover);
+}
+
+/* iOS GTD Badges */
+[data-theme="glass"] .todo-gtd-badge {
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 8px;
+}
+
+[data-theme="glass"] .todo-gtd-badge.inbox {
+    background: rgba(0, 122, 255, 0.15);
+    color: var(--ios-blue);
+}
+
+[data-theme="glass"] .todo-gtd-badge.next_action {
+    background: rgba(52, 199, 89, 0.15);
+    color: #34c759;
+}
+
+[data-theme="glass"] .todo-gtd-badge.waiting_for {
+    background: rgba(255, 149, 0, 0.15);
+    color: var(--ios-orange);
+}
+
+[data-theme="glass"] .todo-gtd-badge.someday_maybe {
+    background: rgba(175, 82, 222, 0.15);
+    color: #af52de;
+}
+
+[data-theme="glass"] .todo-gtd-badge.done {
+    background: rgba(52, 199, 89, 0.15);
+    color: #34c759;
+}
+
+/* iOS Context Badge */
+[data-theme="glass"] .todo-context-badge {
+    background: var(--ios-gray5);
+    color: var(--ios-label-secondary);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 3px 8px;
+}
