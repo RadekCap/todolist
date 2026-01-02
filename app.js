@@ -147,6 +147,7 @@ class TodoApp {
         this.modalGtdStatusSelect = document.getElementById('modalGtdStatusSelect')
         this.modalContextSelect = document.getElementById('modalContextSelect')
         this.modalDueDateInput = document.getElementById('modalDueDateInput')
+        this.modalCommentInput = document.getElementById('modalCommentInput')
         this.modalAddBtn = document.getElementById('modalAddBtn')
         this.modalTitle = document.getElementById('modalTitle')
         this.todoList = document.getElementById('todoList')
@@ -1129,10 +1130,11 @@ class TodoApp {
             return
         }
 
-        // Decrypt todo texts
+        // Decrypt todo texts and comments
         this.todos = await Promise.all(data.map(async (todo) => ({
             ...todo,
-            text: await this.decrypt(todo.text)
+            text: await this.decrypt(todo.text),
+            comment: todo.comment ? await this.decrypt(todo.comment) : null
         })))
         this.renderGtdList()
         this.renderTodos()
@@ -1257,6 +1259,7 @@ class TodoApp {
         this.addTodoModal.classList.add('active')
         this.modalTodoInput.value = ''
         this.modalDueDateInput.value = ''
+        this.modalCommentInput.value = ''
         this.modalPrioritySelect.value = ''
         this.modalGtdStatusSelect.value = 'inbox'
         this.modalContextSelect.value = ''
@@ -1307,6 +1310,7 @@ class TodoApp {
         this.modalGtdStatusSelect.value = todo.gtd_status || 'inbox'
         this.modalContextSelect.value = todo.context_id || ''
         this.modalDueDateInput.value = todo.due_date || ''
+        this.modalCommentInput.value = todo.comment || ''
 
         // Handle Escape key to close modal
         this.handleEscapeKey = (e) => {
@@ -1425,9 +1429,11 @@ class TodoApp {
         const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
         const contextId = this.modalContextSelect.value || null
         const dueDate = this.modalDueDateInput.value || null
+        const comment = this.modalCommentInput.value.trim() || null
 
         // Encrypt todo text before storing
         const encryptedText = await this.encrypt(text)
+        const encryptedComment = comment ? await this.encrypt(comment) : null
 
         // Sync completed with gtd_status (unified status)
         const isCompleted = gtdStatus === 'done'
@@ -1443,7 +1449,8 @@ class TodoApp {
                 priority_id: priorityId,
                 gtd_status: gtdStatus,
                 context_id: contextId,
-                due_date: dueDate
+                due_date: dueDate,
+                comment: encryptedComment
             })
             .select()
 
@@ -1476,9 +1483,11 @@ class TodoApp {
         const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
         const contextId = this.modalContextSelect.value || null
         const dueDate = this.modalDueDateInput.value || null
+        const comment = this.modalCommentInput.value.trim() || null
 
         // Encrypt todo text before storing
         const encryptedText = await this.encrypt(text)
+        const encryptedComment = comment ? await this.encrypt(comment) : null
 
         // Sync completed with gtd_status (unified status)
         const isCompleted = gtdStatus === 'done'
@@ -1493,7 +1502,8 @@ class TodoApp {
                 gtd_status: gtdStatus,
                 completed: isCompleted,
                 context_id: contextId,
-                due_date: dueDate
+                due_date: dueDate,
+                comment: encryptedComment
             })
             .eq('id', this.editingTodoId)
 
@@ -1790,6 +1800,10 @@ class TodoApp {
 
                 const dateBadge = todo.due_date ? this.formatDateBadge(todo.due_date) : ''
 
+                const commentHtml = todo.comment
+                    ? `<div class="todo-comment">${this.escapeHtml(todo.comment)}</div>`
+                    : ''
+
                 if (category) {
                     li.style.borderLeftColor = this.validateColor(category.color)
                 }
@@ -1801,7 +1815,10 @@ class TodoApp {
                         ${isCompleted ? 'checked' : ''}
                         data-id="${todo.id}"
                     >
-                    <span class="todo-text">${this.escapeHtml(todo.text)}</span>
+                    <div class="todo-content">
+                        <span class="todo-text">${this.escapeHtml(todo.text)}</span>
+                        ${commentHtml}
+                    </div>
                     ${gtdBadge}
                     ${priorityBadge}
                     ${contextBadge}
