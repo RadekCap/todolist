@@ -202,21 +202,22 @@
                 <form id="addTodoForm" class="modal-form">
                     <div class="form-columns">
                         <!-- Left Column: Task -->
-                        <div class="form-column">
-                            <fieldset class="form-section">
-                                <legend class="form-section-title">Task</legend>
-                                <div class="form-field">
-                                    <label for="modalTodoInput">What needs to be done?</label>
+                        <div class="form-column form-column-task">
+                            <fieldset class="form-section form-section-task">
+                                <legend class="form-section-title"><span class="section-icon">✏️</span> Task</legend>
+                                <div class="form-field form-field-title">
+                                    <label for="modalTodoInput"><span class="label-icon">📝</span> What needs to be done?</label>
                                     <input
                                         type="text"
                                         id="modalTodoInput"
+                                        class="input-title"
                                         placeholder="Enter todo description..."
                                         autocomplete="off"
                                         required
                                     >
                                 </div>
                                 <div class="form-field">
-                                    <label for="modalCommentInput">Notes</label>
+                                    <label for="modalCommentInput"><span class="label-icon">📋</span> Notes</label>
                                     <textarea
                                         id="modalCommentInput"
                                         placeholder="Add additional notes or details..."
@@ -230,15 +231,15 @@
                         <!-- Right Column: Organization & Planning -->
                         <div class="form-column">
                             <fieldset class="form-section">
-                                <legend class="form-section-title">Organization</legend>
+                                <legend class="form-section-title"><span class="section-icon">📁</span> Organization</legend>
                                 <div class="form-field">
-                                    <label for="modalCategorySelect">Category</label>
+                                    <label for="modalCategorySelect"><span class="label-icon">🏷️</span> Category</label>
                                     <select id="modalCategorySelect">
                                         <option value="">No Category</option>
                                     </select>
                                 </div>
                                 <div class="form-field">
-                                    <label for="modalProjectSelect">Project</label>
+                                    <label for="modalProjectSelect"><span class="label-icon">📂</span> Project</label>
                                     <select id="modalProjectSelect">
                                         <option value="">No Project</option>
                                     </select>
@@ -246,9 +247,9 @@
                             </fieldset>
 
                             <fieldset class="form-section">
-                                <legend class="form-section-title">Planning</legend>
+                                <legend class="form-section-title"><span class="section-icon">📅</span> Planning</legend>
                                 <div class="form-field">
-                                    <label for="modalGtdStatusSelect">Status</label>
+                                    <label for="modalGtdStatusSelect"><span class="label-icon">📥</span> Status</label>
                                     <select id="modalGtdStatusSelect" aria-label="GTD Status">
                                         <option value="inbox">Inbox</option>
                                         <option value="next_action">Next Action</option>
@@ -258,19 +259,19 @@
                                     </select>
                                 </div>
                                 <div class="form-field">
-                                    <label for="modalPrioritySelect">Priority</label>
+                                    <label for="modalPrioritySelect"><span class="label-icon">🔥</span> Priority</label>
                                     <select id="modalPrioritySelect" aria-label="Priority">
                                         <option value="">No Priority</option>
                                     </select>
                                 </div>
                                 <div class="form-field">
-                                    <label for="modalContextSelect">Context</label>
+                                    <label for="modalContextSelect"><span class="label-icon">📍</span> Context</label>
                                     <select id="modalContextSelect" aria-label="Context">
                                         <option value="">No Context</option>
                                     </select>
                                 </div>
                                 <div class="form-field">
-                                    <label for="modalDueDateInput">Due Date</label>
+                                    <label for="modalDueDateInput"><span class="label-icon">🗓️</span> Due Date</label>
                                     <input
                                         type="date"
                                         id="modalDueDateInput"
