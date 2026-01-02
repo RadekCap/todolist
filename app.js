@@ -168,6 +168,7 @@ class TodoApp {
         this.gtdList = document.getElementById('gtdList')
         this.totalTodosEl = document.getElementById('totalTodos')
         this.completedTodosEl = document.getElementById('completedTodos')
+        this.exportBtn = document.getElementById('exportBtn')
         this.versionNumberEl = document.getElementById('versionNumber')
         this.themeSelect = document.getElementById('themeSelect')
         this.unlockModal = document.getElementById('unlockModal')
@@ -333,6 +334,9 @@ class TodoApp {
 
         // Theme selector
         this.themeSelect.addEventListener('change', () => this.changeTheme())
+
+        // Export button
+        this.exportBtn.addEventListener('click', () => this.exportTodos())
     }
 
     switchAuthTab(tabName) {
@@ -2236,6 +2240,143 @@ class TodoApp {
             this.migrateDataBtn.textContent = 'Encrypt Existing Data'
             this.migrateStatus.style.display = 'block'
         }
+    }
+
+    // Export currently displayed todos as plain text
+    exportTodos() {
+        const filteredTodos = this.getFilteredTodos()
+
+        if (filteredTodos.length === 0) {
+            alert('No todos to export')
+            return
+        }
+
+        // Build plain text export
+        const lines = []
+
+        // Add header with current view info
+        const viewName = this.getExportViewName()
+        lines.push(`TodoList Export - ${viewName}`)
+        lines.push(`Exported: ${new Date().toLocaleString()}`)
+        lines.push('─'.repeat(40))
+        lines.push('')
+
+        filteredTodos.forEach(todo => {
+            const checkbox = todo.gtd_status === 'done' ? '[x]' : '[ ]'
+            lines.push(`${checkbox} ${todo.text}`)
+
+            // Add metadata on indented lines
+            const meta = []
+
+            if (todo.due_date) {
+                meta.push(`Due: ${todo.due_date}`)
+            }
+
+            const category = todo.category_id ? this.getCategoryById(todo.category_id) : null
+            if (category) {
+                meta.push(`Category: ${category.name}`)
+            }
+
+            const project = todo.project_id ? this.projects.find(p => p.id === todo.project_id) : null
+            if (project) {
+                meta.push(`Project: ${project.name}`)
+            }
+
+            const context = todo.context_id ? this.getContextById(todo.context_id) : null
+            if (context) {
+                meta.push(`Context: ${context.name}`)
+            }
+
+            const priority = todo.priority_id ? this.getPriorityById(todo.priority_id) : null
+            if (priority) {
+                meta.push(`Priority: ${priority.name}`)
+            }
+
+            if (meta.length > 0) {
+                lines.push(`    ${meta.join(' | ')}`)
+            }
+
+            if (todo.comment) {
+                lines.push(`    Note: ${todo.comment}`)
+            }
+
+            lines.push('')
+        })
+
+        // Add summary
+        lines.push('─'.repeat(40))
+        const completed = filteredTodos.filter(t => t.gtd_status === 'done').length
+        lines.push(`Total: ${filteredTodos.length} | Completed: ${completed}`)
+
+        const content = lines.join('\n')
+
+        // Download as file
+        this.downloadTextFile(content, `todolist-export-${this.getExportFileName()}.txt`)
+    }
+
+    getExportViewName() {
+        const parts = []
+
+        // GTD status
+        const gtdLabels = {
+            'inbox': 'Inbox',
+            'next_action': 'Next Actions',
+            'scheduled': 'Scheduled',
+            'waiting_for': 'Waiting For',
+            'someday_maybe': 'Someday/Maybe',
+            'done': 'Done',
+            'all': 'All'
+        }
+        parts.push(gtdLabels[this.selectedGtdStatus] || this.selectedGtdStatus)
+
+        // Categories
+        if (this.selectedCategoryIds.size > 0) {
+            const catNames = [...this.selectedCategoryIds].map(id => {
+                if (id === 'uncategorized') return 'Uncategorized'
+                const cat = this.getCategoryById(id)
+                return cat ? cat.name : id
+            })
+            parts.push(`Categories: ${catNames.join(', ')}`)
+        }
+
+        // Contexts
+        if (this.selectedContextIds.size > 0) {
+            const ctxNames = [...this.selectedContextIds].map(id => {
+                const ctx = this.getContextById(id)
+                return ctx ? ctx.name : id
+            })
+            parts.push(`Contexts: ${ctxNames.join(', ')}`)
+        }
+
+        // Project
+        if (this.selectedProjectId) {
+            const project = this.projects.find(p => p.id === this.selectedProjectId)
+            if (project) {
+                parts.push(`Project: ${project.name}`)
+            }
+        }
+
+        return parts.join(' | ')
+    }
+
+    getExportFileName() {
+        const date = new Date().toISOString().split('T')[0]
+        const status = this.selectedGtdStatus.replace('_', '-')
+        return `${date}-${status}`
+    }
+
+    downloadTextFile(content, filename) {
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+        const url = URL.createObjectURL(blob)
+
+        const link = document.createElement('a')
+        link.href = url
+        link.download = filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+
+        URL.revokeObjectURL(url)
     }
 }
 
