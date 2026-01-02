@@ -982,6 +982,9 @@ class TodoApp {
             // Clicking a specific project shows its todos
             this.selectedProjectId = projectId
             this.showProjectsView = false
+            // Switch GTD filter to 'all' to show all items in this project
+            this.selectedGtdStatus = 'all'
+            this.renderGtdList()
         }
         this.renderProjects()
         this.renderTodos()
