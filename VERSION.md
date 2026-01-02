@@ -114,5 +114,5 @@ When preparing a feature or breaking change release:
 
 ---
 
-**Current Version:** 1.0.46
+**Current Version:** 1.0.47
 **Last Updated:** 2026-01-02
