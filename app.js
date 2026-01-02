@@ -1912,18 +1912,7 @@ class TodoApp {
                 // Derive completed state from gtd_status (unified status)
                 const isCompleted = todo.gtd_status === 'done'
                 li.className = `todo-item ${isCompleted ? 'completed' : ''}`
-                li.draggable = true
                 li.dataset.todoId = todo.id
-
-                // Drag event handlers
-                li.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', todo.id)
-                    e.dataTransfer.effectAllowed = 'move'
-                    li.classList.add('dragging')
-                })
-                li.addEventListener('dragend', () => {
-                    li.classList.remove('dragging')
-                })
 
                 const category = todo.category_id ? (this.getCategoryById(todo.category_id) ?? null) : null
                 const categoryBadge = category
@@ -1954,6 +1943,7 @@ class TodoApp {
                 }
 
                 li.innerHTML = `
+                    <span class="drag-handle" draggable="true">⋮⋮</span>
                     <input
                         type="checkbox"
                         class="todo-checkbox"
@@ -1972,6 +1962,17 @@ class TodoApp {
                     <button class="edit-btn" data-id="${todo.id}">Edit</button>
                     <button class="delete-btn" data-id="${todo.id}">Delete</button>
                 `
+
+                // Drag handle events
+                const dragHandle = li.querySelector('.drag-handle')
+                dragHandle.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', todo.id)
+                    e.dataTransfer.effectAllowed = 'move'
+                    li.classList.add('dragging')
+                })
+                dragHandle.addEventListener('dragend', () => {
+                    li.classList.remove('dragging')
+                })
 
                 const checkbox = li.querySelector('.todo-checkbox')
                 checkbox.addEventListener('change', () => this.toggleTodo(todo.id))

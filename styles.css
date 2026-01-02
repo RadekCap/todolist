@@ -955,9 +955,6 @@ h1 {
     cursor: grabbing;
 }
 
-.todo-item[draggable="true"] {
-    cursor: grab;
-}
 
 /* Drop target styles */
 .category-item.drag-over,
@@ -968,6 +965,30 @@ h1 {
     color: white !important;
     transform: scale(1.02);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.drag-handle {
+    cursor: grab;
+    color: #999;
+    font-size: 14px;
+    padding: 0 4px;
+    user-select: none;
+    opacity: 0.5;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.drag-handle:hover {
+    opacity: 1;
+    color: #666;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.todo-item.dragging .drag-handle {
+    opacity: 1;
+    color: var(--accent-color);
 }
 
 .todo-checkbox {
@@ -2152,6 +2173,18 @@ h1 {
 
 [data-theme="glass"] .todo-item.completed {
     opacity: 0.5;
+}
+
+[data-theme="glass"] .drag-handle {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .drag-handle:hover {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .todo-item.dragging .drag-handle {
+    color: var(--ios-blue);
 }
 
 [data-theme="glass"] .todo-text {
