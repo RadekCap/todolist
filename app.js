@@ -1059,6 +1059,10 @@ class TodoApp {
             // Count all non-done items
             return this.todos.filter(t => t.gtd_status !== 'done').length
         }
+        if (status === 'scheduled') {
+            // Count all non-done items with a due date
+            return this.todos.filter(t => t.due_date && t.gtd_status !== 'done').length
+        }
         return this.todos.filter(t => t.gtd_status === status).length
     }
 
@@ -1066,6 +1070,7 @@ class TodoApp {
         const icons = {
             'inbox': '📥',
             'next_action': '»',
+            'scheduled': '📆',
             'waiting_for': '⏳',
             'someday_maybe': '📅',
             'done': '✓',
@@ -1078,6 +1083,7 @@ class TodoApp {
         const statuses = [
             { id: 'inbox', label: 'Inbox' },
             { id: 'next_action', label: 'Next' },
+            { id: 'scheduled', label: 'Scheduled', isVirtual: true },
             { id: 'waiting_for', label: 'Waiting' },
             { id: 'someday_maybe', label: 'Someday' },
             { id: 'done', label: 'Done' },
@@ -1102,8 +1108,8 @@ class TodoApp {
 
             li.addEventListener('click', () => this.selectGtdStatus(status.id))
 
-            // Drop target for assigning GTD status (except 'all')
-            if (status.id !== 'all') {
+            // Drop target for assigning GTD status (except 'all' and 'scheduled')
+            if (status.id !== 'all' && !status.isVirtual) {
                 li.addEventListener('dragover', (e) => {
                     e.preventDefault()
                     e.dataTransfer.dropEffect = 'move'
@@ -1686,7 +1692,14 @@ class TodoApp {
         }
 
         // Filter by GTD status
-        if (this.selectedGtdStatus === 'done') {
+        if (this.selectedGtdStatus === 'scheduled') {
+            // Show all non-done items with a due date, sorted by date
+            filtered = filtered.filter(t => t.due_date && t.gtd_status !== 'done')
+            // Sort by due date (earliest first)
+            return filtered.slice().sort((a, b) => {
+                return a.due_date.localeCompare(b.due_date)
+            })
+        } else if (this.selectedGtdStatus === 'done') {
             // Show only done items when Done tab is selected
             filtered = filtered.filter(t => t.gtd_status === 'done')
         } else if (this.selectedGtdStatus !== 'all') {
