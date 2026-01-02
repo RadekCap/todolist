@@ -885,6 +885,7 @@
             color: #333;
             font-size: 16px;
             word-break: break-word;
+            cursor: pointer;
         }
 
         .todo-item.completed .todo-text {
@@ -4314,6 +4315,10 @@
 
                         const checkbox = li.querySelector('.todo-checkbox')
                         checkbox.addEventListener('change', () => this.toggleTodo(todo.id))
+
+                        // Click on todo text opens edit modal
+                        const todoText = li.querySelector('.todo-text')
+                        todoText.addEventListener('click', () => this.openEditModal(todo.id))
 
                         const editBtn = li.querySelector('.edit-btn')
                         editBtn.addEventListener('click', () => this.openEditModal(todo.id))
