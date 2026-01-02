@@ -296,6 +296,21 @@ class TodoApp {
             }
         })
 
+        // Sync due date and scheduled status
+        this.modalDueDateInput.addEventListener('change', () => {
+            if (this.modalDueDateInput.value) {
+                // Auto-set scheduled status when due date is filled
+                this.modalGtdStatusSelect.value = 'scheduled'
+            }
+        })
+
+        this.modalGtdStatusSelect.addEventListener('change', () => {
+            if (this.modalGtdStatusSelect.value === 'scheduled' && !this.modalDueDateInput.value) {
+                // Focus on due date input when scheduled is selected without a date
+                this.modalDueDateInput.focus()
+            }
+        })
+
         // Add category
         this.addCategoryBtn.addEventListener('click', () => this.addCategory())
         this.newCategoryInput.addEventListener('keypress', (e) => {
@@ -1449,15 +1464,23 @@ class TodoApp {
         const text = this.modalTodoInput.value.trim()
         if (!text) return
 
+        const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
+        const dueDate = this.modalDueDateInput.value || null
+
+        // Validate: scheduled status requires a due date
+        if (gtdStatus === 'scheduled' && !dueDate) {
+            alert('A due date is required for scheduled todos')
+            this.modalDueDateInput.focus()
+            return
+        }
+
         this.modalAddBtn.disabled = true
         this.modalAddBtn.textContent = 'Adding...'
 
         const categoryId = this.modalCategorySelect.value || null
         const projectId = this.modalProjectSelect.value || null
         const priorityId = this.modalPrioritySelect.value || null
-        const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
         const contextId = this.modalContextSelect.value || null
-        const dueDate = this.modalDueDateInput.value || null
         const comment = this.modalCommentInput.value.trim() || null
 
         // Encrypt todo text before storing
@@ -1515,15 +1538,23 @@ class TodoApp {
         const text = this.modalTodoInput.value.trim()
         if (!text || !this.editingTodoId) return
 
+        const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
+        const dueDate = this.modalDueDateInput.value || null
+
+        // Validate: scheduled status requires a due date
+        if (gtdStatus === 'scheduled' && !dueDate) {
+            alert('A due date is required for scheduled todos')
+            this.modalDueDateInput.focus()
+            return
+        }
+
         this.modalAddBtn.disabled = true
         this.modalAddBtn.textContent = 'Saving...'
 
         const categoryId = this.modalCategorySelect.value || null
         const projectId = this.modalProjectSelect.value || null
         const priorityId = this.modalPrioritySelect.value || null
-        const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
         const contextId = this.modalContextSelect.value || null
-        const dueDate = this.modalDueDateInput.value || null
         const comment = this.modalCommentInput.value.trim() || null
 
         // Encrypt todo text before storing
