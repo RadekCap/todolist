@@ -190,6 +190,25 @@ h1 {
     font-size: 2em;
 }
 
+/* App Header - iOS Style */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.app-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+}
+
+.app-title {
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
 .auth-container {
     display: none;
 }
@@ -1444,6 +1463,20 @@ h1 {
     font-weight: 700;
     font-size: 28px;
     letter-spacing: -0.5px;
+}
+
+[data-theme="glass"] .app-header {
+    gap: 10px;
+}
+
+[data-theme="glass"] .app-icon {
+    width: 32px;
+    height: 32px;
+}
+
+[data-theme="glass"] .app-title {
+    font-weight: 600;
+    letter-spacing: -0.3px;
 }
 
 [data-theme="glass"] h2 {
