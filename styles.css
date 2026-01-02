@@ -1375,6 +1375,7 @@ h1 {
 
 .gtd-item.inbox .gtd-icon { color: #1976d2; }
 .gtd-item.next_action .gtd-icon { color: #388e3c; }
+.gtd-item.scheduled .gtd-icon { color: #e91e63; }
 .gtd-item.waiting_for .gtd-icon { color: #f57c00; }
 .gtd-item.someday_maybe .gtd-icon { color: #7b1fa2; }
 .gtd-item.done .gtd-icon { color: #2e7d32; }
