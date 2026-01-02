@@ -200,86 +200,85 @@
                     <button id="closeModal" class="modal-close" aria-label="Close modal">&times;</button>
                 </div>
                 <form id="addTodoForm" class="modal-form">
-                    <!-- Task Section -->
-                    <fieldset class="form-section">
-                        <legend class="form-section-title">Task</legend>
-                        <div class="form-field">
-                            <label for="modalTodoInput">What needs to be done?</label>
-                            <input
-                                type="text"
-                                id="modalTodoInput"
-                                placeholder="Enter todo description..."
-                                autocomplete="off"
-                                required
-                            >
+                    <div class="form-columns">
+                        <!-- Left Column: Task -->
+                        <div class="form-column">
+                            <fieldset class="form-section">
+                                <legend class="form-section-title">Task</legend>
+                                <div class="form-field">
+                                    <label for="modalTodoInput">What needs to be done?</label>
+                                    <input
+                                        type="text"
+                                        id="modalTodoInput"
+                                        placeholder="Enter todo description..."
+                                        autocomplete="off"
+                                        required
+                                    >
+                                </div>
+                                <div class="form-field">
+                                    <label for="modalCommentInput">Notes</label>
+                                    <textarea
+                                        id="modalCommentInput"
+                                        placeholder="Add additional notes or details..."
+                                        maxlength="1024"
+                                        rows="6"
+                                    ></textarea>
+                                </div>
+                            </fieldset>
                         </div>
-                        <div class="form-field">
-                            <label for="modalCommentInput">Notes</label>
-                            <textarea
-                                id="modalCommentInput"
-                                placeholder="Add additional notes or details..."
-                                maxlength="1024"
-                                rows="3"
-                            ></textarea>
-                        </div>
-                    </fieldset>
 
-                    <!-- Organization Section -->
-                    <fieldset class="form-section">
-                        <legend class="form-section-title">Organization</legend>
-                        <div class="form-row">
-                            <div class="form-field">
-                                <label for="modalCategorySelect">Category</label>
-                                <select id="modalCategorySelect">
-                                    <option value="">No Category</option>
-                                </select>
-                            </div>
-                            <div class="form-field">
-                                <label for="modalProjectSelect">Project</label>
-                                <select id="modalProjectSelect">
-                                    <option value="">No Project</option>
-                                </select>
-                            </div>
-                        </div>
-                    </fieldset>
+                        <!-- Right Column: Organization & Planning -->
+                        <div class="form-column">
+                            <fieldset class="form-section">
+                                <legend class="form-section-title">Organization</legend>
+                                <div class="form-field">
+                                    <label for="modalCategorySelect">Category</label>
+                                    <select id="modalCategorySelect">
+                                        <option value="">No Category</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label for="modalProjectSelect">Project</label>
+                                    <select id="modalProjectSelect">
+                                        <option value="">No Project</option>
+                                    </select>
+                                </div>
+                            </fieldset>
 
-                    <!-- Planning Section -->
-                    <fieldset class="form-section">
-                        <legend class="form-section-title">Planning</legend>
-                        <div class="form-row">
-                            <div class="form-field">
-                                <label for="modalGtdStatusSelect">Status</label>
-                                <select id="modalGtdStatusSelect" aria-label="GTD Status">
-                                    <option value="inbox">Inbox</option>
-                                    <option value="next_action">Next Action</option>
-                                    <option value="waiting_for">Waiting For</option>
-                                    <option value="someday_maybe">Someday/Maybe</option>
-                                    <option value="done">Done</option>
-                                </select>
-                            </div>
-                            <div class="form-field">
-                                <label for="modalPrioritySelect">Priority</label>
-                                <select id="modalPrioritySelect" aria-label="Priority">
-                                    <option value="">No Priority</option>
-                                </select>
-                            </div>
+                            <fieldset class="form-section">
+                                <legend class="form-section-title">Planning</legend>
+                                <div class="form-field">
+                                    <label for="modalGtdStatusSelect">Status</label>
+                                    <select id="modalGtdStatusSelect" aria-label="GTD Status">
+                                        <option value="inbox">Inbox</option>
+                                        <option value="next_action">Next Action</option>
+                                        <option value="waiting_for">Waiting For</option>
+                                        <option value="someday_maybe">Someday/Maybe</option>
+                                        <option value="done">Done</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label for="modalPrioritySelect">Priority</label>
+                                    <select id="modalPrioritySelect" aria-label="Priority">
+                                        <option value="">No Priority</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label for="modalContextSelect">Context</label>
+                                    <select id="modalContextSelect" aria-label="Context">
+                                        <option value="">No Context</option>
+                                    </select>
+                                </div>
+                                <div class="form-field">
+                                    <label for="modalDueDateInput">Due Date</label>
+                                    <input
+                                        type="date"
+                                        id="modalDueDateInput"
+                                    >
+                                </div>
+                            </fieldset>
                         </div>
-                        <div class="form-row">
-                            <div class="form-field">
-                                <label for="modalContextSelect">Context</label>
-                                <select id="modalContextSelect" aria-label="Context">
-                                    <option value="">No Context</option>
-                                </select>
-                            </div>
-                            <div class="form-field">
-                                <label for="modalDueDateInput">Due Date</label>
-                                <input
-                                    type="date"
-                                    id="modalDueDateInput"
-                                >
-                            </div>
-                        </div>
-                    </fieldset>
+                    </div>
 
                     <div class="create-more-option">
                         <label class="checkbox-label">
