@@ -624,6 +624,108 @@
             cursor: not-allowed;
         }
 
+        /* Projects Section */
+        .project-list {
+            list-style: none;
+        }
+
+        .project-item {
+            padding: 10px 12px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .project-item:hover {
+            background: #f8f9fa;
+        }
+
+        .project-item.active {
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        .project-name {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .project-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .project-delete {
+            opacity: 0;
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 2px 5px;
+            font-size: 16px;
+            transition: opacity 0.2s;
+        }
+
+        .project-item:hover .project-delete {
+            opacity: 0.7;
+        }
+
+        .project-delete:hover {
+            opacity: 1 !important;
+        }
+
+        .add-project-form {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .add-project-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .add-project-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .add-project-btn {
+            width: 100%;
+            padding: 8px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .add-project-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .add-project-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .content {
             flex: 1;
             min-width: 0;
@@ -763,7 +865,8 @@
         /* Drop target styles */
         .category-item.drag-over,
         .context-item.drag-over,
-        .gtd-item.drag-over {
+        .gtd-item.drag-over,
+        .project-item.drag-over {
             background: var(--accent-color) !important;
             color: white !important;
             transform: scale(1.02);
@@ -1552,6 +1655,76 @@
             background: var(--ios-blue-hover);
         }
 
+        /* iOS Projects Section */
+        [data-theme="glass"] .project-list {
+            background: var(--ios-bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 0 0.5px var(--ios-separator);
+        }
+
+        [data-theme="glass"] .project-item {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            color: var(--ios-label);
+            padding: 12px 16px;
+            margin-bottom: 0;
+            transition: background 0.15s ease;
+            border-bottom: 0.5px solid var(--ios-separator);
+        }
+
+        [data-theme="glass"] .project-item:last-child {
+            border-bottom: none;
+        }
+
+        [data-theme="glass"] .project-item:hover {
+            background: var(--ios-gray6);
+        }
+
+        [data-theme="glass"] .project-item.active {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--ios-blue);
+            box-shadow: none;
+        }
+
+        [data-theme="glass"] .project-item.active .project-name {
+            font-weight: 600;
+        }
+
+        [data-theme="glass"] .add-project-form {
+            border-top: none;
+            padding-top: 20px;
+        }
+
+        [data-theme="glass"] .add-project-input {
+            background: var(--ios-bg-secondary);
+            border: none;
+            border-radius: 10px;
+            color: var(--ios-label);
+            font-size: 15px;
+            box-shadow: inset 0 0 0 0.5px var(--ios-separator);
+        }
+
+        [data-theme="glass"] .add-project-input:focus {
+            background: var(--ios-bg-secondary);
+            box-shadow: inset 0 0 0 0.5px var(--ios-separator),
+                        0 0 0 4px rgba(0, 122, 255, 0.15);
+        }
+
+        [data-theme="glass"] .add-project-btn {
+            background: var(--ios-blue);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: background 0.15s ease;
+        }
+
+        [data-theme="glass"] .add-project-btn:hover {
+            background: var(--ios-blue-hover);
+        }
+
         /* iOS Content Area - padding to prevent box-shadow clipping */
         [data-theme="glass"] .content {
             padding-left: 1px;
@@ -1926,7 +2099,8 @@
         /* Glass theme drag-over states */
         [data-theme="glass"] .category-item.drag-over,
         [data-theme="glass"] .context-item.drag-over,
-        [data-theme="glass"] .gtd-item.drag-over {
+        [data-theme="glass"] .gtd-item.drag-over,
+        [data-theme="glass"] .project-item.drag-over {
             background: var(--ios-blue) !important;
             color: white !important;
             transform: scale(1.02);
@@ -2063,6 +2237,27 @@
                         <ul id="gtdList" class="gtd-list"></ul>
                     </div>
 
+                    <!-- Projects Section (collapsed by default) -->
+                    <div class="sidebar-section collapsed" id="projectsSection">
+                        <div class="sidebar-section-header" role="button" aria-expanded="false" aria-controls="projectsContent">
+                            <h2>Projects</h2>
+                            <span class="sidebar-section-toggle" aria-hidden="true">▼</span>
+                        </div>
+                        <div class="sidebar-section-content" id="projectsContent">
+                            <ul id="projectList" class="project-list"></ul>
+                            <div class="add-project-form">
+                                <input
+                                    type="text"
+                                    id="newProjectInput"
+                                    class="add-project-input"
+                                    placeholder="New project..."
+                                    autocomplete="off"
+                                >
+                                <button id="addProjectBtn" class="add-project-btn">Add Project</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Categories Section (collapsed by default) -->
                     <div class="sidebar-section collapsed" id="categoriesSection">
                         <div class="sidebar-section-header" role="button" aria-expanded="false" aria-controls="categoriesContent">
@@ -2178,6 +2373,12 @@
                         <label for="modalCategorySelect">Category (optional)</label>
                         <select id="modalCategorySelect">
                             <option value="">No Category</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="modalProjectSelect">Project (optional)</label>
+                        <select id="modalProjectSelect">
+                            <option value="">No Project</option>
                         </select>
                     </div>
                     <div>
@@ -2405,8 +2606,10 @@
                 this.categories = []
                 this.priorities = []
                 this.contexts = []
+                this.projects = []
                 this.selectedCategoryIds = new Set()
                 this.selectedContextIds = new Set()
+                this.selectedProjectId = null
                 this.selectedGtdStatus = 'inbox'
                 this.editingTodoId = null
 
@@ -2453,6 +2656,11 @@
                 this.addContextBtn = document.getElementById('addContextBtn')
                 this.categoriesSection = document.getElementById('categoriesSection')
                 this.contextsSection = document.getElementById('contextsSection')
+                this.projectList = document.getElementById('projectList')
+                this.newProjectInput = document.getElementById('newProjectInput')
+                this.addProjectBtn = document.getElementById('addProjectBtn')
+                this.projectsSection = document.getElementById('projectsSection')
+                this.modalProjectSelect = document.getElementById('modalProjectSelect')
                 this.gtdList = document.getElementById('gtdList')
                 this.totalTodosEl = document.getElementById('totalTodos')
                 this.completedTodosEl = document.getElementById('completedTodos')
@@ -2595,12 +2803,21 @@
                     if (e.key === 'Enter') this.addContext()
                 })
 
+                // Add project
+                this.addProjectBtn.addEventListener('click', () => this.addProject())
+                this.newProjectInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addProject()
+                })
+
                 // Collapsible sidebar sections
                 this.categoriesSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
                     this.toggleSidebarSection(this.categoriesSection)
                 })
                 this.contextsSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
                     this.toggleSidebarSection(this.contextsSection)
+                })
+                this.projectsSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
+                    this.toggleSidebarSection(this.projectsSection)
                 })
 
                 // Unlock modal
@@ -2705,6 +2922,7 @@
                     this.loadCategories(),
                     this.loadPriorities(),
                     this.loadContexts(),
+                    this.loadProjects(),
                     this.loadTodos()
                 ])
 
@@ -3122,6 +3340,201 @@
                 this.loadTodos()
             }
 
+            // ========================================
+            // Projects Methods
+            // ========================================
+
+            async loadProjects() {
+                const { data, error } = await supabase
+                    .from('projects')
+                    .select('*')
+                    .order('created_at', { ascending: true })
+
+                if (error) {
+                    console.error('Error loading projects:', error)
+                    return
+                }
+
+                // Decrypt project names
+                this.projects = await Promise.all(data.map(async (project) => ({
+                    ...project,
+                    name: await this.decrypt(project.name)
+                })))
+                this.renderProjects()
+                this.updateProjectSelect()
+            }
+
+            renderProjects() {
+                this.projectList.innerHTML = ''
+
+                // Add "All Projects" option
+                const allItem = document.createElement('li')
+                allItem.className = `project-item ${this.selectedProjectId === null ? 'active' : ''}`
+                allItem.innerHTML = `<span class="project-name">All Projects</span>`
+                allItem.addEventListener('click', () => this.selectProject(null))
+
+                // Drop target for removing project
+                allItem.addEventListener('dragover', (e) => {
+                    e.preventDefault()
+                    e.dataTransfer.dropEffect = 'move'
+                    allItem.classList.add('drag-over')
+                })
+                allItem.addEventListener('dragleave', () => {
+                    allItem.classList.remove('drag-over')
+                })
+                allItem.addEventListener('drop', (e) => {
+                    e.preventDefault()
+                    allItem.classList.remove('drag-over')
+                    const todoId = e.dataTransfer.getData('text/plain')
+                    if (todoId) {
+                        this.updateTodoProject(todoId, null)
+                    }
+                })
+                this.projectList.appendChild(allItem)
+
+                // Add user projects
+                this.projects.forEach(project => {
+                    const li = document.createElement('li')
+                    li.className = `project-item ${this.selectedProjectId === project.id ? 'active' : ''}`
+                    li.innerHTML = `
+                        <span class="project-name">
+                            <span class="project-color" style="background-color: ${this.validateColor(project.color)}"></span>
+                            ${this.escapeHtml(project.name)}
+                        </span>
+                        <button class="project-delete" data-id="${project.id}">×</button>
+                    `
+
+                    li.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('project-delete')) {
+                            this.selectProject(project.id)
+                        }
+                    })
+
+                    // Drop target for assigning project
+                    li.addEventListener('dragover', (e) => {
+                        e.preventDefault()
+                        e.dataTransfer.dropEffect = 'move'
+                        li.classList.add('drag-over')
+                    })
+                    li.addEventListener('dragleave', () => {
+                        li.classList.remove('drag-over')
+                    })
+                    li.addEventListener('drop', (e) => {
+                        e.preventDefault()
+                        li.classList.remove('drag-over')
+                        const todoId = e.dataTransfer.getData('text/plain')
+                        if (todoId) {
+                            this.updateTodoProject(todoId, project.id)
+                        }
+                    })
+
+                    const deleteBtn = li.querySelector('.project-delete')
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation()
+                        this.deleteProject(project.id)
+                    })
+
+                    this.projectList.appendChild(li)
+                })
+            }
+
+            updateProjectSelect() {
+                this.modalProjectSelect.innerHTML = '<option value="">No Project</option>'
+
+                this.projects.forEach(project => {
+                    const option = document.createElement('option')
+                    option.value = project.id
+                    option.textContent = project.name
+                    this.modalProjectSelect.appendChild(option)
+                })
+            }
+
+            selectProject(projectId) {
+                this.selectedProjectId = projectId
+                this.renderProjects()
+                this.renderTodos()
+            }
+
+            async addProject() {
+                const name = this.newProjectInput.value.trim()
+                if (!name) return
+
+                this.addProjectBtn.disabled = true
+                this.addProjectBtn.textContent = 'Adding...'
+
+                // Encrypt project name before storing
+                const encryptedName = await this.encrypt(name)
+
+                // Generate a random color
+                const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7', '#fa709a', '#fee140']
+                const randomColor = colors[Math.floor(Math.random() * colors.length)]
+
+                const { data, error } = await supabase
+                    .from('projects')
+                    .insert({
+                        user_id: this.currentUser.id,
+                        name: encryptedName,
+                        color: randomColor
+                    })
+                    .select()
+
+                this.addProjectBtn.disabled = false
+                this.addProjectBtn.textContent = 'Add Project'
+
+                if (error) {
+                    console.error('Error adding project:', error)
+                    alert('Failed to add project')
+                    return
+                }
+
+                this.newProjectInput.value = ''
+                await this.loadProjects()
+            }
+
+            async deleteProject(projectId) {
+                if (!confirm('Delete this project? Todos in this project will become projectless.')) {
+                    return
+                }
+
+                const { error } = await supabase
+                    .from('projects')
+                    .delete()
+                    .eq('id', projectId)
+
+                if (error) {
+                    console.error('Error deleting project:', error)
+                    alert('Failed to delete project')
+                    return
+                }
+
+                this.projects = this.projects.filter(p => p.id !== projectId)
+                if (this.selectedProjectId === projectId) {
+                    this.selectedProjectId = null
+                }
+                this.renderProjects()
+                this.updateProjectSelect()
+                this.loadTodos()
+            }
+
+            async updateTodoProject(todoId, projectId) {
+                const { error } = await supabase
+                    .from('todos')
+                    .update({ project_id: projectId })
+                    .eq('id', todoId)
+
+                if (error) {
+                    console.error('Error updating todo project:', error)
+                    return
+                }
+
+                // Update local state
+                const todo = this.todos.find(t => t.id === todoId)
+                if (todo) {
+                    todo.project_id = projectId
+                }
+                this.renderTodos()
+            }
+
             selectGtdStatus(status) {
                 this.selectedGtdStatus = status
                 this.renderGtdList()
@@ -3380,6 +3793,7 @@
                 // Pre-populate fields with existing todo data
                 this.modalTodoInput.value = todo.text
                 this.modalCategorySelect.value = todo.category_id || ''
+                this.modalProjectSelect.value = todo.project_id || ''
                 this.modalPrioritySelect.value = todo.priority_id || ''
                 this.modalGtdStatusSelect.value = todo.gtd_status || 'inbox'
                 this.modalContextSelect.value = todo.context_id || ''
@@ -3406,6 +3820,7 @@
 
                 this.modalTodoInput.value = ''
                 this.modalCategorySelect.value = ''
+                this.modalProjectSelect.value = ''
                 this.modalPrioritySelect.value = ''
                 this.modalGtdStatusSelect.value = 'inbox'
                 this.modalContextSelect.value = ''
@@ -3496,6 +3911,7 @@
                 this.modalAddBtn.textContent = 'Adding...'
 
                 const categoryId = this.modalCategorySelect.value || null
+                const projectId = this.modalProjectSelect.value || null
                 const priorityId = this.modalPrioritySelect.value || null
                 const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
                 const contextId = this.modalContextSelect.value || null
@@ -3514,6 +3930,7 @@
                         text: encryptedText,
                         completed: isCompleted,
                         category_id: categoryId,
+                        project_id: projectId,
                         priority_id: priorityId,
                         gtd_status: gtdStatus,
                         context_id: contextId,
@@ -3545,6 +3962,7 @@
                 this.modalAddBtn.textContent = 'Saving...'
 
                 const categoryId = this.modalCategorySelect.value || null
+                const projectId = this.modalProjectSelect.value || null
                 const priorityId = this.modalPrioritySelect.value || null
                 const gtdStatus = this.modalGtdStatusSelect.value || 'inbox'
                 const contextId = this.modalContextSelect.value || null
@@ -3561,6 +3979,7 @@
                     .update({
                         text: encryptedText,
                         category_id: categoryId,
+                        project_id: projectId,
                         priority_id: priorityId,
                         gtd_status: gtdStatus,
                         completed: isCompleted,
@@ -3585,6 +4004,7 @@
                         ...this.todos[todoIndex],
                         text: text,
                         category_id: categoryId,
+                        project_id: projectId,
                         priority_id: priorityId,
                         gtd_status: gtdStatus,
                         completed: isCompleted,
@@ -3708,6 +4128,11 @@
                 // Filter by contexts (if any selected)
                 if (this.selectedContextIds.size > 0) {
                     filtered = filtered.filter(t => t.context_id && this.selectedContextIds.has(t.context_id))
+                }
+
+                // Filter by project (if selected)
+                if (this.selectedProjectId !== null) {
+                    filtered = filtered.filter(t => t.project_id === this.selectedProjectId)
                 }
 
                 // Filter by GTD status
