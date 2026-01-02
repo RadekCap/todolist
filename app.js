@@ -148,6 +148,7 @@ class TodoApp {
         this.modalContextSelect = document.getElementById('modalContextSelect')
         this.modalDueDateInput = document.getElementById('modalDueDateInput')
         this.modalCommentInput = document.getElementById('modalCommentInput')
+        this.createMoreCheckbox = document.getElementById('createMoreCheckbox')
         this.modalAddBtn = document.getElementById('modalAddBtn')
         this.modalTitle = document.getElementById('modalTitle')
         this.todoList = document.getElementById('todoList')
@@ -1264,6 +1265,10 @@ class TodoApp {
         this.modalGtdStatusSelect.value = 'inbox'
         this.modalContextSelect.value = ''
 
+        // Show "Create more" checkbox for new todos
+        this.createMoreCheckbox.closest('.create-more-option').style.display = ''
+        // Preserve checkbox state across multiple additions
+
         // Pre-select category if exactly one is selected (not 'uncategorized')
         if (this.selectedCategoryIds.size === 1) {
             const selectedId = [...this.selectedCategoryIds][0]
@@ -1302,6 +1307,9 @@ class TodoApp {
         this.modalAddBtn.textContent = 'Save Changes'
         this.addTodoModal.classList.add('active')
 
+        // Hide "Create more" checkbox for editing (not applicable)
+        this.createMoreCheckbox.closest('.create-more-option').style.display = 'none'
+
         // Pre-populate fields with existing todo data
         this.modalTodoInput.value = todo.text
         this.modalCategorySelect.value = todo.category_id || ''
@@ -1338,6 +1346,8 @@ class TodoApp {
         this.modalGtdStatusSelect.value = 'inbox'
         this.modalContextSelect.value = ''
         this.modalDueDateInput.value = ''
+        this.modalCommentInput.value = ''
+        this.createMoreCheckbox.checked = false
 
         // Reset modal to add mode
         this.modalTitle.textContent = 'Add New Todo'
@@ -1464,10 +1474,22 @@ class TodoApp {
         }
 
         // Store decrypted text in local state for rendering
-        const todoWithDecryptedText = { ...data[0], text: text }
+        const todoWithDecryptedText = { ...data[0], text: text, comment: comment }
         this.todos.push(todoWithDecryptedText)
-        this.closeModal()
-        this.renderTodos()
+
+        // Handle "Create more" mode
+        if (this.createMoreCheckbox.checked) {
+            // Clear only text and comment fields, keep other selections
+            this.modalTodoInput.value = ''
+            this.modalCommentInput.value = ''
+            this.renderTodos()
+            this.renderGtdList()
+            // Refocus on input for next todo
+            setTimeout(() => this.modalTodoInput.focus(), 100)
+        } else {
+            this.closeModal()
+            this.renderTodos()
+        }
     }
 
     async updateTodo() {

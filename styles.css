@@ -1159,6 +1159,31 @@ h1 {
     border-color: var(--accent-color);
 }
 
+.create-more-option {
+    margin-top: 5px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent-color);
+}
+
+.checkbox-label span {
+    line-height: 1;
+}
+
 .modal-actions {
     display: flex;
     gap: 10px;
@@ -1618,6 +1643,16 @@ h1 {
 
 [data-theme="glass"] .modal-btn-secondary:hover {
     background: var(--ios-gray4);
+}
+
+/* iOS Checkbox Label */
+[data-theme="glass"] .checkbox-label {
+    color: var(--ios-label-secondary);
+    font-size: 15px;
+}
+
+[data-theme="glass"] .checkbox-label input[type="checkbox"] {
+    accent-color: var(--ios-blue);
 }
 
 /* iOS Sidebar */
