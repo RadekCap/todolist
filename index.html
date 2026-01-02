@@ -762,7 +762,7 @@
         /* Drop target styles */
         .category-item.drag-over,
         .context-item.drag-over,
-        .gtd-tab.drag-over {
+        .gtd-item.drag-over {
             background: var(--accent-color) !important;
             color: white !important;
             transform: scale(1.02);
@@ -1104,44 +1104,79 @@
         }
 
         /* ========================================
-           GTD Tabs and Context Styles
+           GTD Sidebar Section
            ======================================== */
 
-        .gtd-tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 20px;
-            padding: 4px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            overflow-x: auto;
+        .gtd-section {
+            margin-bottom: 25px;
         }
 
-        .gtd-tab {
-            flex: 1;
-            padding: 10px 16px;
-            background: transparent;
-            border: none;
-            border-radius: 8px;
+        .gtd-list {
+            list-style: none;
+        }
+
+        .gtd-item {
+            padding: 10px 12px;
+            margin-bottom: 2px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
             font-size: 14px;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.2s ease;
-            white-space: nowrap;
+            color: #555;
         }
 
-        .gtd-tab:hover {
-            background: rgba(0, 0, 0, 0.05);
+        .gtd-item:hover {
+            background: #f8f9fa;
             color: #333;
         }
 
-        .gtd-tab.active {
-            background: white;
-            color: #333;
+        .gtd-item.active {
+            background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+            color: white;
             font-weight: 600;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+
+        .gtd-icon {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .gtd-item.active .gtd-icon {
+            opacity: 1;
+        }
+
+        .gtd-label {
+            flex: 1;
+        }
+
+        .gtd-count {
+            font-size: 12px;
+            color: #999;
+            min-width: 24px;
+            text-align: right;
+        }
+
+        .gtd-item.active .gtd-count {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .gtd-item.inbox .gtd-icon { color: #1976d2; }
+        .gtd-item.next_action .gtd-icon { color: #388e3c; }
+        .gtd-item.waiting_for .gtd-icon { color: #f57c00; }
+        .gtd-item.someday_maybe .gtd-icon { color: #7b1fa2; }
+        .gtd-item.done .gtd-icon { color: #2e7d32; }
+        .gtd-item.all .gtd-icon { color: #666; }
+
+        .gtd-item.active .gtd-icon {
+            color: white;
+        }
+
+        /* Context Styles */
 
         /* Contexts section in sidebar */
         .contexts-header {
@@ -1280,20 +1315,6 @@
             background: #eceff1;
             color: #546e7a;
             white-space: nowrap;
-        }
-
-        @media (max-width: 768px) {
-            .gtd-tabs {
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .gtd-tab {
-                flex: 0 0 auto;
-                padding: 8px 12px;
-                font-size: 13px;
-            }
         }
 
         /* ========================================
@@ -1814,31 +1835,56 @@
            Glass Theme - GTD Elements
            ======================================== */
 
-        /* iOS Segmented Control style for GTD tabs */
-        [data-theme="glass"] .gtd-tabs {
-            background: var(--ios-gray5);
-            border-radius: 9px;
-            padding: 2px;
+        /* iOS GTD Section */
+        [data-theme="glass"] .gtd-section {
+            margin-bottom: 20px;
         }
 
-        [data-theme="glass"] .gtd-tab {
-            background: transparent;
-            color: var(--ios-label);
-            font-weight: 500;
-            font-size: 13px;
-            border-radius: 7px;
-            transition: all 0.2s ease;
-        }
-
-        [data-theme="glass"] .gtd-tab:hover {
-            background: rgba(0, 0, 0, 0.03);
-        }
-
-        [data-theme="glass"] .gtd-tab.active {
+        [data-theme="glass"] .gtd-list {
             background: var(--ios-bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 0 0.5px var(--ios-separator);
+        }
+
+        [data-theme="glass"] .gtd-item {
+            background: transparent;
+            border: none;
+            border-radius: 0;
             color: var(--ios-label);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
-                        0 0 0 0.5px var(--ios-separator);
+            padding: 12px 16px;
+            margin-bottom: 0;
+            border-bottom: 0.5px solid var(--ios-separator);
+        }
+
+        [data-theme="glass"] .gtd-item:last-child {
+            border-bottom: none;
+        }
+
+        [data-theme="glass"] .gtd-item:hover {
+            background: var(--ios-gray6);
+        }
+
+        [data-theme="glass"] .gtd-item.active {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--ios-blue);
+        }
+
+        [data-theme="glass"] .gtd-item.active .gtd-icon {
+            color: var(--ios-blue);
+        }
+
+        [data-theme="glass"] .gtd-item.active .gtd-count {
+            color: var(--ios-blue);
+            opacity: 0.7;
+        }
+
+        [data-theme="glass"] .gtd-icon {
+            opacity: 0.8;
+        }
+
+        [data-theme="glass"] .gtd-count {
+            color: var(--ios-label-tertiary);
         }
 
         /* iOS Contexts Section */
@@ -1879,7 +1925,7 @@
         /* Glass theme drag-over states */
         [data-theme="glass"] .category-item.drag-over,
         [data-theme="glass"] .context-item.drag-over,
-        [data-theme="glass"] .gtd-tab.drag-over {
+        [data-theme="glass"] .gtd-item.drag-over {
             background: var(--ios-blue) !important;
             color: white !important;
             transform: scale(1.02);
@@ -2011,6 +2057,11 @@
             <div class="main-content">
                 <!-- Sidebar with categories -->
                 <div class="sidebar">
+                    <!-- GTD Section -->
+                    <div class="gtd-section">
+                        <ul id="gtdList" class="gtd-list"></ul>
+                    </div>
+
                     <!-- Categories Section (collapsed by default) -->
                     <div class="sidebar-section collapsed" id="categoriesSection">
                         <div class="sidebar-section-header" role="button" aria-expanded="false" aria-controls="categoriesContent">
@@ -2057,16 +2108,6 @@
                 <!-- Main content area -->
                 <div class="content">
                     <button id="openAddTodoModal" class="add-todo-btn">+ Add New Todo</button>
-
-                    <!-- GTD Status Tabs -->
-                    <div class="gtd-tabs" id="gtdTabs" role="tablist" aria-label="GTD Status Filter">
-                        <button class="gtd-tab active" data-status="inbox" role="tab" aria-selected="true">Inbox</button>
-                        <button class="gtd-tab" data-status="next_action" role="tab" aria-selected="false">Next</button>
-                        <button class="gtd-tab" data-status="waiting_for" role="tab" aria-selected="false">Waiting</button>
-                        <button class="gtd-tab" data-status="someday_maybe" role="tab" aria-selected="false">Someday</button>
-                        <button class="gtd-tab" data-status="done" role="tab" aria-selected="false">Done</button>
-                        <button class="gtd-tab" data-status="all" role="tab" aria-selected="false">All</button>
-                    </div>
 
                     <ul id="todoList" class="todo-list"></ul>
 
@@ -2411,7 +2452,7 @@
                 this.addContextBtn = document.getElementById('addContextBtn')
                 this.categoriesSection = document.getElementById('categoriesSection')
                 this.contextsSection = document.getElementById('contextsSection')
-                this.gtdTabs = document.getElementById('gtdTabs')
+                this.gtdList = document.getElementById('gtdList')
                 this.totalTodosEl = document.getElementById('totalTodos')
                 this.completedTodosEl = document.getElementById('completedTodos')
                 this.versionNumberEl = document.getElementById('versionNumber')
@@ -2559,35 +2600,6 @@
                 })
                 this.contextsSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
                     this.toggleSidebarSection(this.contextsSection)
-                })
-
-                // GTD tabs
-                this.gtdTabs.querySelectorAll('.gtd-tab').forEach(tab => {
-                    tab.addEventListener('click', (e) => {
-                        const status = e.target.dataset.status
-                        this.selectGtdStatus(status)
-                    })
-
-                    // Drop target for assigning GTD status (except 'all' tab)
-                    const status = tab.dataset.status
-                    if (status !== 'all') {
-                        tab.addEventListener('dragover', (e) => {
-                            e.preventDefault()
-                            e.dataTransfer.dropEffect = 'move'
-                            tab.classList.add('drag-over')
-                        })
-                        tab.addEventListener('dragleave', () => {
-                            tab.classList.remove('drag-over')
-                        })
-                        tab.addEventListener('drop', (e) => {
-                            e.preventDefault()
-                            tab.classList.remove('drag-over')
-                            const todoId = e.dataTransfer.getData('text/plain')
-                            if (todoId) {
-                                this.updateTodoGtdStatus(todoId, status)
-                            }
-                        })
-                    }
                 })
 
                 // Unlock modal
@@ -3111,15 +3123,80 @@
 
             selectGtdStatus(status) {
                 this.selectedGtdStatus = status
-
-                // Update active tab styling
-                this.gtdTabs.querySelectorAll('.gtd-tab').forEach(tab => {
-                    const isActive = tab.dataset.status === status
-                    tab.classList.toggle('active', isActive)
-                    tab.setAttribute('aria-selected', isActive ? 'true' : 'false')
-                })
-
+                this.renderGtdList()
                 this.renderTodos()
+            }
+
+            getGtdCount(status) {
+                if (status === 'all') {
+                    // Count all non-done items
+                    return this.todos.filter(t => t.gtd_status !== 'done').length
+                }
+                return this.todos.filter(t => t.gtd_status === status).length
+            }
+
+            getGtdIcon(status) {
+                const icons = {
+                    'inbox': '📥',
+                    'next_action': '»',
+                    'waiting_for': '⏳',
+                    'someday_maybe': '📅',
+                    'done': '✓',
+                    'all': '☰'
+                }
+                return icons[status] || '•'
+            }
+
+            renderGtdList() {
+                const statuses = [
+                    { id: 'inbox', label: 'Inbox' },
+                    { id: 'next_action', label: 'Next' },
+                    { id: 'waiting_for', label: 'Waiting' },
+                    { id: 'someday_maybe', label: 'Someday' },
+                    { id: 'done', label: 'Done' },
+                    { id: 'all', label: 'All' }
+                ]
+
+                this.gtdList.innerHTML = ''
+
+                statuses.forEach(status => {
+                    const li = document.createElement('li')
+                    const isActive = this.selectedGtdStatus === status.id
+                    li.className = `gtd-item ${status.id} ${isActive ? 'active' : ''}`
+
+                    const count = this.getGtdCount(status.id)
+                    const countDisplay = count > 0 ? count : ''
+
+                    li.innerHTML = `
+                        <span class="gtd-icon">${this.getGtdIcon(status.id)}</span>
+                        <span class="gtd-label">${this.escapeHtml(status.label)}</span>
+                        <span class="gtd-count">${countDisplay}</span>
+                    `
+
+                    li.addEventListener('click', () => this.selectGtdStatus(status.id))
+
+                    // Drop target for assigning GTD status (except 'all')
+                    if (status.id !== 'all') {
+                        li.addEventListener('dragover', (e) => {
+                            e.preventDefault()
+                            e.dataTransfer.dropEffect = 'move'
+                            li.classList.add('drag-over')
+                        })
+                        li.addEventListener('dragleave', () => {
+                            li.classList.remove('drag-over')
+                        })
+                        li.addEventListener('drop', (e) => {
+                            e.preventDefault()
+                            li.classList.remove('drag-over')
+                            const todoId = e.dataTransfer.getData('text/plain')
+                            if (todoId) {
+                                this.updateTodoGtdStatus(todoId, status.id)
+                            }
+                        })
+                    }
+
+                    this.gtdList.appendChild(li)
+                })
             }
 
             async loadTodos() {
@@ -3141,6 +3218,7 @@
                     ...todo,
                     text: await this.decrypt(todo.text)
                 })))
+                this.renderGtdList()
                 this.renderTodos()
             }
 
