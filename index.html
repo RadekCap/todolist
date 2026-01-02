@@ -1494,13 +1494,12 @@
         [data-theme="glass"] .modal-form input,
         [data-theme="glass"] .modal-form select {
             background: var(--ios-bg-secondary);
-            border: none;
+            border: 1px solid var(--ios-separator);
             border-radius: 10px;
             color: var(--ios-label);
             font-size: 17px;
             padding: 11px 16px;
-            box-shadow: inset 0 0 0 0.5px var(--ios-separator);
-            transition: box-shadow 0.2s ease;
+            transition: border-color 0.2s ease, outline 0.2s ease;
         }
 
         [data-theme="glass"] .form-group input:focus,
@@ -1508,9 +1507,9 @@
         [data-theme="glass"] .modal-form input:focus,
         [data-theme="glass"] .modal-form select:focus {
             background: var(--ios-bg-secondary);
-            box-shadow: inset 0 0 0 0.5px var(--ios-separator),
-                        0 0 0 4px rgba(0, 122, 255, 0.15);
-            outline: none;
+            border-color: var(--ios-blue);
+            outline: 4px solid rgba(0, 122, 255, 0.15);
+            outline-offset: -1px;
         }
 
         [data-theme="glass"] .form-group input::placeholder,
@@ -1631,17 +1630,17 @@
 
         [data-theme="glass"] .add-category-input {
             background: var(--ios-bg-secondary);
-            border: none;
+            border: 1px solid var(--ios-separator);
             border-radius: 10px;
             color: var(--ios-label);
             font-size: 15px;
-            box-shadow: inset 0 0 0 0.5px var(--ios-separator);
         }
 
         [data-theme="glass"] .add-category-input:focus {
             background: var(--ios-bg-secondary);
-            box-shadow: inset 0 0 0 0.5px var(--ios-separator),
-                        0 0 0 4px rgba(0, 122, 255, 0.15);
+            border-color: var(--ios-blue);
+            outline: 4px solid rgba(0, 122, 255, 0.15);
+            outline-offset: -1px;
         }
 
         [data-theme="glass"] .add-category-btn {
@@ -1701,17 +1700,17 @@
 
         [data-theme="glass"] .add-project-input {
             background: var(--ios-bg-secondary);
-            border: none;
+            border: 1px solid var(--ios-separator);
             border-radius: 10px;
             color: var(--ios-label);
             font-size: 15px;
-            box-shadow: inset 0 0 0 0.5px var(--ios-separator);
         }
 
         [data-theme="glass"] .add-project-input:focus {
             background: var(--ios-bg-secondary);
-            box-shadow: inset 0 0 0 0.5px var(--ios-separator),
-                        0 0 0 4px rgba(0, 122, 255, 0.15);
+            border-color: var(--ios-blue);
+            outline: 4px solid rgba(0, 122, 255, 0.15);
+            outline-offset: -1px;
         }
 
         [data-theme="glass"] .add-project-btn {
@@ -2109,16 +2108,16 @@
 
         [data-theme="glass"] .add-context-input {
             background: var(--ios-bg-secondary);
-            border: none;
+            border: 1px solid var(--ios-separator);
             border-radius: 10px;
             color: var(--ios-label);
             font-size: 15px;
-            box-shadow: inset 0 0 0 0.5px var(--ios-separator);
         }
 
         [data-theme="glass"] .add-context-input:focus {
-            box-shadow: inset 0 0 0 0.5px var(--ios-separator),
-                        0 0 0 4px rgba(0, 122, 255, 0.15);
+            border-color: var(--ios-blue);
+            outline: 4px solid rgba(0, 122, 255, 0.15);
+            outline-offset: -1px;
         }
 
         [data-theme="glass"] .add-context-btn {
