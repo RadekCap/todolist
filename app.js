@@ -2083,7 +2083,7 @@ class TodoApp {
         let savedTheme = localStorage.getItem('colorTheme') || 'glass'
 
         // Migrate old themes to glass
-        const validThemes = ['glass', 'dark', 'tint']
+        const validThemes = ['glass', 'dark', 'clear']
         if (!validThemes.includes(savedTheme)) {
             savedTheme = 'glass'
             localStorage.setItem('colorTheme', savedTheme)
@@ -2114,7 +2114,7 @@ class TodoApp {
             let dbTheme = data.color_theme
 
             // Migrate old themes to glass
-            const validThemes = ['glass', 'dark', 'tint']
+            const validThemes = ['glass', 'dark', 'clear']
             if (!validThemes.includes(dbTheme)) {
                 dbTheme = 'glass'
                 this.saveThemeToDatabase(dbTheme)
