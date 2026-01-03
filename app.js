@@ -2080,7 +2080,15 @@ class TodoApp {
 
     initTheme() {
         // Load theme from localStorage first (instant)
-        const savedTheme = localStorage.getItem('colorTheme') || 'purple'
+        let savedTheme = localStorage.getItem('colorTheme') || 'glass'
+
+        // Migrate old themes to glass
+        const validThemes = ['glass', 'dark', 'tint']
+        if (!validThemes.includes(savedTheme)) {
+            savedTheme = 'glass'
+            localStorage.setItem('colorTheme', savedTheme)
+        }
+
         this.applyTheme(savedTheme)
         this.themeSelect.value = savedTheme
 
@@ -2103,7 +2111,15 @@ class TodoApp {
         }
 
         if (data && data.color_theme) {
-            const dbTheme = data.color_theme
+            let dbTheme = data.color_theme
+
+            // Migrate old themes to glass
+            const validThemes = ['glass', 'dark', 'tint']
+            if (!validThemes.includes(dbTheme)) {
+                dbTheme = 'glass'
+                this.saveThemeToDatabase(dbTheme)
+            }
+
             this.applyTheme(dbTheme)
             this.themeSelect.value = dbTheme
             localStorage.setItem('colorTheme', dbTheme)
