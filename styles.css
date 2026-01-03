@@ -1069,21 +1069,6 @@ h1 {
     white-space: nowrap;
 }
 
-.edit-btn {
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-}
-
-.edit-btn:hover {
-    background: var(--accent-hover);
-}
-
 .delete-btn {
     background: #e74c3c;
     color: white;
@@ -2216,19 +2201,6 @@ h1 {
     width: 22px;
     height: 22px;
     accent-color: var(--ios-blue);
-}
-
-[data-theme="glass"] .edit-btn {
-    background: var(--ios-blue);
-    border: none;
-    border-radius: 8px;
-    font-size: 13px;
-    padding: 6px 12px;
-    font-weight: 500;
-}
-
-[data-theme="glass"] .edit-btn:hover {
-    background: var(--ios-blue-hover);
 }
 
 [data-theme="glass"] .delete-btn {
