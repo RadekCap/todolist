@@ -1,61 +1,43 @@
 /* CSS Variables for Theming */
 :root {
-    --primary-start: #b8c5f2;
-    --primary-end: #c5b3d9;
-    --accent-color: #b8c5f2;
-    --accent-hover: #a0aee6;
+    /* Default to Glass theme variables */
+    --ios-bg-primary: #f2f2f7;
+    --ios-bg-secondary: #ffffff;
+    --ios-bg-tertiary: #f2f2f7;
+    --ios-bg-grouped: #f2f2f7;
+    --ios-blue: #007aff;
+    --ios-blue-hover: #0056b3;
+    --ios-gray: #8e8e93;
+    --ios-gray2: #aeaeb2;
+    --ios-gray3: #c7c7cc;
+    --ios-gray4: #d1d1d6;
+    --ios-gray5: #e5e5ea;
+    --ios-gray6: #f2f2f7;
+    --ios-red: #ff3b30;
+    --ios-orange: #ff9500;
+    --ios-label: #000000;
+    --ios-label-secondary: #3c3c43;
+    --ios-label-tertiary: #3c3c4399;
+    --ios-label-quaternary: #3c3c434d;
+    --ios-material-thick: rgba(255, 255, 255, 0.92);
+    --ios-material-regular: rgba(255, 255, 255, 0.85);
+    --ios-material-thin: rgba(255, 255, 255, 0.75);
+    --ios-material-ultrathin: rgba(255, 255, 255, 0.55);
+    --ios-blur-thick: 50px;
+    --ios-blur-regular: 40px;
+    --ios-blur-thin: 30px;
+    --ios-separator: rgba(60, 60, 67, 0.12);
+    --ios-separator-opaque: #c6c6c8;
+    --primary-start: #e8eaed;
+    --primary-end: #f5f5f7;
+    --accent-color: var(--ios-blue);
+    --accent-hover: var(--ios-blue-hover);
 }
 
-/* Purple Theme (Default) */
-[data-theme="purple"] {
-    --primary-start: #b8c5f2;
-    --primary-end: #c5b3d9;
-    --accent-color: #b8c5f2;
-    --accent-hover: #a0aee6;
-}
-
-/* Blue Theme */
-[data-theme="blue"] {
-    --primary-start: #a8d5f7;
-    --primary-end: #b3e5fc;
-    --accent-color: #a8d5f7;
-    --accent-hover: #8fc3e8;
-}
-
-/* Green Theme */
-[data-theme="green"] {
-    --primary-start: #a8e6c1;
-    --primary-end: #b8f0da;
-    --accent-color: #a8e6c1;
-    --accent-hover: #8ed4a8;
-}
-
-/* Orange Theme */
-[data-theme="orange"] {
-    --primary-start: #fcc5d3;
-    --primary-end: #fff0b8;
-    --accent-color: #fcc5d3;
-    --accent-hover: #f5a9bc;
-}
-
-/* Dark Theme */
-[data-theme="dark"] {
-    --primary-start: #546e7a;
-    --primary-end: #607d8b;
-    --accent-color: #81b3d2;
-    --accent-hover: #6a9fc4;
-}
-
-/* Light Theme */
-[data-theme="light"] {
-    --primary-start: #d4f5f3;
-    --primary-end: #fef0f5;
-    --accent-color: #d4f5f3;
-    --accent-hover: #b8e3e0;
-}
-
-/* Glass Theme - iOS 26 Style */
-[data-theme="glass"] {
+/* Glass Theme - iOS Style (Light) */
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] {
     /* iOS System Background Colors */
     --ios-bg-primary: #f2f2f7;
     --ios-bg-secondary: #ffffff;
@@ -98,6 +80,102 @@
     /* Theme mapping */
     --primary-start: #e8eaed;
     --primary-end: #f5f5f7;
+    --accent-color: var(--ios-blue);
+    --accent-hover: var(--ios-blue-hover);
+}
+
+/* Dark Theme - macOS/iOS Dark Mode */
+[data-theme="dark"] {
+    /* Dark System Background Colors */
+    --ios-bg-primary: #000000;
+    --ios-bg-secondary: #1c1c1e;
+    --ios-bg-tertiary: #2c2c2e;
+    --ios-bg-grouped: #000000;
+
+    /* iOS System Colors (Dark) */
+    --ios-blue: #0a84ff;
+    --ios-blue-hover: #409cff;
+    --ios-gray: #8e8e93;
+    --ios-gray2: #636366;
+    --ios-gray3: #48484a;
+    --ios-gray4: #3a3a3c;
+    --ios-gray5: #2c2c2e;
+    --ios-gray6: #1c1c1e;
+    --ios-red: #ff453a;
+    --ios-orange: #ff9f0a;
+
+    /* Dark Label Colors */
+    --ios-label: #ffffff;
+    --ios-label-secondary: #ebebf5;
+    --ios-label-tertiary: #ebebf599;
+    --ios-label-quaternary: #ebebf54d;
+
+    /* Dark Material */
+    --ios-material-thick: rgba(30, 30, 30, 0.92);
+    --ios-material-regular: rgba(30, 30, 30, 0.85);
+    --ios-material-thin: rgba(30, 30, 30, 0.75);
+    --ios-material-ultrathin: rgba(30, 30, 30, 0.55);
+
+    /* iOS Blur */
+    --ios-blur-thick: 50px;
+    --ios-blur-regular: 40px;
+    --ios-blur-thin: 30px;
+
+    /* Dark Separator */
+    --ios-separator: rgba(84, 84, 88, 0.65);
+    --ios-separator-opaque: #38383a;
+
+    /* Theme mapping */
+    --primary-start: #1c1c1e;
+    --primary-end: #2c2c2e;
+    --accent-color: var(--ios-blue);
+    --accent-hover: var(--ios-blue-hover);
+}
+
+/* Tint Theme - Colored tint overlay (macOS/iOS style) */
+[data-theme="tint"] {
+    /* Tinted System Background Colors - subtle purple/blue tint */
+    --ios-bg-primary: #f0f0f8;
+    --ios-bg-secondary: #ffffff;
+    --ios-bg-tertiary: #e8e8f4;
+    --ios-bg-grouped: #f0f0f8;
+
+    /* iOS System Colors with tint */
+    --ios-blue: #5856d6;
+    --ios-blue-hover: #4240a8;
+    --ios-gray: #8e8e93;
+    --ios-gray2: #aeaeb2;
+    --ios-gray3: #c7c7cc;
+    --ios-gray4: #d1d1d6;
+    --ios-gray5: #e5e5ea;
+    --ios-gray6: #f2f2f7;
+    --ios-red: #ff3b30;
+    --ios-orange: #ff9500;
+
+    /* Tinted Label Colors */
+    --ios-label: #1c1c3c;
+    --ios-label-secondary: #3c3c5c;
+    --ios-label-tertiary: #3c3c5c99;
+    --ios-label-quaternary: #3c3c5c4d;
+
+    /* Tinted Material */
+    --ios-material-thick: rgba(248, 248, 255, 0.92);
+    --ios-material-regular: rgba(248, 248, 255, 0.85);
+    --ios-material-thin: rgba(248, 248, 255, 0.75);
+    --ios-material-ultrathin: rgba(248, 248, 255, 0.55);
+
+    /* iOS Blur */
+    --ios-blur-thick: 50px;
+    --ios-blur-regular: 40px;
+    --ios-blur-thin: 30px;
+
+    /* Tinted Separator */
+    --ios-separator: rgba(88, 86, 214, 0.12);
+    --ios-separator-opaque: #d0d0e8;
+
+    /* Theme mapping */
+    --primary-start: #e0e0f0;
+    --primary-end: #f0f0f8;
     --accent-color: var(--ios-blue);
     --accent-hover: var(--ios-blue-hover);
 }
@@ -1701,14 +1779,18 @@ h1 {
    ======================================== */
 
 /* iOS Background - Subtle light gradient */
-[data-theme="glass"] body {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] body {
     background: var(--ios-bg-grouped);
     background-image: linear-gradient(180deg, #ffffff 0%, var(--ios-gray6) 100%);
     background-attachment: fixed;
 }
 
 /* iOS Container - Thick material */
-[data-theme="glass"] .container {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .container {
     background: var(--ios-material-thick);
     backdrop-filter: blur(var(--ios-blur-thick));
     -webkit-backdrop-filter: blur(var(--ios-blur-thick));
@@ -1719,28 +1801,38 @@ h1 {
 }
 
 /* iOS Typography */
-[data-theme="glass"] h1 {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] h1 {
     color: var(--ios-label);
     font-weight: 700;
     font-size: 28px;
     letter-spacing: -0.5px;
 }
 
-[data-theme="glass"] .app-header {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .app-header {
     gap: 10px;
 }
 
-[data-theme="glass"] .app-icon {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .app-icon {
     width: 32px;
     height: 32px;
 }
 
-[data-theme="glass"] .app-title {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .app-title {
     font-weight: 600;
     letter-spacing: -0.3px;
 }
 
-[data-theme="glass"] h2 {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] h2 {
     color: var(--ios-label-secondary);
     font-weight: 600;
     font-size: 13px;
@@ -1749,13 +1841,17 @@ h1 {
 }
 
 /* iOS Segmented Control (Auth tabs) */
-[data-theme="glass"] .auth-tabs {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .auth-tabs {
     background: var(--ios-gray5);
     border-radius: 9px;
     padding: 2px;
 }
 
-[data-theme="glass"] .auth-tab {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .auth-tab {
     background: transparent;
     border: none;
     border-radius: 7px;
@@ -1765,11 +1861,15 @@ h1 {
     transition: all 0.2s ease;
 }
 
-[data-theme="glass"] .auth-tab:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .auth-tab:hover {
     background: rgba(0, 0, 0, 0.03);
 }
 
-[data-theme="glass"] .auth-tab.active {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .auth-tab.active {
     background: var(--ios-bg-secondary);
     color: var(--ios-label);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
@@ -1777,11 +1877,21 @@ h1 {
 }
 
 /* iOS Form Inputs */
-[data-theme="glass"] .form-group input,
-[data-theme="glass"] .form-group select,
-[data-theme="glass"] .modal-form input,
-[data-theme="glass"] .modal-form select,
-[data-theme="glass"] .modal-form textarea {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-group input,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-group select,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form input,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form select,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form textarea {
     background: var(--ios-bg-secondary);
     border: 1px solid var(--ios-separator);
     border-radius: 10px;
@@ -1791,39 +1901,63 @@ h1 {
     transition: border-color 0.2s ease, outline 0.2s ease;
 }
 
-[data-theme="glass"] .form-group input:focus,
-[data-theme="glass"] .form-group select:focus,
-[data-theme="glass"] .modal-form input:focus,
-[data-theme="glass"] .modal-form select:focus,
-[data-theme="glass"] .modal-form textarea:focus {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-group input:focus,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-group select:focus,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form input:focus,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form select:focus,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form textarea:focus {
     background: var(--ios-bg-secondary);
     border-color: var(--ios-blue);
     outline: 4px solid rgba(0, 122, 255, 0.15);
     outline-offset: -1px;
 }
 
-[data-theme="glass"] .form-group input::placeholder,
-[data-theme="glass"] .modal-form input::placeholder,
-[data-theme="glass"] .modal-form textarea::placeholder {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-group input::placeholder,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form input::placeholder,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form textarea::placeholder {
     color: var(--ios-label-tertiary);
 }
 
-[data-theme="glass"] .form-group label,
-[data-theme="glass"] .modal-form label {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-group label,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form label {
     color: var(--ios-label);
     font-weight: 400;
     font-size: 15px;
 }
 
 /* iOS Form Sections */
-[data-theme="glass"] .form-section {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-section {
     background: var(--ios-bg-secondary);
     border-radius: 12px;
     padding: 16px;
     border: 1px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .form-section-title {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-section-title {
     color: var(--ios-label-secondary);
     font-size: 13px;
     font-weight: 600;
@@ -1832,22 +1966,34 @@ h1 {
     margin-bottom: 16px;
 }
 
-[data-theme="glass"] .form-field {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-field {
     margin-bottom: 16px;
 }
 
-[data-theme="glass"] .form-row {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-row {
     gap: 16px;
 }
 
-[data-theme="glass"] .form-row .form-field {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .form-row .form-field {
     margin-bottom: 16px;
 }
 
 /* iOS Buttons - Filled style */
-[data-theme="glass"] .auth-btn,
-[data-theme="glass"] .modal-btn-primary,
-[data-theme="glass"] .add-todo-btn {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .auth-btn,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-btn-primary,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-todo-btn {
     background: var(--ios-blue);
     color: #ffffff;
     border: none;
@@ -1859,21 +2005,35 @@ h1 {
     transition: all 0.15s ease;
 }
 
-[data-theme="glass"] .auth-btn:hover,
-[data-theme="glass"] .modal-btn-primary:hover,
-[data-theme="glass"] .add-todo-btn:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .auth-btn:hover,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-btn-primary:hover,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-todo-btn:hover {
     background: var(--ios-blue-hover);
     transform: none;
     box-shadow: none;
 }
 
-[data-theme="glass"] .auth-btn:active,
-[data-theme="glass"] .modal-btn-primary:active,
-[data-theme="glass"] .add-todo-btn:active {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .auth-btn:active,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-btn-primary:active,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-todo-btn:active {
     transform: scale(0.98);
 }
 
-[data-theme="glass"] .modal-btn-secondary {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-btn-secondary {
     background: var(--ios-gray5);
     color: var(--ios-label);
     border: none;
@@ -1882,49 +2042,67 @@ h1 {
     font-size: 17px;
 }
 
-[data-theme="glass"] .modal-btn-secondary:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-btn-secondary:hover {
     background: var(--ios-gray4);
 }
 
 /* iOS Checkbox Label */
-[data-theme="glass"] .checkbox-label {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .checkbox-label {
     color: var(--ios-label-secondary);
     font-size: 15px;
 }
 
-[data-theme="glass"] .checkbox-label input[type="checkbox"] {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .checkbox-label input[type="checkbox"] {
     accent-color: var(--ios-blue);
 }
 
 /* iOS Sidebar */
-[data-theme="glass"] .sidebar {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .sidebar {
     background: transparent;
     padding: 1px; /* Prevents Safari from clipping box-shadow on child lists */
 }
 
-[data-theme="glass"] .sidebar h2 {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .sidebar h2 {
     color: var(--ios-label-secondary);
     padding-left: 16px;
     margin-bottom: 8px;
 }
 
-[data-theme="glass"] .sidebar-section-header {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .sidebar-section-header {
     padding: 5px 16px 5px 0;
 }
 
-[data-theme="glass"] .sidebar-section-toggle {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .sidebar-section-toggle {
     color: var(--ios-label-tertiary);
 }
 
 /* iOS Grouped List (Categories) */
-[data-theme="glass"] .category-list {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .category-list {
     background: var(--ios-bg-secondary);
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .category-item {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .category-item {
     background: transparent;
     border: none;
     border-radius: 0;
@@ -1935,30 +2113,42 @@ h1 {
     border-bottom: 0.5px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .category-item:last-child {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .category-item:last-child {
     border-bottom: none;
 }
 
-[data-theme="glass"] .category-item:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .category-item:hover {
     background: var(--ios-gray6);
 }
 
-[data-theme="glass"] .category-item.active {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .category-item.active {
     background: rgba(0, 122, 255, 0.1);
     color: var(--ios-blue);
     box-shadow: none;
 }
 
-[data-theme="glass"] .category-item.active .category-name {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .category-item.active .category-name {
     font-weight: 600;
 }
 
-[data-theme="glass"] .add-category-form {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-category-form {
     border-top: none;
     padding: 20px 5px 0 5px; /* Horizontal padding for input focus outline */
 }
 
-[data-theme="glass"] .add-category-input {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-category-input {
     background: var(--ios-bg-secondary);
     border: 1px solid var(--ios-separator);
     border-radius: 10px;
@@ -1966,14 +2156,18 @@ h1 {
     font-size: 15px;
 }
 
-[data-theme="glass"] .add-category-input:focus {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-category-input:focus {
     background: var(--ios-bg-secondary);
     border-color: var(--ios-blue);
     outline: 4px solid rgba(0, 122, 255, 0.15);
     outline-offset: -1px;
 }
 
-[data-theme="glass"] .add-category-btn {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-category-btn {
     background: var(--ios-blue);
     color: #ffffff;
     border: none;
@@ -1982,19 +2176,25 @@ h1 {
     transition: background 0.15s ease;
 }
 
-[data-theme="glass"] .add-category-btn:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-category-btn:hover {
     background: var(--ios-blue-hover);
 }
 
 /* iOS Projects Section */
-[data-theme="glass"] .project-list {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-list {
     background: var(--ios-bg-secondary);
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .project-item {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-item {
     background: transparent;
     border: none;
     border-radius: 0;
@@ -2005,31 +2205,43 @@ h1 {
     border-bottom: 0.5px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .project-item:last-child {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-item:last-child {
     border-bottom: none;
 }
 
-[data-theme="glass"] .project-item:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-item:hover {
     background: var(--ios-gray6);
 }
 
-[data-theme="glass"] .project-item.active {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-item.active {
     background: rgba(0, 122, 255, 0.1);
     color: var(--ios-blue);
     box-shadow: none;
 }
 
-[data-theme="glass"] .project-item.active .project-name {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-item.active .project-name {
     font-weight: 600;
 }
 
-[data-theme="glass"] .add-project-form {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-project-form {
     border-top: none;
     padding: 20px 5px 0 5px; /* Horizontal padding for input focus outline */
 }
 
 /* iOS Project View Cards */
-[data-theme="glass"] .project-card {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-card {
     background: var(--ios-bg-secondary);
     border: 1px solid var(--ios-separator);
     border-left: none;
@@ -2038,23 +2250,31 @@ h1 {
     margin-bottom: 8px;
 }
 
-[data-theme="glass"] .project-card:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-card:hover {
     background: var(--ios-gray6);
     transform: none;
 }
 
-[data-theme="glass"] .project-card-name {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-card-name {
     color: var(--ios-label);
     font-size: 17px;
 }
 
-[data-theme="glass"] .project-card-count {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-card-count {
     background: var(--ios-gray5);
     color: var(--ios-label-secondary);
     font-size: 13px;
 }
 
-[data-theme="glass"] .add-project-input {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-project-input {
     background: var(--ios-bg-secondary);
     border: 1px solid var(--ios-separator);
     border-radius: 10px;
@@ -2062,14 +2282,18 @@ h1 {
     font-size: 15px;
 }
 
-[data-theme="glass"] .add-project-input:focus {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-project-input:focus {
     background: var(--ios-bg-secondary);
     border-color: var(--ios-blue);
     outline: 4px solid rgba(0, 122, 255, 0.15);
     outline-offset: -1px;
 }
 
-[data-theme="glass"] .add-project-btn {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-project-btn {
     background: var(--ios-blue);
     color: #ffffff;
     border: none;
@@ -2078,17 +2302,23 @@ h1 {
     transition: background 0.15s ease;
 }
 
-[data-theme="glass"] .add-project-btn:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-project-btn:hover {
     background: var(--ios-blue-hover);
 }
 
 /* iOS Content Area - padding to prevent box-shadow clipping */
-[data-theme="glass"] .content {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .content {
     padding-left: 1px;
 }
 
 /* iOS Todo Items - Grouped list style */
-[data-theme="glass"] .todo-list {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-list {
     background: var(--ios-bg-secondary);
     border-radius: 12px;
     overflow: hidden;
@@ -2096,7 +2326,9 @@ h1 {
 }
 
 /* iOS Scheduled Section Headers */
-[data-theme="glass"] .scheduled-section-header {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .scheduled-section-header {
     background: var(--ios-gray5);
     color: var(--ios-label-secondary);
     border-radius: 0;
@@ -2109,37 +2341,51 @@ h1 {
     border-bottom: 0.5px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .scheduled-section-header.overdue {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .scheduled-section-header.overdue {
     background: rgba(255, 59, 48, 0.15);
     color: var(--ios-red);
 }
 
-[data-theme="glass"] .scheduled-section-header.today {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .scheduled-section-header.today {
     background: rgba(255, 149, 0, 0.15);
     color: var(--ios-orange);
 }
 
-[data-theme="glass"] .scheduled-section-header.tomorrow {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .scheduled-section-header.tomorrow {
     background: rgba(0, 122, 255, 0.15);
     color: var(--ios-blue);
 }
 
-[data-theme="glass"] .scheduled-section-header.this-week {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .scheduled-section-header.this-week {
     background: rgba(175, 82, 222, 0.15);
     color: #af52de;
 }
 
-[data-theme="glass"] .scheduled-section-header.next-week {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .scheduled-section-header.next-week {
     background: rgba(52, 199, 89, 0.15);
     color: #34c759;
 }
 
-[data-theme="glass"] .scheduled-section-header.later {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .scheduled-section-header.later {
     background: var(--ios-gray5);
     color: var(--ios-label-secondary);
 }
 
-[data-theme="glass"] .todo-item {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-item {
     background: transparent;
     border: none;
     border-left: none;
@@ -2150,60 +2396,84 @@ h1 {
     transition: background 0.15s ease;
 }
 
-[data-theme="glass"] .todo-item:last-child {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-item:last-child {
     border-bottom: none;
 }
 
-[data-theme="glass"] .todo-item:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-item:hover {
     background: var(--ios-gray6);
     transform: none;
     box-shadow: none;
 }
 
-[data-theme="glass"] .todo-item.completed {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-item.completed {
     opacity: 0.5;
 }
 
-[data-theme="glass"] .drag-handle {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .drag-handle {
     color: var(--ios-label-tertiary);
 }
 
-[data-theme="glass"] .drag-handle:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .drag-handle:hover {
     color: var(--ios-label-secondary);
     background-color: var(--ios-gray5);
 }
 
-[data-theme="glass"] .todo-item.dragging .drag-handle {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-item.dragging .drag-handle {
     color: white;
     background-color: var(--ios-blue);
     transform: scale(1.15);
 }
 
-[data-theme="glass"] .todo-text {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-text {
     color: var(--ios-label);
     font-size: 17px;
 }
 
-[data-theme="glass"] .todo-comment {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-comment {
     color: var(--ios-label-secondary);
     font-size: 14px;
 }
 
-[data-theme="glass"] .todo-item.completed .todo-text {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-item.completed .todo-text {
     color: var(--ios-label-tertiary);
 }
 
-[data-theme="glass"] .todo-item.completed .todo-comment {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-item.completed .todo-comment {
     color: var(--ios-label-tertiary);
 }
 
-[data-theme="glass"] .todo-checkbox {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-checkbox {
     width: 22px;
     height: 22px;
     accent-color: var(--ios-blue);
 }
 
-[data-theme="glass"] .delete-btn {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .delete-btn {
     background: var(--ios-red);
     border: none;
     border-radius: 8px;
@@ -2212,20 +2482,28 @@ h1 {
     font-weight: 500;
 }
 
-[data-theme="glass"] .delete-btn:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .delete-btn:hover {
     background: #e62e24;
 }
 
 /* iOS Badges */
-[data-theme="glass"] .todo-category-badge,
-[data-theme="glass"] .todo-priority-badge {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-category-badge,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-priority-badge {
     border-radius: 6px;
     font-size: 12px;
     font-weight: 500;
     padding: 3px 8px;
 }
 
-[data-theme="glass"] .todo-date {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-date {
     background: var(--ios-gray5);
     color: var(--ios-label-secondary);
     border-radius: 6px;
@@ -2234,48 +2512,66 @@ h1 {
     padding: 3px 8px;
 }
 
-[data-theme="glass"] .todo-date.overdue {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-date.overdue {
     background: rgba(255, 59, 48, 0.15);
     color: var(--ios-red);
 }
 
-[data-theme="glass"] .todo-date.today {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-date.today {
     background: rgba(255, 149, 0, 0.15);
     color: var(--ios-orange);
 }
 
 /* iOS Stats */
-[data-theme="glass"] .stats {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .stats {
     color: var(--ios-label-secondary);
     border-top-color: var(--ios-separator);
     font-size: 13px;
 }
 
-[data-theme="glass"] .export-btn {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .export-btn {
     background: var(--ios-blue);
     border-radius: 8px;
     font-weight: 500;
 }
 
-[data-theme="glass"] .export-btn:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .export-btn:hover {
     background: var(--ios-blue-hover);
 }
 
 /* iOS User Header */
-[data-theme="glass"] .user-header {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .user-header {
     border-top-color: var(--ios-separator);
 }
 
-[data-theme="glass"] .user-display {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .user-display {
     color: var(--ios-label);
     font-weight: 600;
 }
 
-[data-theme="glass"] .user-email {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .user-email {
     color: var(--ios-label-tertiary);
 }
 
-[data-theme="glass"] .settings-btn {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .settings-btn {
     background: var(--ios-gray5);
     color: var(--ios-label);
     border: none;
@@ -2284,11 +2580,15 @@ h1 {
     transition: background 0.15s ease;
 }
 
-[data-theme="glass"] .settings-btn:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .settings-btn:hover {
     background: var(--ios-gray4);
 }
 
-[data-theme="glass"] .lock-btn {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .lock-btn {
     background: var(--ios-gray5);
     color: var(--ios-label);
     border: none;
@@ -2296,35 +2596,49 @@ h1 {
     transition: background 0.15s ease;
 }
 
-[data-theme="glass"] .lock-btn:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .lock-btn:hover {
     background: var(--ios-gray4);
 }
 
-[data-theme="glass"] .logout-btn {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .logout-btn {
     background: var(--ios-red);
     border: none;
     border-radius: 8px;
     transition: background 0.15s ease;
 }
 
-[data-theme="glass"] .logout-btn:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .logout-btn:hover {
     background: #e62e24;
 }
 
 /* iOS Footer */
-[data-theme="glass"] .app-footer {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .app-footer {
     border-top-color: var(--ios-separator);
 }
 
-[data-theme="glass"] .app-version {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .app-version {
     color: var(--ios-label-tertiary);
 }
 
-[data-theme="glass"] .theme-selector label {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .theme-selector label {
     color: var(--ios-label-secondary);
 }
 
-[data-theme="glass"] .theme-selector select {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .theme-selector select {
     background: var(--ios-bg-secondary);
     border: 1px solid var(--ios-separator);
     border-radius: 8px;
@@ -2332,23 +2646,31 @@ h1 {
     padding: 8px 12px;
 }
 
-[data-theme="glass"] .app-footer-links a {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .app-footer-links a {
     color: var(--ios-blue);
 }
 
-[data-theme="glass"] .app-footer-links a:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .app-footer-links a:hover {
     color: var(--ios-blue-hover);
 }
 
 /* iOS Modal Overlay */
-[data-theme="glass"] .modal-overlay {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-overlay {
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(var(--ios-blur-thin));
     -webkit-backdrop-filter: blur(var(--ios-blur-thin));
 }
 
 /* iOS Modal - Sheet style */
-[data-theme="glass"] .modal {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal {
     background: var(--ios-bg-grouped);
     backdrop-filter: blur(var(--ios-blur-thick));
     -webkit-backdrop-filter: blur(var(--ios-blur-thick));
@@ -2359,17 +2681,23 @@ h1 {
     max-width: 720px;
 }
 
-[data-theme="glass"] .modal-form {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-form {
     gap: 16px;
 }
 
-[data-theme="glass"] .modal-header {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-header {
     border-bottom: 0.5px solid var(--ios-separator);
     padding-bottom: 16px;
     margin-bottom: 8px;
 }
 
-[data-theme="glass"] .modal-header h2 {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-header h2 {
     color: var(--ios-label);
     font-size: 17px;
     font-weight: 600;
@@ -2377,7 +2705,9 @@ h1 {
     letter-spacing: 0;
 }
 
-[data-theme="glass"] .modal-close {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-close {
     color: var(--ios-gray);
     background: var(--ios-gray5);
     width: 30px;
@@ -2386,31 +2716,43 @@ h1 {
     font-size: 20px;
 }
 
-[data-theme="glass"] .modal-close:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .modal-close:hover {
     background: var(--ios-gray4);
     color: var(--ios-label);
 }
 
 /* iOS Empty State */
-[data-theme="glass"] .empty-state {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .empty-state {
     color: var(--ios-label-tertiary);
     font-size: 15px;
 }
 
-[data-theme="glass"] .inbox-zen-state .zen-title {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .inbox-zen-state .zen-title {
     color: var(--ios-blue);
 }
 
-[data-theme="glass"] .inbox-zen-state .zen-message {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .inbox-zen-state .zen-message {
     color: var(--ios-label-secondary);
 }
 
-[data-theme="glass"] .inbox-zen-state .zen-illustration {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .inbox-zen-state .zen-illustration {
     opacity: 0.9;
 }
 
 /* iOS Messages */
-[data-theme="glass"] .error-message {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .error-message {
     background: rgba(255, 59, 48, 0.12);
     color: var(--ios-red);
     border: none;
@@ -2418,7 +2760,9 @@ h1 {
     font-size: 14px;
 }
 
-[data-theme="glass"] .success-message {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .success-message {
     background: rgba(52, 199, 89, 0.12);
     color: #34c759;
     border: none;
@@ -2427,7 +2771,9 @@ h1 {
 }
 
 /* iOS Category Colors */
-[data-theme="glass"] .category-color {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .category-color {
     width: 10px;
     height: 10px;
 }
@@ -2437,18 +2783,24 @@ h1 {
    ======================================== */
 
 /* iOS GTD Section */
-[data-theme="glass"] .gtd-section {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-section {
     margin-bottom: 20px;
 }
 
-[data-theme="glass"] .gtd-list {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-list {
     background: var(--ios-bg-secondary);
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .gtd-item {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-item {
     background: transparent;
     border: none;
     border-radius: 0;
@@ -2458,49 +2810,69 @@ h1 {
     border-bottom: 0.5px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .gtd-item:last-child {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-item:last-child {
     border-bottom: none;
 }
 
-[data-theme="glass"] .gtd-item:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-item:hover {
     background: var(--ios-gray6);
 }
 
-[data-theme="glass"] .gtd-item.active {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-item.active {
     background: rgba(0, 122, 255, 0.1);
     color: var(--ios-blue);
 }
 
-[data-theme="glass"] .gtd-item.active .gtd-icon {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-item.active .gtd-icon {
     color: var(--ios-blue);
 }
 
-[data-theme="glass"] .gtd-item.active .gtd-count {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-item.active .gtd-count {
     color: var(--ios-blue);
     opacity: 0.7;
 }
 
-[data-theme="glass"] .gtd-icon {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-icon {
     opacity: 0.8;
 }
 
-[data-theme="glass"] .gtd-count {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-count {
     color: var(--ios-label-tertiary);
 }
 
 /* iOS Contexts Section */
-[data-theme="glass"] .contexts-header {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .contexts-header {
     color: var(--ios-label-secondary);
 }
 
-[data-theme="glass"] .context-list {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .context-list {
     background: var(--ios-bg-secondary);
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .context-item {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .context-item {
     background: transparent;
     border: none;
     border-radius: 0;
@@ -2510,35 +2882,53 @@ h1 {
     border-bottom: 0.5px solid var(--ios-separator);
 }
 
-[data-theme="glass"] .context-item:last-child {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .context-item:last-child {
     border-bottom: none;
 }
 
-[data-theme="glass"] .context-item:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .context-item:hover {
     background: var(--ios-gray6);
 }
 
-[data-theme="glass"] .context-item.active {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .context-item.active {
     background: rgba(0, 122, 255, 0.1);
     color: var(--ios-blue);
 }
 
 /* Glass theme drag-over states */
-[data-theme="glass"] .category-item.drag-over,
-[data-theme="glass"] .context-item.drag-over,
-[data-theme="glass"] .gtd-item.drag-over,
-[data-theme="glass"] .project-item.drag-over {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .category-item.drag-over,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .context-item.drag-over,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .gtd-item.drag-over,
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .project-item.drag-over {
     background: var(--ios-blue) !important;
     color: white !important;
     transform: scale(1.02);
     box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
-[data-theme="glass"] .add-context-form {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-context-form {
     padding: 0 5px; /* Horizontal padding for input focus outline */
 }
 
-[data-theme="glass"] .add-context-input {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-context-input {
     background: var(--ios-bg-secondary);
     border: 1px solid var(--ios-separator);
     border-radius: 10px;
@@ -2546,13 +2936,17 @@ h1 {
     font-size: 15px;
 }
 
-[data-theme="glass"] .add-context-input:focus {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-context-input:focus {
     border-color: var(--ios-blue);
     outline: 4px solid rgba(0, 122, 255, 0.15);
     outline-offset: -1px;
 }
 
-[data-theme="glass"] .add-context-btn {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-context-btn {
     background: var(--ios-blue);
     color: #ffffff;
     border: none;
@@ -2560,50 +2954,68 @@ h1 {
     font-weight: 600;
 }
 
-[data-theme="glass"] .add-context-btn:hover {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .add-context-btn:hover {
     background: var(--ios-blue-hover);
 }
 
 /* iOS GTD Badges */
-[data-theme="glass"] .todo-gtd-badge {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-gtd-badge {
     border-radius: 6px;
     font-size: 12px;
     font-weight: 500;
     padding: 3px 8px;
 }
 
-[data-theme="glass"] .todo-gtd-badge.inbox {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-gtd-badge.inbox {
     background: rgba(0, 122, 255, 0.15);
     color: var(--ios-blue);
 }
 
-[data-theme="glass"] .todo-gtd-badge.next_action {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-gtd-badge.next_action {
     background: rgba(52, 199, 89, 0.15);
     color: #34c759;
 }
 
-[data-theme="glass"] .todo-gtd-badge.scheduled {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-gtd-badge.scheduled {
     background: rgba(255, 45, 85, 0.15);
     color: #ff2d55;
 }
 
-[data-theme="glass"] .todo-gtd-badge.waiting_for {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-gtd-badge.waiting_for {
     background: rgba(255, 149, 0, 0.15);
     color: var(--ios-orange);
 }
 
-[data-theme="glass"] .todo-gtd-badge.someday_maybe {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-gtd-badge.someday_maybe {
     background: rgba(175, 82, 222, 0.15);
     color: #af52de;
 }
 
-[data-theme="glass"] .todo-gtd-badge.done {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-gtd-badge.done {
     background: rgba(52, 199, 89, 0.15);
     color: #34c759;
 }
 
 /* iOS Context Badge */
-[data-theme="glass"] .todo-context-badge {
+[data-theme="glass"],
+[data-theme="dark"],
+[data-theme="tint"] .todo-context-badge {
     background: var(--ios-gray5);
     color: var(--ios-label-secondary);
     border-radius: 6px;
