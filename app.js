@@ -1959,7 +1959,6 @@ class TodoApp {
                     ${contextBadge}
                     ${dateBadge}
                     ${categoryBadge}
-                    <button class="edit-btn" data-id="${todo.id}">Edit</button>
                     <button class="delete-btn" data-id="${todo.id}">Delete</button>
                 `
 
@@ -1980,9 +1979,6 @@ class TodoApp {
                 // Click on todo text opens edit modal
                 const todoText = li.querySelector('.todo-text')
                 todoText.addEventListener('click', () => this.openEditModal(todo.id))
-
-                const editBtn = li.querySelector('.edit-btn')
-                editBtn.addEventListener('click', () => this.openEditModal(todo.id))
 
                 const deleteBtn = li.querySelector('.delete-btn')
                 deleteBtn.addEventListener('click', () => this.deleteTodo(todo.id))
