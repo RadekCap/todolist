@@ -191,103 +191,127 @@
 
         <!-- Add Todo Modal -->
         <div id="addTodoModal" class="modal-overlay">
-            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
                 <div class="modal-header">
                     <h2 id="modalTitle">Add New Todo</h2>
                     <button id="closeModal" class="modal-close" aria-label="Close modal">&times;</button>
                 </div>
-                <form id="addTodoForm" class="modal-form">
-                    <div class="form-columns">
-                        <!-- Left Column: Task -->
-                        <div class="form-column form-column-task">
-                            <fieldset class="form-section form-section-task">
-                                <legend class="form-section-title"><span class="section-icon">✏️</span> Task</legend>
-                                <div class="form-field form-field-title">
-                                    <label for="modalTodoInput"><span class="label-icon">📝</span> What needs to be done?</label>
-                                    <input
-                                        type="text"
-                                        id="modalTodoInput"
-                                        class="input-title"
-                                        placeholder="Enter todo description..."
-                                        autocomplete="off"
-                                        required
-                                    >
-                                </div>
-                                <div class="form-field">
-                                    <label for="modalCommentInput"><span class="label-icon">📋</span> Notes</label>
-                                    <textarea
-                                        id="modalCommentInput"
-                                        placeholder="Add additional notes or details..."
-                                        maxlength="1024"
-                                        rows="6"
-                                    ></textarea>
-                                </div>
-                            </fieldset>
+                <form id="addTodoForm" class="modal-form modal-form-split">
+                    <div class="modal-form-main">
+                        <div class="modal-title-row">
+                            <button type="button" id="modalPriorityToggle" class="priority-star" aria-label="Toggle priority" title="Toggle priority">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                            </button>
+                            <input
+                                type="text"
+                                id="modalTodoInput"
+                                class="modal-title-input"
+                                placeholder="To Do"
+                                autocomplete="off"
+                                required
+                            >
                         </div>
-
-                        <!-- Right Column: Organization & Planning -->
-                        <div class="form-column">
-                            <fieldset class="form-section">
-                                <legend class="form-section-title"><span class="section-icon">📁</span> Organization</legend>
-                                <div class="form-field">
-                                    <label for="modalCategorySelect"><span class="label-icon">🏷️</span> Category</label>
-                                    <select id="modalCategorySelect">
-                                        <option value="">No Category</option>
-                                    </select>
-                                </div>
-                                <div class="form-field">
-                                    <label for="modalProjectSelect"><span class="label-icon">📂</span> Project</label>
-                                    <select id="modalProjectSelect">
-                                        <option value="">No Project</option>
-                                    </select>
-                                </div>
-                            </fieldset>
-
-                            <fieldset class="form-section">
-                                <legend class="form-section-title"><span class="section-icon">📅</span> Planning</legend>
-                                <div class="form-field">
-                                    <label for="modalGtdStatusSelect"><span class="label-icon">📥</span> Status</label>
-                                    <select id="modalGtdStatusSelect" aria-label="GTD Status">
-                                        <option value="inbox">Inbox</option>
-                                        <option value="next_action">Next Action</option>
-                                        <option value="scheduled">Scheduled</option>
-                                        <option value="waiting_for">Waiting For</option>
-                                        <option value="someday_maybe">Someday/Maybe</option>
-                                        <option value="done">Done</option>
-                                    </select>
-                                </div>
-                                <div class="form-field">
-                                    <label for="modalPrioritySelect"><span class="label-icon">🔥</span> Priority</label>
-                                    <select id="modalPrioritySelect" aria-label="Priority">
-                                        <option value="">No Priority</option>
-                                    </select>
-                                </div>
-                                <div class="form-field">
-                                    <label for="modalContextSelect"><span class="label-icon">📍</span> Context</label>
-                                    <select id="modalContextSelect" aria-label="Context">
-                                        <option value="">No Context</option>
-                                    </select>
-                                </div>
-                                <div class="form-field">
-                                    <label for="modalDueDateInput"><span class="label-icon">🗓️</span> Due Date</label>
-                                    <input
-                                        type="date"
-                                        id="modalDueDateInput"
-                                    >
-                                </div>
-                            </fieldset>
+                        <div class="modal-field">
+                            <textarea
+                                id="modalCommentInput"
+                                class="modal-notes-input"
+                                placeholder="Notes"
+                                rows="6"
+                            ></textarea>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="submit" id="modalAddBtn" class="modal-btn modal-btn-primary">Save Changes</button>
+                            <button type="button" id="cancelModal" class="modal-btn modal-btn-secondary">Cancel</button>
                         </div>
                     </div>
-
-                    <div class="create-more-option">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="createMoreCheckbox">
-                            <span>Create more</span>
-                        </label>
-                    </div>
-                    <div class="modal-actions">
-                        <button type="button" id="cancelModal" class="modal-btn modal-btn-secondary">Cancel</button>
-                        <button type="submit" id="modalAddBtn" class="modal-btn modal-btn-primary">Add Todo</button>
+                    <div class="modal-form-sidebar">
+                        <div class="modal-sidebar-field">
+                            <label for="modalDueDateInput">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                                        <path d="M16 2v4M8 2v4M2 10h20"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">due</span>
+                            </label>
+                            <input type="date" id="modalDueDateInput" class="modal-sidebar-input">
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="modalPrioritySelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                                        <line x1="4" y1="22" x2="4" y2="15"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">priority</span>
+                            </label>
+                            <select id="modalPrioritySelect" class="modal-sidebar-select" aria-label="Priority">
+                                <option value="">No Priority</option>
+                            </select>
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="modalGtdStatusSelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">status</span>
+                            </label>
+                            <select id="modalGtdStatusSelect" class="modal-sidebar-select" aria-label="GTD Status">
+                                <option value="inbox">Inbox</option>
+                                <option value="next_action">Next Action</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="waiting_for">Waiting For</option>
+                                <option value="someday_maybe">Someday/Maybe</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="modalProjectSelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">project</span>
+                            </label>
+                            <select id="modalProjectSelect" class="modal-sidebar-select">
+                                <option value="">No Project</option>
+                            </select>
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="modalCategorySelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                                        <line x1="7" y1="7" x2="7.01" y2="7"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">category</span>
+                            </label>
+                            <select id="modalCategorySelect" class="modal-sidebar-select">
+                                <option value="">No Category</option>
+                            </select>
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="modalContextSelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="10" r="3"/>
+                                        <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">context</span>
+                            </label>
+                            <select id="modalContextSelect" class="modal-sidebar-select" aria-label="Context">
+                                <option value="">No Context</option>
+                            </select>
+                        </div>
                     </div>
                 </form>
             </div>
