@@ -1515,11 +1515,12 @@ h1 {
 
 /* Two-column modal layout */
 .modal-wide {
-    max-width: 800px;
+    max-width: 600px;
 }
 
 .modal-form-split {
     display: flex;
+    flex-direction: column;
     gap: 20px;
 }
 
@@ -1532,13 +1533,12 @@ h1 {
 }
 
 .modal-form-sidebar {
-    width: 220px;
-    flex-shrink: 0;
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    border-left: 1px solid #e0e0e0;
-    padding-left: 20px;
+    gap: 12px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 16px;
     align-content: start;
 }
 
@@ -1679,22 +1679,9 @@ h1 {
     font-size: 14px;
 }
 
-@media (max-width: 768px) {
-    .modal-form-split {
-        flex-direction: column;
-    }
-
+@media (max-width: 480px) {
     .modal-form-sidebar {
-        width: 100%;
-        border-left: none;
-        border-top: 1px solid #e0e0e0;
-        padding-left: 0;
-        padding-top: 15px;
-        grid-template-columns: repeat(3, 1fr);
-    }
-
-    .modal-wide {
-        max-width: 100%;
+        grid-template-columns: 1fr;
     }
 }
 
@@ -2273,7 +2260,7 @@ h1 {
 [data-theme="glass"] .modal-form-sidebar,
 [data-theme="dark"] .modal-form-sidebar,
 [data-theme="clear"] .modal-form-sidebar {
-    border-left-color: var(--ios-separator);
+    border-top-color: var(--ios-separator);
 }
 
 [data-theme="glass"] .modal-title-input,
