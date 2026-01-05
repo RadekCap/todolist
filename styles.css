@@ -1535,11 +1535,14 @@ h1 {
 .modal-form-sidebar {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    border-top: 1px solid #e0e0e0;
-    padding-top: 16px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px 12px;
+    padding: 16px;
+    margin-top: 8px;
     align-content: start;
+    background: linear-gradient(135deg, #f8f9fc 0%, #f0f2f8 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .modal-title-row {
@@ -1679,7 +1682,13 @@ h1 {
     font-size: 14px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+    .modal-form-sidebar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 400px) {
     .modal-form-sidebar {
         grid-template-columns: 1fr;
     }
@@ -2258,9 +2267,14 @@ h1 {
 
 /* iOS Split Modal Layout */
 [data-theme="glass"] .modal-form-sidebar,
-[data-theme="dark"] .modal-form-sidebar,
 [data-theme="clear"] .modal-form-sidebar {
-    border-top-color: var(--ios-separator);
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator);
+}
+
+[data-theme="dark"] .modal-form-sidebar {
+    background: var(--ios-bg-tertiary);
+    border-color: var(--ios-separator);
 }
 
 [data-theme="glass"] .modal-title-input,
