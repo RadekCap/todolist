@@ -149,7 +149,7 @@ class TodoApp {
         this.modalContextSelect = document.getElementById('modalContextSelect')
         this.modalDueDateInput = document.getElementById('modalDueDateInput')
         this.modalCommentInput = document.getElementById('modalCommentInput')
-        this.createMoreCheckbox = document.getElementById('createMoreCheckbox')
+        this.modalPriorityToggle = document.getElementById('modalPriorityToggle')
         this.modalAddBtn = document.getElementById('modalAddBtn')
         this.modalTitle = document.getElementById('modalTitle')
         this.todoList = document.getElementById('todoList')
@@ -311,6 +311,9 @@ class TodoApp {
                 this.modalDueDateInput.focus()
             }
         })
+
+        // Priority star toggle
+        this.modalPriorityToggle.addEventListener('click', () => this.togglePriorityStar())
 
         // Add category
         this.addCategoryBtn.addEventListener('click', () => this.addCategory())
@@ -1301,10 +1304,7 @@ class TodoApp {
         this.modalPrioritySelect.value = ''
         this.modalGtdStatusSelect.value = 'inbox'
         this.modalContextSelect.value = ''
-
-        // Show "Create more" checkbox for new todos
-        this.createMoreCheckbox.closest('.create-more-option').style.display = ''
-        // Preserve checkbox state across multiple additions
+        this.modalPriorityToggle.classList.remove('active')
 
         // Pre-select category if exactly one is selected (not 'uncategorized')
         if (this.selectedCategoryIds.size === 1) {
@@ -1344,9 +1344,6 @@ class TodoApp {
         this.modalAddBtn.textContent = 'Save Changes'
         this.addTodoModal.classList.add('active')
 
-        // Hide "Create more" checkbox for editing (not applicable)
-        this.createMoreCheckbox.closest('.create-more-option').style.display = 'none'
-
         // Pre-populate fields with existing todo data
         this.modalTodoInput.value = todo.text
         this.modalCategorySelect.value = todo.category_id || ''
@@ -1356,6 +1353,13 @@ class TodoApp {
         this.modalContextSelect.value = todo.context_id || ''
         this.modalDueDateInput.value = todo.due_date || ''
         this.modalCommentInput.value = todo.comment || ''
+
+        // Set priority star state
+        if (todo.priority_id) {
+            this.modalPriorityToggle.classList.add('active')
+        } else {
+            this.modalPriorityToggle.classList.remove('active')
+        }
 
         // Handle Escape key to close modal
         this.handleEscapeKey = (e) => {
@@ -1384,7 +1388,7 @@ class TodoApp {
         this.modalContextSelect.value = ''
         this.modalDueDateInput.value = ''
         this.modalCommentInput.value = ''
-        this.createMoreCheckbox.checked = false
+        this.modalPriorityToggle.classList.remove('active')
 
         // Reset modal to add mode
         this.modalTitle.textContent = 'Add New Todo'
@@ -1393,6 +1397,18 @@ class TodoApp {
         // Return focus to the trigger button for accessibility
         if (this.openAddTodoModalBtn && typeof this.openAddTodoModalBtn.focus === 'function') {
             this.openAddTodoModalBtn.focus()
+        }
+    }
+
+    togglePriorityStar() {
+        this.modalPriorityToggle.classList.toggle('active')
+        // When star is active, select the first priority if available
+        if (this.modalPriorityToggle.classList.contains('active')) {
+            if (this.priorities.length > 0 && !this.modalPrioritySelect.value) {
+                this.modalPrioritySelect.value = this.priorities[0].id
+            }
+        } else {
+            this.modalPrioritySelect.value = ''
         }
     }
 
@@ -1521,20 +1537,8 @@ class TodoApp {
         // Store decrypted text in local state for rendering
         const todoWithDecryptedText = { ...data[0], text: text, comment: comment }
         this.todos.push(todoWithDecryptedText)
-
-        // Handle "Create more" mode
-        if (this.createMoreCheckbox.checked) {
-            // Clear only text and comment fields, keep other selections
-            this.modalTodoInput.value = ''
-            this.modalCommentInput.value = ''
-            this.renderTodos()
-            this.renderGtdList()
-            // Refocus on input for next todo
-            setTimeout(() => this.modalTodoInput.focus(), 100)
-        } else {
-            this.closeModal()
-            this.renderTodos()
-        }
+        this.closeModal()
+        this.renderTodos()
     }
 
     async updateTodo() {

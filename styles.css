@@ -1513,6 +1513,195 @@ h1 {
     background: #d0d0d0;
 }
 
+/* Two-column modal layout */
+.modal-wide {
+    max-width: 800px;
+}
+
+.modal-form-split {
+    display: flex;
+    gap: 20px;
+}
+
+.modal-form-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-form-sidebar {
+    width: 180px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-left: 1px solid #e0e0e0;
+    padding-left: 20px;
+}
+
+.modal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.priority-star {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ccc;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.priority-star:hover {
+    color: #f5a623;
+    background: #fff8e8;
+}
+
+.priority-star.active {
+    color: #f5a623;
+}
+
+.priority-star.active svg {
+    fill: #f5a623;
+}
+
+.modal-title-input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 18px;
+    padding: 8px 0;
+    outline: none;
+    font-weight: 500;
+    background: transparent;
+}
+
+.modal-title-input:focus {
+    border-bottom-color: var(--accent-color);
+}
+
+.modal-title-input::placeholder {
+    color: #bbb;
+    font-weight: 400;
+}
+
+.modal-notes-input {
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    padding: 12px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 120px;
+    background: #fafafa;
+}
+
+.modal-notes-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: white;
+}
+
+.modal-notes-input::placeholder {
+    color: #aaa;
+}
+
+.modal-sidebar-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.modal-sidebar-field label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #888;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: lowercase;
+}
+
+.modal-field-icon {
+    display: flex;
+    align-items: center;
+    color: #aaa;
+}
+
+.modal-field-label {
+    flex: 1;
+}
+
+.modal-sidebar-select,
+.modal-sidebar-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 13px;
+    background: white;
+    cursor: pointer;
+    color: #333;
+}
+
+.modal-sidebar-select:focus,
+.modal-sidebar-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.modal-sidebar-select:hover,
+.modal-sidebar-input:hover {
+    border-color: #ccc;
+}
+
+/* Updated modal actions for split layout */
+.modal-form-split .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 15px;
+}
+
+.modal-form-split .modal-btn {
+    flex: 0 0 auto;
+    padding: 10px 20px;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .modal-form-split {
+        flex-direction: column;
+    }
+
+    .modal-form-sidebar {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid #e0e0e0;
+        padding-left: 0;
+        padding-top: 15px;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .modal-sidebar-field {
+        width: calc(50% - 5px);
+    }
+
+    .modal-wide {
+        max-width: 100%;
+    }
+}
+
 @media (max-width: 768px) {
     .main-content {
         flex-direction: column;
@@ -2082,6 +2271,119 @@ h1 {
 [data-theme="dark"] .modal-btn-secondary:hover,
 [data-theme="clear"] .modal-btn-secondary:hover {
     background: var(--ios-gray4);
+}
+
+/* iOS Split Modal Layout */
+[data-theme="glass"] .modal-form-sidebar,
+[data-theme="dark"] .modal-form-sidebar,
+[data-theme="clear"] .modal-form-sidebar {
+    border-left-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .modal-title-input,
+[data-theme="dark"] .modal-title-input,
+[data-theme="clear"] .modal-title-input {
+    border-bottom-color: var(--ios-separator);
+    color: var(--ios-label);
+    font-size: 17px;
+}
+
+[data-theme="glass"] .modal-title-input:focus,
+[data-theme="dark"] .modal-title-input:focus,
+[data-theme="clear"] .modal-title-input:focus {
+    border-bottom-color: var(--ios-blue);
+}
+
+[data-theme="glass"] .modal-title-input::placeholder,
+[data-theme="dark"] .modal-title-input::placeholder,
+[data-theme="clear"] .modal-title-input::placeholder {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .modal-notes-input,
+[data-theme="dark"] .modal-notes-input,
+[data-theme="clear"] .modal-notes-input {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator);
+    border-radius: 10px;
+    color: var(--ios-label);
+    font-size: 15px;
+}
+
+[data-theme="glass"] .modal-notes-input:focus,
+[data-theme="dark"] .modal-notes-input:focus,
+[data-theme="clear"] .modal-notes-input:focus {
+    border-color: var(--ios-blue);
+    background: var(--ios-bg-secondary);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+}
+
+[data-theme="glass"] .modal-notes-input::placeholder,
+[data-theme="dark"] .modal-notes-input::placeholder,
+[data-theme="clear"] .modal-notes-input::placeholder {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .priority-star,
+[data-theme="dark"] .priority-star,
+[data-theme="clear"] .priority-star {
+    color: var(--ios-gray3);
+}
+
+[data-theme="glass"] .priority-star:hover,
+[data-theme="dark"] .priority-star:hover,
+[data-theme="clear"] .priority-star:hover {
+    color: var(--ios-orange);
+    background: rgba(255, 149, 0, 0.1);
+}
+
+[data-theme="glass"] .priority-star.active,
+[data-theme="dark"] .priority-star.active,
+[data-theme="clear"] .priority-star.active {
+    color: var(--ios-orange);
+}
+
+[data-theme="glass"] .modal-sidebar-field label,
+[data-theme="dark"] .modal-sidebar-field label,
+[data-theme="clear"] .modal-sidebar-field label {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .modal-field-icon,
+[data-theme="dark"] .modal-field-icon,
+[data-theme="clear"] .modal-field-icon {
+    color: var(--ios-gray);
+}
+
+[data-theme="glass"] .modal-sidebar-select,
+[data-theme="glass"] .modal-sidebar-input,
+[data-theme="dark"] .modal-sidebar-select,
+[data-theme="dark"] .modal-sidebar-input,
+[data-theme="clear"] .modal-sidebar-select,
+[data-theme="clear"] .modal-sidebar-input {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+    border-radius: 8px;
+}
+
+[data-theme="glass"] .modal-sidebar-select:focus,
+[data-theme="glass"] .modal-sidebar-input:focus,
+[data-theme="dark"] .modal-sidebar-select:focus,
+[data-theme="dark"] .modal-sidebar-input:focus,
+[data-theme="clear"] .modal-sidebar-select:focus,
+[data-theme="clear"] .modal-sidebar-input:focus {
+    border-color: var(--ios-blue);
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
+}
+
+[data-theme="glass"] .modal-sidebar-select:hover,
+[data-theme="glass"] .modal-sidebar-input:hover,
+[data-theme="dark"] .modal-sidebar-select:hover,
+[data-theme="dark"] .modal-sidebar-input:hover,
+[data-theme="clear"] .modal-sidebar-select:hover,
+[data-theme="clear"] .modal-sidebar-input:hover {
+    border-color: var(--ios-gray3);
 }
 
 /* iOS Checkbox Label */
