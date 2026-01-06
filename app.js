@@ -1,7 +1,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
 // Application version - Update when preparing a new release
-const APP_VERSION = '1.0.76'
+const APP_VERSION = '1.0.77'
 
 // Initialize Supabase
 const supabaseUrl = 'https://rkvmujdayjmszmyzbhal.supabase.co'
