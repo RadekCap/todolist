@@ -127,6 +127,7 @@ class TodoApp {
         this.userDisplay = document.getElementById('userDisplay')
         this.userEmail = document.getElementById('userEmail')
         this.settingsBtn = document.getElementById('settingsBtn')
+        this.refreshBtn = document.getElementById('refreshBtn')
         this.lockBtn = document.getElementById('lockBtn')
         this.logoutBtn = document.getElementById('logoutBtn')
         this.settingsModal = document.getElementById('settingsModal')
@@ -261,6 +262,9 @@ class TodoApp {
         this.logoutBtn.addEventListener('click', async () => {
             await this.handleLogout()
         })
+
+        // Refresh data
+        this.refreshBtn.addEventListener('click', () => this.refreshData())
 
         // Settings modal controls
         this.settingsBtn.addEventListener('click', () => this.openSettingsModal())
@@ -465,6 +469,26 @@ class TodoApp {
         this.loadingScreen.classList.add('hidden')
         this.mainContainer.classList.remove('loading')
         this.mainContainer.classList.add('loaded')
+    }
+
+    async refreshData() {
+        this.refreshBtn.disabled = true
+        this.refreshBtn.textContent = 'Refreshing...'
+
+        try {
+            await Promise.all([
+                this.loadCategories(),
+                this.loadPriorities(),
+                this.loadContexts(),
+                this.loadProjects(),
+                this.loadTodos()
+            ])
+        } catch (error) {
+            console.error('Error refreshing data:', error)
+        } finally {
+            this.refreshBtn.disabled = false
+            this.refreshBtn.textContent = 'Refresh'
+        }
     }
 
     handleSignOut() {

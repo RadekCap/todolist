@@ -455,6 +455,21 @@ h1 {
     background: var(--accent-hover);
 }
 
+.refresh-btn {
+    padding: 8px 15px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.refresh-btn:hover {
+    background: #5a6268;
+}
+
 .logout-btn {
     padding: 8px 15px;
     background: #e74c3c;
@@ -2922,6 +2937,23 @@ h1 {
 [data-theme="glass"] .settings-btn:hover,
 [data-theme="dark"] .settings-btn:hover,
 [data-theme="clear"] .settings-btn:hover {
+    background: var(--ios-gray4);
+}
+
+[data-theme="glass"] .refresh-btn,
+[data-theme="dark"] .refresh-btn,
+[data-theme="clear"] .refresh-btn {
+    background: var(--ios-gray5);
+    color: var(--ios-label);
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background 0.15s ease;
+}
+
+[data-theme="glass"] .refresh-btn:hover,
+[data-theme="dark"] .refresh-btn:hover,
+[data-theme="clear"] .refresh-btn:hover {
     background: var(--ios-gray4);
 }
 
