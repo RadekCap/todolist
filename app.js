@@ -447,6 +447,7 @@ class TodoApp {
         this.authContainer.classList.remove('active')
         this.appContainer.classList.add('active')
         this.mainContainer.classList.remove('auth-mode')
+        document.body.classList.add('fullscreen-mode')
 
         // Load data and wait for essential items
         await Promise.all([
@@ -505,6 +506,7 @@ class TodoApp {
         this.authContainer.classList.add('active')
         this.appContainer.classList.remove('active')
         this.mainContainer.classList.add('auth-mode')
+        document.body.classList.remove('fullscreen-mode')
         this.loginForm.reset()
         this.signupForm.reset()
         this.authMessage.innerHTML = ''
