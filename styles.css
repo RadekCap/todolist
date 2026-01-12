@@ -256,6 +256,21 @@ body {
     padding: 20px;
 }
 
+/* Fullscreen mode - applied when user is logged in */
+body.fullscreen-mode {
+    padding: 0;
+    align-items: stretch;
+}
+
+body.fullscreen-mode .container {
+    max-width: none;
+    border-radius: 0;
+    box-shadow: none;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .container {
     background: white;
     border-radius: 15px;
@@ -406,7 +421,29 @@ h1 {
 }
 
 .app-container.active {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Make main content area expand in fullscreen mode */
+body.fullscreen-mode .app-container.active {
+    min-height: 0;
+}
+
+body.fullscreen-mode .main-content {
+    flex: 1;
+    min-height: 0;
+}
+
+body.fullscreen-mode .content {
+    display: flex;
+    flex-direction: column;
+}
+
+body.fullscreen-mode .todo-list {
+    flex: 1;
+    overflow-y: auto;
 }
 
 .user-header {
@@ -2024,6 +2061,14 @@ h1 {
     box-shadow: 0 0 0 0.5px var(--ios-separator-opaque),
                 0 4px 20px rgba(0, 0, 0, 0.4);
     border-radius: 20px;
+}
+
+/* iOS Container - Fullscreen mode overrides */
+[data-theme="glass"] body.fullscreen-mode .container,
+[data-theme="dark"] body.fullscreen-mode .container,
+[data-theme="clear"] body.fullscreen-mode .container {
+    border-radius: 0;
+    box-shadow: none;
 }
 
 /* iOS Typography */
