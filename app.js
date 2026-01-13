@@ -295,6 +295,26 @@ class TodoApp {
             if (e.target === this.addTodoModal) this.closeModal()
         })
 
+        // Keyboard shortcut: 'n' to create new item
+        document.addEventListener('keydown', (e) => {
+            // Ignore if user is typing in an input field
+            const activeElement = document.activeElement
+            const isTyping = activeElement.tagName === 'INPUT' ||
+                           activeElement.tagName === 'TEXTAREA' ||
+                           activeElement.tagName === 'SELECT' ||
+                           activeElement.isContentEditable
+
+            // Ignore if any modal is open
+            const modalOpen = this.addTodoModal.classList.contains('active') ||
+                            this.unlockModal.classList.contains('active') ||
+                            this.settingsModal.classList.contains('active')
+
+            if (e.key === 'n' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                e.preventDefault()
+                this.openModal()
+            }
+        })
+
         // Add/Edit todo via modal form
         this.addTodoForm.addEventListener('submit', (e) => {
             e.preventDefault()
