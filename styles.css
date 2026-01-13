@@ -636,11 +636,24 @@ body.fullscreen-mode .todo-list {
     flex-shrink: 0;
 }
 
+.sidebar-app-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 .sidebar-app-title {
     font-size: 18px;
     font-weight: 600;
     color: #333;
     letter-spacing: -0.3px;
+    line-height: 1.2;
+}
+
+.sidebar-app-version {
+    font-size: 11px;
+    color: #888;
+    letter-spacing: 0;
 }
 
 /* Sidebar resize handle */
@@ -2781,6 +2794,12 @@ body.sidebar-resizing * {
 [data-theme="dark"] .sidebar-app-title,
 [data-theme="clear"] .sidebar-app-title {
     color: var(--ios-label);
+}
+
+[data-theme="glass"] .sidebar-app-version,
+[data-theme="dark"] .sidebar-app-version,
+[data-theme="clear"] .sidebar-app-version {
+    color: var(--ios-label-tertiary);
 }
 
 [data-theme="glass"] .sidebar-section-header,
