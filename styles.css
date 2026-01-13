@@ -427,39 +427,6 @@ body.fullscreen-mode .todo-list {
     text-align: center;
 }
 
-.theme-selector {
-    margin: 10px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-size: 13px;
-}
-
-.theme-selector label {
-    color: #666;
-    font-weight: 500;
-}
-
-.theme-selector select {
-    padding: 6px 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
-    background: white;
-    transition: border-color 0.3s;
-}
-
-.theme-selector select:hover {
-    border-color: #ccc;
-}
-
-.theme-selector select:focus {
-    outline: none;
-    border-color: var(--accent-color);
-}
-
 .app-footer-links {
     font-size: 11px;
     color: #aaa;
@@ -1169,6 +1136,27 @@ body.sidebar-resizing * {
 
 .toolbar-spacer {
     flex: 1;
+}
+
+/* Toolbar theme selector */
+.toolbar-theme-select {
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #f5f5f5;
+    color: #333;
+    font-size: 13px;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.toolbar-theme-select:hover {
+    background: #e8e8e8;
+}
+
+.toolbar-theme-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
 }
 
 /* Toolbar user menu */
@@ -2163,6 +2151,34 @@ body.sidebar-resizing * {
     background: var(--ios-bg-secondary);
 }
 
+[data-theme="glass"] .toolbar-theme-select,
+[data-theme="clear"] .toolbar-theme-select {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
+[data-theme="dark"] .toolbar-theme-select {
+    background: var(--ios-bg-tertiary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .toolbar-theme-select:hover,
+[data-theme="clear"] .toolbar-theme-select:hover {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="dark"] .toolbar-theme-select:hover {
+    background: var(--ios-bg-secondary);
+}
+
+[data-theme="glass"] .toolbar-theme-select:focus,
+[data-theme="dark"] .toolbar-theme-select:focus,
+[data-theme="clear"] .toolbar-theme-select:focus {
+    border-color: var(--ios-blue);
+}
+
 [data-theme="glass"] .toolbar-user-btn,
 [data-theme="dark"] .toolbar-user-btn,
 [data-theme="clear"] .toolbar-user-btn {
@@ -2777,22 +2793,6 @@ body.sidebar-resizing * {
 [data-theme="dark"] .app-footer,
 [data-theme="clear"] .app-footer {
     border-top-color: var(--ios-separator);
-}
-
-[data-theme="glass"] .theme-selector label,
-[data-theme="dark"] .theme-selector label,
-[data-theme="clear"] .theme-selector label {
-    color: var(--ios-label-secondary);
-}
-
-[data-theme="glass"] .theme-selector select,
-[data-theme="dark"] .theme-selector select,
-[data-theme="clear"] .theme-selector select {
-    background: var(--ios-bg-secondary);
-    border: 1px solid var(--ios-separator);
-    border-radius: 8px;
-    color: var(--ios-label);
-    padding: 8px 12px;
 }
 
 [data-theme="glass"] .app-footer-links a,

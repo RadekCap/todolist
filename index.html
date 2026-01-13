@@ -115,6 +115,11 @@
                         <button id="openAddTodoModal" class="toolbar-btn add-todo-btn">+ Add Todo</button>
                         <div class="toolbar-spacer"></div>
                         <button id="exportBtn" class="toolbar-btn toolbar-btn-secondary" aria-label="Export current list">Export</button>
+                        <select id="themeSelect" class="toolbar-theme-select" aria-label="Color scheme selector">
+                            <option value="glass">Glass</option>
+                            <option value="dark">Dark</option>
+                            <option value="clear">Clear</option>
+                        </select>
                         <div class="toolbar-user-menu" id="toolbarUserMenu">
                             <button class="toolbar-user-btn" id="toolbarUserBtn" aria-haspopup="true" aria-expanded="false">
                                 <span class="toolbar-username" id="toolbarUsername"></span>
@@ -136,14 +141,6 @@
 
 
             <footer class="app-footer">
-                <div class="theme-selector">
-                    <label for="themeSelect">Theme:</label>
-                    <select id="themeSelect" aria-label="Color scheme selector">
-                        <option value="glass">Glass</option>
-                        <option value="dark">Dark</option>
-                        <option value="clear">Clear</option>
-                    </select>
-                </div>
                 <div class="app-footer-links">
                     <a href="https://github.com/RadekCap/todolist" target="_blank" rel="noopener noreferrer">GitHub</a>
                     <a href="https://github.com/RadekCap/todolist/blob/main/VERSION.md" target="_blank" rel="noopener noreferrer">Changelog</a>
