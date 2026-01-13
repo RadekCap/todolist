@@ -151,6 +151,20 @@
                 <div class="content">
                     <div class="content-toolbar">
                         <button id="openAddTodoModal" class="toolbar-btn add-todo-btn">+ Add Todo</button>
+                        <div class="toolbar-spacer"></div>
+                        <div class="toolbar-user-menu" id="toolbarUserMenu">
+                            <button class="toolbar-user-btn" id="toolbarUserBtn" aria-haspopup="true" aria-expanded="false">
+                                <span class="toolbar-username" id="toolbarUsername"></span>
+                                <span class="toolbar-menu-arrow">▼</span>
+                            </button>
+                            <div class="toolbar-dropdown" id="toolbarDropdown" role="menu">
+                                <button id="settingsBtn" class="toolbar-dropdown-item" role="menuitem">Settings</button>
+                                <button id="refreshBtn" class="toolbar-dropdown-item" role="menuitem">Refresh</button>
+                                <button id="lockBtn" class="toolbar-dropdown-item" role="menuitem">Lock</button>
+                                <div class="toolbar-dropdown-divider"></div>
+                                <button id="logoutBtn" class="toolbar-dropdown-item toolbar-dropdown-item-danger" role="menuitem">Logout</button>
+                            </div>
+                        </div>
                     </div>
 
                     <ul id="todoList" class="todo-list"></ul>
@@ -163,18 +177,6 @@
                 </div>
             </div>
 
-            <div class="user-header">
-                <div class="user-info">
-                    <span class="user-display" id="userDisplay"></span>
-                    <span class="user-email" id="userEmail"></span>
-                </div>
-                <div class="user-actions">
-                    <button id="lockBtn" class="lock-btn" aria-label="Lock application">🔒</button>
-                    <button id="settingsBtn" class="settings-btn">Settings</button>
-                    <button id="refreshBtn" class="refresh-btn" aria-label="Refresh data">Refresh</button>
-                    <button id="logoutBtn" class="logout-btn">Logout</button>
-                </div>
-            </div>
 
             <footer class="app-footer">
                 <div class="app-version" id="appVersion">
