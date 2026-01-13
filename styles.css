@@ -1374,6 +1374,28 @@ body.sidebar-resizing * {
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
+/* Content toolbar */
+.content-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.toolbar-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    width: auto;
+    margin-bottom: 0;
+}
+
+.toolbar-btn:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
 .modal-overlay {
     display: none;
     position: fixed;
@@ -2375,6 +2397,21 @@ body.sidebar-resizing * {
 [data-theme="dark"] .add-todo-btn:active,
 [data-theme="clear"] .add-todo-btn:active {
     transform: scale(0.98);
+}
+
+/* Content toolbar theme styles */
+[data-theme="glass"] .content-toolbar,
+[data-theme="dark"] .content-toolbar,
+[data-theme="clear"] .content-toolbar {
+    border-bottom-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .toolbar-btn,
+[data-theme="dark"] .toolbar-btn,
+[data-theme="clear"] .toolbar-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 8px;
 }
 
 [data-theme="glass"] .modal-btn-secondary,
