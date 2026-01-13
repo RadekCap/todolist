@@ -614,8 +614,48 @@ body.fullscreen-mode .todo-list {
 }
 
 .sidebar {
-    width: 200px;
+    width: 20%;
+    min-width: 15%;
+    max-width: 30%;
     flex-shrink: 0;
+}
+
+/* Sidebar resize handle */
+.sidebar-resize-handle {
+    width: 6px;
+    cursor: col-resize;
+    background: transparent;
+    position: relative;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease;
+}
+
+.sidebar-resize-handle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 40px;
+    background: #ddd;
+    border-radius: 1px;
+    transition: background-color 0.15s ease, height 0.15s ease;
+}
+
+.sidebar-resize-handle:hover::after,
+.sidebar-resize-handle.resizing::after {
+    background: #007AFF;
+    height: 60px;
+}
+
+body.sidebar-resizing {
+    cursor: col-resize;
+    user-select: none;
+}
+
+body.sidebar-resizing * {
+    cursor: col-resize !important;
 }
 
 .sidebar h2 {
@@ -1753,6 +1793,12 @@ body.fullscreen-mode .todo-list {
 
     .sidebar {
         width: 100%;
+        min-width: unset;
+        max-width: unset;
+    }
+
+    .sidebar-resize-handle {
+        display: none;
     }
 
     .input-row {
