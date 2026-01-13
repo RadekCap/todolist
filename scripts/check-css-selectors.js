@@ -88,6 +88,8 @@ const DYNAMIC_CLASS_PATTERNS = [
     /^body\.sidebar-resizing/,
     // Toolbar menu open state
     /\.toolbar-user-menu\.open/,
+    // Sidebar section collapsed state (toggled by JavaScript)
+    /\.sidebar-section\.collapsed/,
     // GTD status classes
     /\.inbox/,
     /\.next_action/,
