@@ -124,8 +124,9 @@ class TodoApp {
         this.authMessage = document.getElementById('authMessage')
         this.loginForm = document.getElementById('loginForm')
         this.signupForm = document.getElementById('signupForm')
-        this.userDisplay = document.getElementById('userDisplay')
-        this.userEmail = document.getElementById('userEmail')
+        this.toolbarUsername = document.getElementById('toolbarUsername')
+        this.toolbarUserMenu = document.getElementById('toolbarUserMenu')
+        this.toolbarUserBtn = document.getElementById('toolbarUserBtn')
         this.settingsBtn = document.getElementById('settingsBtn')
         this.refreshBtn = document.getElementById('refreshBtn')
         this.lockBtn = document.getElementById('lockBtn')
@@ -259,18 +260,28 @@ class TodoApp {
         })
 
         // Lock
-        this.lockBtn.addEventListener('click', () => this.lockApp())
+        this.lockBtn.addEventListener('click', () => {
+            this.closeToolbarMenu()
+            this.lockApp()
+        })
 
         // Logout
         this.logoutBtn.addEventListener('click', async () => {
+            this.closeToolbarMenu()
             await this.handleLogout()
         })
 
         // Refresh data
-        this.refreshBtn.addEventListener('click', () => this.refreshData())
+        this.refreshBtn.addEventListener('click', () => {
+            this.closeToolbarMenu()
+            this.refreshData()
+        })
 
         // Settings modal controls
-        this.settingsBtn.addEventListener('click', () => this.openSettingsModal())
+        this.settingsBtn.addEventListener('click', () => {
+            this.closeToolbarMenu()
+            this.openSettingsModal()
+        })
         this.closeSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
         this.cancelSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
         this.settingsModal.addEventListener('click', (e) => {
@@ -364,8 +375,31 @@ class TodoApp {
         // Export button
         this.exportBtn.addEventListener('click', () => this.exportTodos())
 
+        // Toolbar user menu toggle
+        this.toolbarUserBtn.addEventListener('click', (e) => {
+            e.stopPropagation()
+            this.toggleToolbarMenu()
+        })
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.toolbarUserMenu && !this.toolbarUserMenu.contains(e.target)) {
+                this.closeToolbarMenu()
+            }
+        })
+
         // Initialize sidebar resize
         this.initSidebarResize()
+    }
+
+    toggleToolbarMenu() {
+        const isOpen = this.toolbarUserMenu.classList.toggle('open')
+        this.toolbarUserBtn.setAttribute('aria-expanded', isOpen)
+    }
+
+    closeToolbarMenu() {
+        this.toolbarUserMenu.classList.remove('open')
+        this.toolbarUserBtn.setAttribute('aria-expanded', 'false')
     }
 
     initSidebarResize() {
@@ -513,7 +547,6 @@ class TodoApp {
 
     async handleAuthSuccess(user) {
         this.currentUser = user
-        this.userEmail.textContent = `(${user.email})`
         this.authContainer.classList.remove('active')
         this.appContainer.classList.add('active')
         this.mainContainer.classList.remove('auth-mode')
@@ -2279,14 +2312,14 @@ class TodoApp {
 
         if (error) {
             // No settings yet, use email as display
-            this.userDisplay.textContent = this.currentUser.email
+            this.toolbarUsername.textContent = this.currentUser.email
             return
         }
 
         if (data && data.username) {
-            this.userDisplay.textContent = data.username
+            this.toolbarUsername.textContent = data.username
         } else {
-            this.userDisplay.textContent = this.currentUser.email
+            this.toolbarUsername.textContent = this.currentUser.email
         }
     }
 
@@ -2294,7 +2327,7 @@ class TodoApp {
         this.settingsModal.classList.add('active')
 
         // Load current username into input
-        const currentUsername = this.userDisplay.textContent
+        const currentUsername = this.toolbarUsername.textContent
         if (currentUsername !== this.currentUser.email) {
             this.usernameInput.value = currentUsername
         } else {
@@ -2367,9 +2400,9 @@ class TodoApp {
 
         // Update display
         if (username) {
-            this.userDisplay.textContent = username
+            this.toolbarUsername.textContent = username
         } else {
-            this.userDisplay.textContent = this.currentUser.email
+            this.toolbarUsername.textContent = this.currentUser.email
         }
 
         this.closeSettingsModal()
