@@ -169,8 +169,6 @@ class TodoApp {
         this.projectsSection = document.getElementById('projectsSection')
         this.modalProjectSelect = document.getElementById('modalProjectSelect')
         this.gtdList = document.getElementById('gtdList')
-        this.totalTodosEl = document.getElementById('totalTodos')
-        this.completedTodosEl = document.getElementById('completedTodos')
         this.exportBtn = document.getElementById('exportBtn')
         this.versionNumberEl = document.getElementById('versionNumber')
         this.themeSelect = document.getElementById('themeSelect')
@@ -1932,11 +1930,6 @@ class TodoApp {
 
     updateStats() {
         const filteredTodos = this.getFilteredTodos()
-        const total = filteredTodos.length
-        // Use gtd_status for completed count (unified status)
-        const completed = filteredTodos.filter(t => t.gtd_status === 'done').length
-        this.totalTodosEl.textContent = `Total: ${total}`
-        this.completedTodosEl.textContent = `Completed: ${completed}`
     }
 
     renderProjectsView() {
@@ -1963,9 +1956,7 @@ class TodoApp {
     }
 
     updateProjectsViewStats() {
-        const totalItems = this.projects.reduce((sum, p) => sum + this.getProjectTodoCount(p.id), 0)
-        this.totalTodosEl.textContent = `Projects: ${this.projects.length}`
-        this.completedTodosEl.textContent = `Items: ${totalItems}`
+        // Stats display removed - method kept for compatibility
     }
 
     renderTodos() {
