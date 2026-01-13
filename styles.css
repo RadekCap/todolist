@@ -620,6 +620,29 @@ body.fullscreen-mode .todo-list {
     flex-shrink: 0;
 }
 
+/* Sidebar app branding */
+.sidebar-branding {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 0 20px 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.sidebar-app-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.sidebar-app-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    letter-spacing: -0.3px;
+}
+
 /* Sidebar resize handle */
 .sidebar-resize-handle {
     width: 6px;
@@ -2517,6 +2540,19 @@ body.sidebar-resizing * {
     color: var(--ios-label-secondary);
     padding-left: 16px;
     margin-bottom: 8px;
+}
+
+[data-theme="glass"] .sidebar-branding,
+[data-theme="dark"] .sidebar-branding,
+[data-theme="clear"] .sidebar-branding {
+    border-bottom-color: var(--ios-separator);
+    padding-left: 16px;
+}
+
+[data-theme="glass"] .sidebar-app-title,
+[data-theme="dark"] .sidebar-app-title,
+[data-theme="clear"] .sidebar-app-title {
+    color: var(--ios-label);
 }
 
 [data-theme="glass"] .sidebar-section-header,
