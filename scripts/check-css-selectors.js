@@ -83,6 +83,11 @@ const IGNORED_PATTERNS = [
 
 // Additional class patterns that are dynamically generated
 const DYNAMIC_CLASS_PATTERNS = [
+    // Body state classes (added by JavaScript)
+    /^body\.fullscreen-mode/,
+    /^body\.sidebar-resizing/,
+    // Toolbar menu open state
+    /\.toolbar-user-menu\.open/,
     // GTD status classes
     /\.inbox/,
     /\.next_action/,
