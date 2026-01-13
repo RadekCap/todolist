@@ -325,6 +325,18 @@ class TodoApp {
             }
         })
 
+        // Ctrl+Enter to submit todo form
+        this.addTodoForm.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault()
+                if (this.editingTodoId) {
+                    this.updateTodo()
+                } else {
+                    this.addTodo()
+                }
+            }
+        })
+
         // Sync due date and scheduled status
         this.modalDueDateInput.addEventListener('change', () => {
             if (this.modalDueDateInput.value) {
