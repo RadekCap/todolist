@@ -180,6 +180,9 @@ class TodoApp {
         this.unlockError = document.getElementById('unlockError')
         this.unlockBtn = document.getElementById('unlockBtn')
         this.unlockLogoutBtn = document.getElementById('unlockLogoutBtn')
+        this.sidebar = document.querySelector('.sidebar')
+        this.sidebarResizeHandle = document.getElementById('sidebarResizeHandle')
+        this.mainContent = document.querySelector('.main-content')
 
         this.initAuth()
         this.initEventListeners()
@@ -360,6 +363,73 @@ class TodoApp {
 
         // Export button
         this.exportBtn.addEventListener('click', () => this.exportTodos())
+
+        // Initialize sidebar resize
+        this.initSidebarResize()
+    }
+
+    initSidebarResize() {
+        if (!this.sidebarResizeHandle || !this.sidebar || !this.mainContent) return
+
+        // Restore saved width from localStorage
+        const savedWidth = localStorage.getItem('sidebarWidth')
+        if (savedWidth) {
+            const width = parseFloat(savedWidth)
+            if (width >= 15 && width <= 30) {
+                this.sidebar.style.width = `${width}%`
+            }
+        }
+
+        let isResizing = false
+        let startX = 0
+        let startWidth = 0
+
+        const startResize = (e) => {
+            isResizing = true
+            startX = e.clientX || e.touches[0].clientX
+            startWidth = this.sidebar.getBoundingClientRect().width
+            document.body.classList.add('sidebar-resizing')
+            this.sidebarResizeHandle.classList.add('resizing')
+            e.preventDefault()
+        }
+
+        const doResize = (e) => {
+            if (!isResizing) return
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX)
+            if (clientX === undefined) return
+
+            const deltaX = clientX - startX
+            const containerWidth = this.mainContent.getBoundingClientRect().width
+            const newWidth = startWidth + deltaX
+            const newWidthPercent = (newWidth / containerWidth) * 100
+
+            // Clamp between 15% and 30%
+            const clampedPercent = Math.min(30, Math.max(15, newWidthPercent))
+            this.sidebar.style.width = `${clampedPercent}%`
+        }
+
+        const stopResize = () => {
+            if (!isResizing) return
+            isResizing = false
+            document.body.classList.remove('sidebar-resizing')
+            this.sidebarResizeHandle.classList.remove('resizing')
+
+            // Save width to localStorage
+            const containerWidth = this.mainContent.getBoundingClientRect().width
+            const currentWidth = this.sidebar.getBoundingClientRect().width
+            const widthPercent = (currentWidth / containerWidth) * 100
+            localStorage.setItem('sidebarWidth', widthPercent.toFixed(2))
+        }
+
+        // Mouse events
+        this.sidebarResizeHandle.addEventListener('mousedown', startResize)
+        document.addEventListener('mousemove', doResize)
+        document.addEventListener('mouseup', stopResize)
+
+        // Touch events for mobile/tablet
+        this.sidebarResizeHandle.addEventListener('touchstart', startResize, { passive: false })
+        document.addEventListener('touchmove', doResize, { passive: false })
+        document.addEventListener('touchend', stopResize)
     }
 
     switchAuthTab(tabName) {
