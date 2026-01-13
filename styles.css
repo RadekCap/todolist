@@ -420,38 +420,6 @@ body.fullscreen-mode .todo-list {
     overflow-y: auto;
 }
 
-.app-footer {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 1px solid #e0e0e0;
-    text-align: center;
-}
-
-.app-footer-links {
-    font-size: 11px;
-    color: #aaa;
-}
-
-.app-footer-links a {
-    color: var(--accent-color);
-    text-decoration: none;
-}
-
-.app-footer-links a:not(:last-child)::after {
-    content: " • ";
-    color: #aaa;
-    margin: 0 8px;
-}
-
-.app-footer-links a:hover {
-    text-decoration: underline;
-}
-
-.app-footer-links a:focus {
-    outline: 2px solid var(--accent-color);
-    outline-offset: 2px;
-}
-
 .main-content {
     display: flex;
     gap: 20px;
@@ -1248,6 +1216,16 @@ body.sidebar-resizing * {
     height: 1px;
     background: #eee;
     margin: 4px 0;
+}
+
+.toolbar-dropdown-link {
+    text-decoration: none;
+    color: #666;
+    font-size: 13px;
+}
+
+.toolbar-dropdown-link:hover {
+    color: #333;
 }
 
 .modal-overlay {
@@ -2244,6 +2222,18 @@ body.sidebar-resizing * {
     background: var(--ios-separator);
 }
 
+[data-theme="glass"] .toolbar-dropdown-link,
+[data-theme="dark"] .toolbar-dropdown-link,
+[data-theme="clear"] .toolbar-dropdown-link {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .toolbar-dropdown-link:hover,
+[data-theme="dark"] .toolbar-dropdown-link:hover,
+[data-theme="clear"] .toolbar-dropdown-link:hover {
+    color: var(--ios-blue);
+}
+
 [data-theme="glass"] .modal-btn-secondary,
 [data-theme="dark"] .modal-btn-secondary,
 [data-theme="clear"] .modal-btn-secondary {
@@ -2786,25 +2776,6 @@ body.sidebar-resizing * {
 [data-theme="clear"] .todo-date.today {
     background: rgba(255, 149, 0, 0.15);
     color: var(--ios-orange);
-}
-
-/* iOS Footer */
-[data-theme="glass"] .app-footer,
-[data-theme="dark"] .app-footer,
-[data-theme="clear"] .app-footer {
-    border-top-color: var(--ios-separator);
-}
-
-[data-theme="glass"] .app-footer-links a,
-[data-theme="dark"] .app-footer-links a,
-[data-theme="clear"] .app-footer-links a {
-    color: var(--ios-blue);
-}
-
-[data-theme="glass"] .app-footer-links a:hover,
-[data-theme="dark"] .app-footer-links a:hover,
-[data-theme="clear"] .app-footer-links a:hover {
-    color: var(--ios-blue-hover);
 }
 
 /* iOS Modal Overlay */
