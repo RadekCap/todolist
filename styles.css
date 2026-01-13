@@ -284,32 +284,6 @@ body.fullscreen-mode .container {
     max-width: 500px;
 }
 
-h1 {
-    color: #333;
-    margin-bottom: 25px;
-    text-align: center;
-    font-size: 2em;
-}
-
-/* App Header - iOS Style */
-.app-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-}
-
-.app-icon {
-    width: 36px;
-    height: 36px;
-    flex-shrink: 0;
-}
-
-.app-title {
-    font-weight: 600;
-    letter-spacing: -0.5px;
-}
-
 .auth-container {
     display: none;
 }
@@ -446,108 +420,11 @@ body.fullscreen-mode .todo-list {
     overflow-y: auto;
 }
 
-.user-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 2px solid #e0e0e0;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.user-display {
-    color: #333;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.user-email {
-    color: #999;
-    font-size: 12px;
-}
-
-.user-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.settings-btn {
-    padding: 8px 15px;
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-}
-
-.settings-btn:hover {
-    background: var(--accent-hover);
-}
-
-.refresh-btn {
-    padding: 8px 15px;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-}
-
-.refresh-btn:hover {
-    background: #5a6268;
-}
-
-.logout-btn {
-    padding: 8px 15px;
-    background: #e74c3c;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-}
-
-.logout-btn:hover {
-    background: #c0392b;
-}
-
-.lock-btn {
-    padding: 8px 12px;
-    background: #f39c12;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background 0.3s;
-}
-
-.lock-btn:hover {
-    background: #d68910;
-}
-
 .app-footer {
     margin-top: 20px;
     padding-top: 15px;
     border-top: 1px solid #e0e0e0;
     text-align: center;
-}
-
-.app-version {
-    color: #999;
-    font-size: 12px;
-    margin-bottom: 5px;
 }
 
 .theme-selector {
@@ -1341,33 +1218,6 @@ body.sidebar-resizing * {
     font-size: 16px;
 }
 
-.stats {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px solid #e0e0e0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #666;
-    font-size: 14px;
-}
-
-.export-btn {
-    padding: 6px 12px;
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    transition: background 0.2s;
-}
-
-.export-btn:hover {
-    background: var(--accent-hover);
-}
-
 .add-todo-btn {
     padding: 15px 30px;
     background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
@@ -1973,27 +1823,6 @@ body.sidebar-resizing * {
         min-width: auto;
     }
 
-    .user-header {
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .user-info {
-        flex-wrap: wrap;
-        min-width: 0;
-    }
-
-    .user-email {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 150px;
-    }
-
-    .user-actions {
-        flex-shrink: 0;
-    }
-
     .form-row {
         flex-direction: column;
         gap: 0;
@@ -2289,26 +2118,6 @@ body.sidebar-resizing * {
     font-weight: 700;
     font-size: 28px;
     letter-spacing: -0.5px;
-}
-
-[data-theme="glass"] .app-header,
-[data-theme="dark"] .app-header,
-[data-theme="clear"] .app-header {
-    gap: 10px;
-}
-
-[data-theme="glass"] .app-icon,
-[data-theme="dark"] .app-icon,
-[data-theme="clear"] .app-icon {
-    width: 32px;
-    height: 32px;
-}
-
-[data-theme="glass"] .app-title,
-[data-theme="dark"] .app-title,
-[data-theme="clear"] .app-title {
-    font-weight: 600;
-    letter-spacing: -0.3px;
 }
 
 [data-theme="glass"] h2,
@@ -3254,125 +3063,11 @@ body.sidebar-resizing * {
     color: var(--ios-orange);
 }
 
-/* iOS Stats */
-[data-theme="glass"] .stats,
-[data-theme="dark"] .stats,
-[data-theme="clear"] .stats {
-    color: var(--ios-label-secondary);
-    border-top-color: var(--ios-separator);
-    font-size: 13px;
-}
-
-[data-theme="glass"] .export-btn,
-[data-theme="dark"] .export-btn,
-[data-theme="clear"] .export-btn {
-    background: var(--ios-blue);
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-[data-theme="glass"] .export-btn:hover,
-[data-theme="dark"] .export-btn:hover,
-[data-theme="clear"] .export-btn:hover {
-    background: var(--ios-blue-hover);
-}
-
-/* iOS User Header */
-[data-theme="glass"] .user-header,
-[data-theme="dark"] .user-header,
-[data-theme="clear"] .user-header {
-    border-top-color: var(--ios-separator);
-}
-
-[data-theme="glass"] .user-display,
-[data-theme="dark"] .user-display,
-[data-theme="clear"] .user-display {
-    color: var(--ios-label);
-    font-weight: 600;
-}
-
-[data-theme="glass"] .user-email,
-[data-theme="dark"] .user-email,
-[data-theme="clear"] .user-email {
-    color: var(--ios-label-tertiary);
-}
-
-[data-theme="glass"] .settings-btn,
-[data-theme="dark"] .settings-btn,
-[data-theme="clear"] .settings-btn {
-    background: var(--ios-gray5);
-    color: var(--ios-label);
-    border: none;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: background 0.15s ease;
-}
-
-[data-theme="glass"] .settings-btn:hover,
-[data-theme="dark"] .settings-btn:hover,
-[data-theme="clear"] .settings-btn:hover {
-    background: var(--ios-gray4);
-}
-
-[data-theme="glass"] .refresh-btn,
-[data-theme="dark"] .refresh-btn,
-[data-theme="clear"] .refresh-btn {
-    background: var(--ios-gray5);
-    color: var(--ios-label);
-    border: none;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: background 0.15s ease;
-}
-
-[data-theme="glass"] .refresh-btn:hover,
-[data-theme="dark"] .refresh-btn:hover,
-[data-theme="clear"] .refresh-btn:hover {
-    background: var(--ios-gray4);
-}
-
-[data-theme="glass"] .lock-btn,
-[data-theme="dark"] .lock-btn,
-[data-theme="clear"] .lock-btn {
-    background: var(--ios-gray5);
-    color: var(--ios-label);
-    border: none;
-    border-radius: 8px;
-    transition: background 0.15s ease;
-}
-
-[data-theme="glass"] .lock-btn:hover,
-[data-theme="dark"] .lock-btn:hover,
-[data-theme="clear"] .lock-btn:hover {
-    background: var(--ios-gray4);
-}
-
-[data-theme="glass"] .logout-btn,
-[data-theme="dark"] .logout-btn,
-[data-theme="clear"] .logout-btn {
-    background: var(--ios-red);
-    border: none;
-    border-radius: 8px;
-    transition: background 0.15s ease;
-}
-
-[data-theme="glass"] .logout-btn:hover,
-[data-theme="dark"] .logout-btn:hover,
-[data-theme="clear"] .logout-btn:hover {
-    background: #e62e24;
-}
-
 /* iOS Footer */
 [data-theme="glass"] .app-footer,
 [data-theme="dark"] .app-footer,
 [data-theme="clear"] .app-footer {
     border-top-color: var(--ios-separator);
-}
-
-[data-theme="glass"] .app-version,
-[data-theme="dark"] .app-version,
-[data-theme="clear"] .app-version {
-    color: var(--ios-label-tertiary);
 }
 
 [data-theme="glass"] .theme-selector label,
