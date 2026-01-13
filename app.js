@@ -155,14 +155,6 @@ class TodoApp {
         this.modalAddBtn = document.getElementById('modalAddBtn')
         this.modalTitle = document.getElementById('modalTitle')
         this.todoList = document.getElementById('todoList')
-        this.categoryList = document.getElementById('categoryList')
-        this.newCategoryInput = document.getElementById('newCategoryInput')
-        this.addCategoryBtn = document.getElementById('addCategoryBtn')
-        this.contextList = document.getElementById('contextList')
-        this.newContextInput = document.getElementById('newContextInput')
-        this.addContextBtn = document.getElementById('addContextBtn')
-        this.categoriesSection = document.getElementById('categoriesSection')
-        this.contextsSection = document.getElementById('contextsSection')
         this.projectList = document.getElementById('projectList')
         this.newProjectInput = document.getElementById('newProjectInput')
         this.addProjectBtn = document.getElementById('addProjectBtn')
@@ -331,18 +323,6 @@ class TodoApp {
         // Priority star toggle
         this.modalPriorityToggle.addEventListener('click', () => this.togglePriorityStar())
 
-        // Add category
-        this.addCategoryBtn.addEventListener('click', () => this.addCategory())
-        this.newCategoryInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.addCategory()
-        })
-
-        // Add context
-        this.addContextBtn.addEventListener('click', () => this.addContext())
-        this.newContextInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.addContext()
-        })
-
         // Add project
         this.addProjectBtn.addEventListener('click', () => this.addProject())
         this.newProjectInput.addEventListener('keypress', (e) => {
@@ -350,12 +330,6 @@ class TodoApp {
         })
 
         // Collapsible sidebar sections
-        this.categoriesSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
-            this.toggleSidebarSection(this.categoriesSection)
-        })
-        this.contextsSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
-            this.toggleSidebarSection(this.contextsSection)
-        })
         this.projectsSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
             this.toggleSidebarSection(this.projectsSection)
         })
@@ -628,8 +602,6 @@ class TodoApp {
 
         // Clear the UI
         this.todoList.innerHTML = ''
-        this.categoryList.innerHTML = ''
-        this.contextList.innerHTML = ''
 
         // Hide app and show unlock modal
         this.appContainer.classList.remove('active')
@@ -778,7 +750,6 @@ class TodoApp {
             ...category,
             name: await this.decrypt(category.name)
         })))
-        this.renderCategories()
         this.updateCategorySelect()
     }
 
@@ -825,79 +796,7 @@ class TodoApp {
             ...context,
             name: await this.decrypt(context.name)
         })))
-        this.renderContexts()
         this.updateContextSelect()
-    }
-
-    renderContexts() {
-        this.contextList.innerHTML = ''
-
-        // Add "All Contexts" option (shown as active when no filter is applied)
-        const allItem = document.createElement('li')
-        allItem.className = `context-item ${this.selectedContextIds.size === 0 ? 'active' : ''}`
-        allItem.innerHTML = `<span class="context-name">All Contexts</span>`
-        allItem.addEventListener('click', () => this.selectContext(null))
-
-        // Drop target for removing context
-        allItem.addEventListener('dragover', (e) => {
-            e.preventDefault()
-            e.dataTransfer.dropEffect = 'move'
-            allItem.classList.add('drag-over')
-        })
-        allItem.addEventListener('dragleave', () => {
-            allItem.classList.remove('drag-over')
-        })
-        allItem.addEventListener('drop', (e) => {
-            e.preventDefault()
-            allItem.classList.remove('drag-over')
-            const todoId = e.dataTransfer.getData('text/plain')
-            if (todoId) {
-                this.updateTodoContext(todoId, null)
-            }
-        })
-        this.contextList.appendChild(allItem)
-
-        // Add user contexts
-        this.contexts.forEach(context => {
-            const li = document.createElement('li')
-            li.className = `context-item ${this.selectedContextIds.has(context.id) ? 'active' : ''}`
-            li.innerHTML = `
-                <span class="context-name">${this.escapeHtml(context.name)}</span>
-                <button class="context-delete" data-id="${context.id}">×</button>
-            `
-
-            li.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('context-delete')) {
-                    this.selectContext(context.id)
-                }
-            })
-
-            // Drop target for assigning context
-            li.addEventListener('dragover', (e) => {
-                e.preventDefault()
-                e.dataTransfer.dropEffect = 'move'
-                li.classList.add('drag-over')
-            })
-            li.addEventListener('dragleave', () => {
-                li.classList.remove('drag-over')
-            })
-            li.addEventListener('drop', (e) => {
-                e.preventDefault()
-                li.classList.remove('drag-over')
-                const todoId = e.dataTransfer.getData('text/plain')
-                if (todoId) {
-                    this.updateTodoContext(todoId, context.id)
-                }
-            })
-
-            const deleteBtn = li.querySelector('.context-delete')
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation()
-                this.deleteContext(context.id)
-            })
-
-            this.contextList.appendChild(li)
-        })
     }
 
     toggleSidebarSection(section) {
@@ -915,83 +814,6 @@ class TodoApp {
             option.textContent = context.name
             this.modalContextSelect.appendChild(option)
         })
-    }
-
-    selectContext(contextId) {
-        // Toggle: clicking a context adds/removes it from the selection
-        if (contextId === null) {
-            // "All Contexts" clears the selection
-            this.selectedContextIds.clear()
-        } else if (this.selectedContextIds.has(contextId)) {
-            this.selectedContextIds.delete(contextId)
-        } else {
-            this.selectedContextIds.add(contextId)
-        }
-        this.renderContexts()
-        this.renderTodos()
-    }
-
-    async addContext() {
-        let name = this.newContextInput.value.trim()
-        if (!name) return
-
-        // Auto-prefix with @ if not already prefixed
-        if (!name.startsWith('@')) {
-            name = '@' + name
-        }
-
-        this.addContextBtn.disabled = true
-        this.addContextBtn.textContent = 'Adding...'
-
-        // Encrypt context name before storing
-        const encryptedName = await this.encrypt(name)
-
-        const { data, error } = await supabase
-            .from('contexts')
-            .insert({
-                user_id: this.currentUser.id,
-                name: encryptedName
-            })
-            .select()
-
-        this.addContextBtn.disabled = false
-        this.addContextBtn.textContent = 'Add Context'
-
-        if (error) {
-            console.error('Error adding context:', error)
-            alert('Failed to add context')
-            return
-        }
-
-        // Store decrypted name in local state for rendering
-        const contextWithDecryptedName = { ...data[0], name: name }
-        this.contexts.push(contextWithDecryptedName)
-        this.newContextInput.value = ''
-        this.renderContexts()
-        this.updateContextSelect()
-    }
-
-    async deleteContext(contextId) {
-        if (!confirm('Delete this context? Todos with this context will become contextless.')) {
-            return
-        }
-
-        const { error } = await supabase
-            .from('contexts')
-            .delete()
-            .eq('id', contextId)
-
-        if (error) {
-            console.error('Error deleting context:', error)
-            alert('Failed to delete context')
-            return
-        }
-
-        this.contexts = this.contexts.filter(c => c.id !== contextId)
-        this.selectedContextIds.delete(contextId)
-        this.renderContexts()
-        this.updateContextSelect()
-        this.loadTodos()
     }
 
     // ========================================
@@ -1308,91 +1130,6 @@ class TodoApp {
         this.renderTodos()
     }
 
-    renderCategories() {
-        this.categoryList.innerHTML = ''
-
-        // Add "All" category (shown as active when no filter is applied)
-        const allItem = document.createElement('li')
-        allItem.className = `category-item ${this.selectedCategoryIds.size === 0 ? 'active' : ''}`
-        allItem.innerHTML = `
-            <span class="category-name">All Todos</span>
-        `
-        allItem.addEventListener('click', () => this.selectCategory(null))
-        this.categoryList.appendChild(allItem)
-
-        // Add "Uncategorized" as drop target to remove category
-        const uncategorizedItem = document.createElement('li')
-        uncategorizedItem.className = `category-item ${this.selectedCategoryIds.has('uncategorized') ? 'active' : ''}`
-        uncategorizedItem.innerHTML = `
-            <span class="category-name">Uncategorized</span>
-        `
-        uncategorizedItem.addEventListener('click', () => this.selectCategory('uncategorized'))
-
-        // Drop target for removing category
-        uncategorizedItem.addEventListener('dragover', (e) => {
-            e.preventDefault()
-            e.dataTransfer.dropEffect = 'move'
-            uncategorizedItem.classList.add('drag-over')
-        })
-        uncategorizedItem.addEventListener('dragleave', () => {
-            uncategorizedItem.classList.remove('drag-over')
-        })
-        uncategorizedItem.addEventListener('drop', (e) => {
-            e.preventDefault()
-            uncategorizedItem.classList.remove('drag-over')
-            const todoId = e.dataTransfer.getData('text/plain')
-            if (todoId) {
-                this.updateTodoCategory(todoId, null)
-            }
-        })
-        this.categoryList.appendChild(uncategorizedItem)
-
-        // Add user categories
-        this.categories.forEach(category => {
-            const li = document.createElement('li')
-            li.className = `category-item ${this.selectedCategoryIds.has(category.id) ? 'active' : ''}`
-            li.innerHTML = `
-                <span class="category-name">
-                    <span class="category-color" style="background-color: ${this.validateColor(category.color)}"></span>
-                    ${this.escapeHtml(category.name)}
-                </span>
-                <button class="category-delete" data-id="${category.id}">×</button>
-            `
-
-            li.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('category-delete')) {
-                    this.selectCategory(category.id)
-                }
-            })
-
-            // Drop target for assigning category
-            li.addEventListener('dragover', (e) => {
-                e.preventDefault()
-                e.dataTransfer.dropEffect = 'move'
-                li.classList.add('drag-over')
-            })
-            li.addEventListener('dragleave', () => {
-                li.classList.remove('drag-over')
-            })
-            li.addEventListener('drop', (e) => {
-                e.preventDefault()
-                li.classList.remove('drag-over')
-                const todoId = e.dataTransfer.getData('text/plain')
-                if (todoId) {
-                    this.updateTodoCategory(todoId, category.id)
-                }
-            })
-
-            const deleteBtn = li.querySelector('.category-delete')
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation()
-                this.deleteCategory(category.id)
-            })
-
-            this.categoryList.appendChild(li)
-        })
-    }
-
     updateCategorySelect() {
         // Update modal category select
         this.modalCategorySelect.innerHTML = '<option value="">No Category</option>'
@@ -1403,21 +1140,6 @@ class TodoApp {
             option.textContent = category.name
             this.modalCategorySelect.appendChild(option)
         })
-    }
-
-    selectCategory(categoryId) {
-        // Toggle: clicking a category adds/removes it from the selection
-        if (categoryId === null) {
-            // "All Todos" clears the selection
-            this.selectedCategoryIds.clear()
-        } else if (this.selectedCategoryIds.has(categoryId)) {
-            this.selectedCategoryIds.delete(categoryId)
-        } else {
-            this.selectedCategoryIds.add(categoryId)
-        }
-
-        this.renderCategories()
-        this.renderTodos()
     }
 
     openModal() {
@@ -1537,73 +1259,6 @@ class TodoApp {
         } else {
             this.modalPrioritySelect.value = ''
         }
-    }
-
-    async addCategory() {
-        const name = this.newCategoryInput.value.trim()
-        if (!name) return
-
-        this.addCategoryBtn.disabled = true
-        this.addCategoryBtn.textContent = 'Adding...'
-
-        // Generate a random color
-        const colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#feca57', '#ee5a6f', '#c471ed']
-        const color = colors[Math.floor(Math.random() * colors.length)]
-
-        // Encrypt category name before storing
-        const encryptedName = await this.encrypt(name)
-
-        const { data, error } = await supabase
-            .from('categories')
-            .insert({
-                user_id: this.currentUser.id,
-                name: encryptedName,
-                color: color
-            })
-            .select()
-
-        this.addCategoryBtn.disabled = false
-        this.addCategoryBtn.textContent = 'Add Category'
-
-        if (error) {
-            console.error('Error adding category:', error)
-            if (error.code === '23505') {
-                alert('A category with this name already exists')
-            } else {
-                alert('Failed to add category')
-            }
-            return
-        }
-
-        // Store decrypted name in local state for rendering
-        const categoryWithDecryptedName = { ...data[0], name: name }
-        this.categories.push(categoryWithDecryptedName)
-        this.newCategoryInput.value = ''
-        this.renderCategories()
-        this.updateCategorySelect()
-    }
-
-    async deleteCategory(categoryId) {
-        if (!confirm('Delete this category? Todos in this category will become uncategorized.')) {
-            return
-        }
-
-        const { error } = await supabase
-            .from('categories')
-            .delete()
-            .eq('id', categoryId)
-
-        if (error) {
-            console.error('Error deleting category:', error)
-            alert('Failed to delete category')
-            return
-        }
-
-        this.categories = this.categories.filter(c => c.id !== categoryId)
-        this.selectedCategoryIds.delete(categoryId)
-        this.renderCategories()
-        this.updateCategorySelect()
-        this.loadTodos()
     }
 
     async addTodo() {
