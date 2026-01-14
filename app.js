@@ -325,9 +325,10 @@ class TodoApp {
             // Ignore if any modal is open
             const modalOpen = this.addTodoModal.classList.contains('active') ||
                             this.unlockModal.classList.contains('active') ||
-                            this.settingsModal.classList.contains('active')
+                            this.settingsModal.classList.contains('active') ||
+                            this.manageAreasModal.classList.contains('active')
 
-            if (e.key === 'n' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            if (e.code === 'KeyN' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
                 e.preventDefault()
                 this.openModal()
             }
