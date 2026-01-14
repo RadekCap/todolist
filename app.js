@@ -1469,15 +1469,13 @@ class TodoApp {
 
         if (error) {
             console.error('Error updating todo project:', error)
+            alert('Failed to update todo project')
             return
         }
 
-        // Update local state
-        const todo = this.todos.find(t => t.id === todoId)
-        if (todo) {
-            todo.project_id = projectId
-        }
-        this.renderTodos()
+        // Reload todos to ensure UI is in sync
+        await this.loadTodos()
+        this.renderProjects()
     }
 
     selectGtdStatus(status) {
