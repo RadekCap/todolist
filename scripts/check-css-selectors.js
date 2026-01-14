@@ -88,6 +88,7 @@ const DYNAMIC_CLASS_PATTERNS = [
     /^body\.sidebar-resizing/,
     // Toolbar menu open state
     /\.toolbar-user-menu\.open/,
+    /\.toolbar-areas-menu\.open/,
     // Sidebar section collapsed state (toggled by JavaScript)
     /\.sidebar-section\.collapsed/,
     // GTD status classes
@@ -148,6 +149,17 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     // Scheduled view headers (rendered by JavaScript)
     /\.scheduled-section-header/,
     /\.section-header-text/,
+    // GTD separator and section label (rendered by JavaScript)
+    /\.gtd-inbox-separator/,
+    /\.gtd-section-label/,
+    // Area management items (rendered by JavaScript)
+    /\.manage-areas-item/,
+    /\.manage-areas-drag-handle/,
+    /\.manage-areas-name/,
+    /\.manage-areas-name-input/,
+    /\.manage-areas-actions/,
+    /\.manage-areas-edit/,
+    /\.manage-areas-delete/,
     // Empty/loading states (rendered by JavaScript)
     /\.empty-state/,
     /\.loading-state/,
