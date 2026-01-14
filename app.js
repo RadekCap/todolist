@@ -115,6 +115,8 @@ class TodoApp {
         this.showProjectsView = false  // When true, show project list instead of todos
         this.selectedGtdStatus = 'inbox'
         this.editingTodoId = null
+        this.areas = []
+        this.selectedAreaId = 'all'  // 'all', 'unassigned', or UUID
 
         // Get DOM elements
         this.loadingScreen = document.getElementById('loadingScreen')
@@ -174,6 +176,22 @@ class TodoApp {
         this.sidebar = document.querySelector('.sidebar')
         this.sidebarResizeHandle = document.getElementById('sidebarResizeHandle')
         this.mainContent = document.querySelector('.main-content')
+
+        // Areas UI elements
+        this.toolbarAreasMenu = document.getElementById('toolbarAreasMenu')
+        this.toolbarAreasBtn = document.getElementById('toolbarAreasBtn')
+        this.toolbarAreasLabel = document.getElementById('toolbarAreasLabel')
+        this.toolbarAreasDropdown = document.getElementById('toolbarAreasDropdown')
+        this.areaListContainer = document.getElementById('areaListContainer')
+        this.areaListDivider = document.getElementById('areaListDivider')
+        this.addAreaBtn = document.getElementById('addAreaBtn')
+        this.manageAreasBtn = document.getElementById('manageAreasBtn')
+        this.manageAreasModal = document.getElementById('manageAreasModal')
+        this.closeManageAreasModalBtn = document.getElementById('closeManageAreasModal')
+        this.closeManageAreasModalBtn2 = document.getElementById('closeManageAreasModalBtn')
+        this.newAreaInput = document.getElementById('newAreaInput')
+        this.addNewAreaBtn = document.getElementById('addNewAreaBtn')
+        this.manageAreasList = document.getElementById('manageAreasList')
 
         this.initAuth()
         this.initEventListeners()
@@ -390,6 +408,50 @@ class TodoApp {
             if (this.toolbarUserMenu && !this.toolbarUserMenu.contains(e.target)) {
                 this.closeToolbarMenu()
             }
+            // Also close areas menu when clicking outside
+            if (this.toolbarAreasMenu && !this.toolbarAreasMenu.contains(e.target)) {
+                this.closeAreasMenu()
+            }
+        })
+
+        // Areas dropdown toggle
+        this.toolbarAreasBtn.addEventListener('click', (e) => {
+            e.stopPropagation()
+            this.toggleAreasMenu()
+        })
+
+        // Areas dropdown item clicks
+        this.toolbarAreasDropdown.addEventListener('click', (e) => {
+            const item = e.target.closest('[data-area-id]')
+            if (item) {
+                this.selectArea(item.dataset.areaId)
+            }
+        })
+
+        // Add new area from dropdown
+        this.addAreaBtn.addEventListener('click', () => {
+            this.closeAreasMenu()
+            this.openManageAreasModal()
+            setTimeout(() => this.newAreaInput.focus(), 100)
+        })
+
+        // Open manage areas modal
+        this.manageAreasBtn.addEventListener('click', () => {
+            this.closeAreasMenu()
+            this.openManageAreasModal()
+        })
+
+        // Manage areas modal controls
+        this.closeManageAreasModalBtn.addEventListener('click', () => this.closeManageAreasModal())
+        this.closeManageAreasModalBtn2.addEventListener('click', () => this.closeManageAreasModal())
+        this.manageAreasModal.addEventListener('click', (e) => {
+            if (e.target === this.manageAreasModal) this.closeManageAreasModal()
+        })
+
+        // Add new area
+        this.addNewAreaBtn.addEventListener('click', () => this.addArea())
+        this.newAreaInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.addArea()
         })
 
         // Initialize sidebar resize
@@ -404,6 +466,349 @@ class TodoApp {
     closeToolbarMenu() {
         this.toolbarUserMenu.classList.remove('open')
         this.toolbarUserBtn.setAttribute('aria-expanded', 'false')
+    }
+
+    // ========================================
+    // Areas Methods
+    // ========================================
+
+    toggleAreasMenu() {
+        const isOpen = this.toolbarAreasMenu.classList.toggle('open')
+        this.toolbarAreasBtn.setAttribute('aria-expanded', isOpen)
+    }
+
+    closeAreasMenu() {
+        this.toolbarAreasMenu.classList.remove('open')
+        this.toolbarAreasBtn.setAttribute('aria-expanded', 'false')
+    }
+
+    async loadAreas() {
+        const { data, error } = await supabase
+            .from('areas')
+            .select('*')
+            .order('sort_order', { ascending: true })
+
+        if (error) {
+            console.error('Error loading areas:', error)
+            return
+        }
+
+        // Decrypt area names
+        this.areas = await Promise.all(data.map(async (area) => ({
+            ...area,
+            name: await this.decrypt(area.name)
+        })))
+
+        this.renderAreasDropdown()
+    }
+
+    renderAreasDropdown() {
+        this.areaListContainer.innerHTML = ''
+
+        // Hide divider if no areas
+        if (this.areaListDivider) {
+            this.areaListDivider.style.display = this.areas.length > 0 ? 'block' : 'none'
+        }
+
+        this.areas.forEach(area => {
+            const button = document.createElement('button')
+            const isActive = this.selectedAreaId === area.id
+            button.className = `toolbar-dropdown-item toolbar-areas-item ${isActive ? 'active' : ''}`
+            button.setAttribute('role', 'menuitem')
+            button.dataset.areaId = area.id
+            button.innerHTML = `
+                <span class="areas-item-icon">📂</span>
+                <span class="areas-item-label">${this.escapeHtml(area.name)}</span>
+            `
+            this.areaListContainer.appendChild(button)
+        })
+
+        // Update active state for All and Unassigned buttons
+        const allBtn = this.toolbarAreasDropdown.querySelector('[data-area-id="all"]')
+        const unassignedBtn = this.toolbarAreasDropdown.querySelector('[data-area-id="unassigned"]')
+
+        if (allBtn) allBtn.classList.toggle('active', this.selectedAreaId === 'all')
+        if (unassignedBtn) unassignedBtn.classList.toggle('active', this.selectedAreaId === 'unassigned')
+
+        // Update toolbar label
+        this.updateAreasLabel()
+    }
+
+    updateAreasLabel() {
+        if (this.selectedAreaId === 'all') {
+            this.toolbarAreasLabel.textContent = 'All Areas'
+        } else if (this.selectedAreaId === 'unassigned') {
+            this.toolbarAreasLabel.textContent = 'Unassigned'
+        } else {
+            const area = this.areas.find(a => a.id === this.selectedAreaId)
+            this.toolbarAreasLabel.textContent = area ? area.name : 'All Areas'
+        }
+    }
+
+    selectArea(areaId) {
+        this.selectedAreaId = areaId
+        this.closeAreasMenu()
+        this.renderAreasDropdown()
+        this.renderGtdList()
+        this.renderProjects()
+        this.renderTodos()
+    }
+
+    openManageAreasModal() {
+        this.manageAreasModal.classList.add('active')
+        this.renderManageAreasList()
+
+        this.handleManageAreasEscapeKey = (e) => {
+            if (e.key === 'Escape') this.closeManageAreasModal()
+        }
+        document.addEventListener('keydown', this.handleManageAreasEscapeKey)
+
+        setTimeout(() => this.newAreaInput.focus(), 100)
+    }
+
+    closeManageAreasModal() {
+        this.manageAreasModal.classList.remove('active')
+
+        if (this.handleManageAreasEscapeKey) {
+            document.removeEventListener('keydown', this.handleManageAreasEscapeKey)
+        }
+
+        this.newAreaInput.value = ''
+    }
+
+    renderManageAreasList() {
+        this.manageAreasList.innerHTML = ''
+
+        this.areas.forEach(area => {
+            const li = document.createElement('li')
+            li.className = 'manage-areas-item'
+            li.dataset.areaId = area.id
+            li.draggable = true
+            li.innerHTML = `
+                <span class="manage-areas-drag-handle">⋮⋮</span>
+                <span class="manage-areas-name">${this.escapeHtml(area.name)}</span>
+                <div class="manage-areas-actions">
+                    <button class="manage-areas-edit" data-id="${area.id}" title="Rename">✎</button>
+                    <button class="manage-areas-delete" data-id="${area.id}" title="Delete">×</button>
+                </div>
+            `
+
+            // Drag events for reordering
+            li.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', area.id)
+                li.classList.add('dragging')
+            })
+            li.addEventListener('dragend', () => {
+                li.classList.remove('dragging')
+                this.manageAreasList.querySelectorAll('.manage-areas-item').forEach(item => {
+                    item.classList.remove('drag-over')
+                })
+            })
+            li.addEventListener('dragover', (e) => {
+                e.preventDefault()
+                const dragging = this.manageAreasList.querySelector('.dragging')
+                if (dragging && dragging !== li) {
+                    li.classList.add('drag-over')
+                }
+            })
+            li.addEventListener('dragleave', () => {
+                li.classList.remove('drag-over')
+            })
+            li.addEventListener('drop', async (e) => {
+                e.preventDefault()
+                li.classList.remove('drag-over')
+                const dragging = this.manageAreasList.querySelector('.dragging')
+                if (dragging && dragging !== li) {
+                    const rect = li.getBoundingClientRect()
+                    const midY = rect.top + rect.height / 2
+                    if (e.clientY < midY) {
+                        li.before(dragging)
+                    } else {
+                        li.after(dragging)
+                    }
+                    const orderedIds = [...this.manageAreasList.querySelectorAll('.manage-areas-item')]
+                        .map(item => item.dataset.areaId)
+                    await this.reorderAreas(orderedIds)
+                }
+            })
+
+            // Edit button
+            li.querySelector('.manage-areas-edit').addEventListener('click', (e) => {
+                e.stopPropagation()
+                this.startEditingArea(area.id)
+            })
+
+            // Delete button
+            li.querySelector('.manage-areas-delete').addEventListener('click', (e) => {
+                e.stopPropagation()
+                this.deleteArea(area.id)
+            })
+
+            this.manageAreasList.appendChild(li)
+        })
+    }
+
+    startEditingArea(areaId) {
+        const li = this.manageAreasList.querySelector(`[data-area-id="${areaId}"]`)
+        if (!li) return
+
+        const area = this.areas.find(a => a.id === areaId)
+        if (!area) return
+
+        const nameSpan = li.querySelector('.manage-areas-name')
+        const currentName = area.name
+
+        // Replace name with input
+        const input = document.createElement('input')
+        input.type = 'text'
+        input.className = 'manage-areas-name-input'
+        input.value = currentName
+        input.maxLength = 50
+
+        nameSpan.replaceWith(input)
+        input.focus()
+        input.select()
+
+        const saveEdit = async () => {
+            const newName = input.value.trim()
+            if (newName && newName !== currentName) {
+                await this.renameArea(areaId, newName)
+            } else {
+                // Restore original name
+                const newSpan = document.createElement('span')
+                newSpan.className = 'manage-areas-name'
+                newSpan.textContent = currentName
+                input.replaceWith(newSpan)
+            }
+        }
+
+        input.addEventListener('blur', saveEdit)
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault()
+                input.blur()
+            }
+        })
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault()
+                const newSpan = document.createElement('span')
+                newSpan.className = 'manage-areas-name'
+                newSpan.textContent = currentName
+                input.replaceWith(newSpan)
+            }
+        })
+    }
+
+    async renameArea(areaId, newName) {
+        const encryptedName = await this.encrypt(newName)
+
+        const { error } = await supabase
+            .from('areas')
+            .update({ name: encryptedName })
+            .eq('id', areaId)
+
+        if (error) {
+            console.error('Error renaming area:', error)
+            alert('Failed to rename area')
+            return
+        }
+
+        // Update local state
+        const area = this.areas.find(a => a.id === areaId)
+        if (area) {
+            area.name = newName
+        }
+
+        this.renderManageAreasList()
+        this.renderAreasDropdown()
+    }
+
+    async addArea() {
+        const name = this.newAreaInput.value.trim()
+        if (!name) return
+
+        this.addNewAreaBtn.disabled = true
+        this.addNewAreaBtn.textContent = 'Adding...'
+
+        // Get next sort order
+        const maxSortOrder = this.areas.reduce((max, a) => Math.max(max, a.sort_order || 0), 0)
+
+        // Encrypt area name before storing
+        const encryptedName = await this.encrypt(name)
+
+        const { data, error } = await supabase
+            .from('areas')
+            .insert({
+                user_id: this.currentUser.id,
+                name: encryptedName,
+                sort_order: maxSortOrder + 1
+            })
+            .select()
+
+        this.addNewAreaBtn.disabled = false
+        this.addNewAreaBtn.textContent = 'Add'
+
+        if (error) {
+            console.error('Error adding area:', error)
+            alert('Failed to add area')
+            return
+        }
+
+        this.newAreaInput.value = ''
+        await this.loadAreas()
+        this.renderManageAreasList()
+    }
+
+    async deleteArea(areaId) {
+        const area = this.areas.find(a => a.id === areaId)
+        if (!area) return
+
+        if (!confirm(`Delete "${area.name}"? Projects in this area will become unassigned.`)) {
+            return
+        }
+
+        const { error } = await supabase
+            .from('areas')
+            .delete()
+            .eq('id', areaId)
+
+        if (error) {
+            console.error('Error deleting area:', error)
+            alert('Failed to delete area')
+            return
+        }
+
+        // Update local state
+        this.areas = this.areas.filter(a => a.id !== areaId)
+
+        // If deleted area was selected, switch to All
+        if (this.selectedAreaId === areaId) {
+            this.selectedAreaId = 'all'
+        }
+
+        this.renderAreasDropdown()
+        this.renderManageAreasList()
+        await this.loadProjects()  // Reload to get updated area assignments
+    }
+
+    async reorderAreas(orderedIds) {
+        // Update local state first for immediate feedback
+        const reorderedAreas = orderedIds.map((id, index) => {
+            const area = this.areas.find(a => a.id === id)
+            return { ...area, sort_order: index }
+        })
+        this.areas = reorderedAreas
+
+        // Update database
+        for (let i = 0; i < orderedIds.length; i++) {
+            await supabase
+                .from('areas')
+                .update({ sort_order: i })
+                .eq('id', orderedIds[i])
+        }
+
+        this.renderAreasDropdown()
     }
 
     initSidebarResize() {
@@ -558,6 +963,7 @@ class TodoApp {
 
         // Load data and wait for essential items
         await Promise.all([
+            this.loadAreas(),
             this.loadCategories(),
             this.loadPriorities(),
             this.loadContexts(),
@@ -585,6 +991,7 @@ class TodoApp {
 
         try {
             await Promise.all([
+                this.loadAreas(),
                 this.loadCategories(),
                 this.loadPriorities(),
                 this.loadContexts(),
@@ -605,6 +1012,8 @@ class TodoApp {
         this.todos = []
         this.categories = []
         this.priorities = []
+        this.areas = []
+        this.selectedAreaId = 'all'
         this.contexts = []
         this.selectedCategoryIds = new Set()
         this.selectedContextIds = new Set()
@@ -875,6 +1284,16 @@ class TodoApp {
     renderProjects() {
         this.projectList.innerHTML = ''
 
+        // Filter projects by selected area
+        let filteredProjects = this.projects
+        if (this.selectedAreaId !== 'all') {
+            if (this.selectedAreaId === 'unassigned') {
+                filteredProjects = this.projects.filter(p => p.area_id === null)
+            } else {
+                filteredProjects = this.projects.filter(p => p.area_id === this.selectedAreaId)
+            }
+        }
+
         // Add "All Projects" option
         const allItem = document.createElement('li')
         allItem.className = `project-item ${this.selectedProjectId === null ? 'active' : ''}`
@@ -900,8 +1319,8 @@ class TodoApp {
         })
         this.projectList.appendChild(allItem)
 
-        // Add user projects
-        this.projects.forEach(project => {
+        // Add user projects (filtered by area)
+        filteredProjects.forEach(project => {
             const li = document.createElement('li')
             li.className = `project-item ${this.selectedProjectId === project.id ? 'active' : ''}`
             li.innerHTML = `
@@ -988,12 +1407,18 @@ class TodoApp {
         const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7', '#fa709a', '#fee140']
         const randomColor = colors[Math.floor(Math.random() * colors.length)]
 
+        // Assign to current area if a specific area is selected
+        const areaId = (this.selectedAreaId !== 'all' && this.selectedAreaId !== 'unassigned')
+            ? this.selectedAreaId
+            : null
+
         const { data, error } = await supabase
             .from('projects')
             .insert({
                 user_id: this.currentUser.id,
                 name: encryptedName,
-                color: randomColor
+                color: randomColor,
+                area_id: areaId
             })
             .select()
 
@@ -1086,8 +1511,13 @@ class TodoApp {
     }
 
     renderGtdList() {
-        const statuses = [
-            { id: 'inbox', label: 'Inbox' },
+        // Global statuses (always visible)
+        const globalStatuses = [
+            { id: 'inbox', label: 'Inbox' }
+        ]
+
+        // Area-specific statuses
+        const areaStatuses = [
             { id: 'next_action', label: 'Next' },
             { id: 'scheduled', label: 'Scheduled', isVirtual: true },
             { id: 'waiting_for', label: 'Waiting' },
@@ -1098,7 +1528,8 @@ class TodoApp {
 
         this.gtdList.innerHTML = ''
 
-        statuses.forEach(status => {
+        // Helper function to render a GTD item
+        const renderGtdItem = (status) => {
             const li = document.createElement('li')
             const isActive = this.selectedGtdStatus === status.id
             li.className = `gtd-item ${status.id} ${isActive ? 'active' : ''}`
@@ -1135,7 +1566,34 @@ class TodoApp {
             }
 
             this.gtdList.appendChild(li)
-        })
+        }
+
+        // Render global Inbox
+        globalStatuses.forEach(status => renderGtdItem(status))
+
+        // Add separator between Inbox and area-specific items
+        const separator = document.createElement('li')
+        separator.className = 'gtd-inbox-separator'
+        this.gtdList.appendChild(separator)
+
+        // Add area label if a specific area is selected
+        if (this.selectedAreaId !== 'all' && this.selectedAreaId !== 'unassigned') {
+            const area = this.areas.find(a => a.id === this.selectedAreaId)
+            if (area) {
+                const label = document.createElement('li')
+                label.className = 'gtd-section-label'
+                label.textContent = area.name
+                this.gtdList.appendChild(label)
+            }
+        } else if (this.selectedAreaId === 'unassigned') {
+            const label = document.createElement('li')
+            label.className = 'gtd-section-label'
+            label.textContent = 'Unassigned'
+            this.gtdList.appendChild(label)
+        }
+
+        // Render area-specific statuses
+        areaStatuses.forEach(status => renderGtdItem(status))
     }
 
     async loadTodos() {
@@ -1545,6 +2003,28 @@ class TodoApp {
         // Filter by project (if selected)
         if (this.selectedProjectId !== null) {
             filtered = filtered.filter(t => t.project_id === this.selectedProjectId)
+        }
+
+        // Filter by area (through project.area_id)
+        // Inbox items are always shown regardless of area selection
+        if (this.selectedAreaId !== 'all') {
+            filtered = filtered.filter(t => {
+                // Inbox items are always visible
+                if (t.gtd_status === 'inbox') {
+                    return true
+                }
+
+                // Get the project's area
+                const project = t.project_id ? this.projects.find(p => p.id === t.project_id) : null
+
+                if (this.selectedAreaId === 'unassigned') {
+                    // Show items where the project has no area, or item has no project
+                    return !project || project.area_id === null
+                } else {
+                    // Show items where the project belongs to the selected area
+                    return project && project.area_id === this.selectedAreaId
+                }
+            })
         }
 
         // Filter by GTD status

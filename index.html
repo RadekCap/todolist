@@ -112,6 +112,34 @@
                 <!-- Main content area -->
                 <div class="content">
                     <div class="content-toolbar">
+                        <!-- Areas Dropdown -->
+                        <div class="toolbar-areas-menu" id="toolbarAreasMenu">
+                            <button class="toolbar-areas-btn" id="toolbarAreasBtn" aria-haspopup="true" aria-expanded="false">
+                                <span class="toolbar-areas-label" id="toolbarAreasLabel">All Areas</span>
+                                <span class="toolbar-menu-arrow">▼</span>
+                            </button>
+                            <div class="toolbar-areas-dropdown" id="toolbarAreasDropdown" role="menu">
+                                <button class="toolbar-dropdown-item toolbar-areas-item" data-area-id="all" role="menuitem">
+                                    <span class="areas-item-icon">☰</span>
+                                    <span class="areas-item-label">All Areas</span>
+                                </button>
+                                <button class="toolbar-dropdown-item toolbar-areas-item" data-area-id="unassigned" role="menuitem">
+                                    <span class="areas-item-icon">📁</span>
+                                    <span class="areas-item-label">Unassigned</span>
+                                </button>
+                                <div class="toolbar-dropdown-divider"></div>
+                                <div id="areaListContainer"></div>
+                                <div class="toolbar-dropdown-divider" id="areaListDivider"></div>
+                                <button class="toolbar-dropdown-item toolbar-areas-action" id="addAreaBtn" role="menuitem">
+                                    <span class="areas-item-icon">+</span>
+                                    <span class="areas-item-label">Add New Area</span>
+                                </button>
+                                <button class="toolbar-dropdown-item toolbar-areas-action" id="manageAreasBtn" role="menuitem">
+                                    <span class="areas-item-icon">⚙</span>
+                                    <span class="areas-item-label">Manage Areas</span>
+                                </button>
+                            </div>
+                        </div>
                         <button id="openAddTodoModal" class="toolbar-btn add-todo-btn">+ Add Todo</button>
                         <div class="toolbar-spacer"></div>
                         <button id="exportBtn" class="toolbar-btn toolbar-btn-secondary" aria-label="Export current list">Export</button>
@@ -311,6 +339,32 @@
                         <button type="submit" id="saveSettingsBtn" class="modal-btn modal-btn-primary">Save Settings</button>
                     </div>
                 </form>
+            </div>
+        </div>
+
+        <!-- Manage Areas Modal -->
+        <div id="manageAreasModal" class="modal-overlay">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="manageAreasModalTitle">
+                <div class="modal-header">
+                    <h2 id="manageAreasModalTitle">Manage Areas</h2>
+                    <button id="closeManageAreasModal" class="modal-close" aria-label="Close modal">&times;</button>
+                </div>
+                <div class="modal-form">
+                    <div class="manage-areas-add">
+                        <input
+                            type="text"
+                            id="newAreaInput"
+                            placeholder="New area name..."
+                            autocomplete="off"
+                            maxlength="50"
+                        >
+                        <button type="button" id="addNewAreaBtn" class="modal-btn modal-btn-primary">Add</button>
+                    </div>
+                    <ul id="manageAreasList" class="manage-areas-list"></ul>
+                    <div class="modal-actions">
+                        <button type="button" id="closeManageAreasModalBtn" class="modal-btn modal-btn-secondary">Close</button>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -1228,6 +1228,237 @@ body.sidebar-resizing * {
     color: #333;
 }
 
+/* ========================================
+   Areas Dropdown Menu
+   ======================================== */
+
+.toolbar-areas-menu {
+    position: relative;
+    margin-right: 8px;
+}
+
+.toolbar-areas-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    font-weight: 500;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.toolbar-areas-btn:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+.toolbar-areas-label {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.toolbar-areas-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    min-width: 200px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    overflow: hidden;
+}
+
+.toolbar-areas-menu.open .toolbar-areas-dropdown {
+    display: block;
+}
+
+.toolbar-areas-menu.open .toolbar-menu-arrow {
+    transform: rotate(180deg);
+}
+
+.toolbar-areas-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.areas-item-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.areas-item-label {
+    flex: 1;
+}
+
+.toolbar-areas-item.active {
+    background: linear-gradient(135deg, var(--primary-start, #5AC8FA) 0%, var(--primary-end, #007AFF) 100%);
+    color: white;
+}
+
+.toolbar-areas-action {
+    color: var(--ios-blue, #007AFF);
+}
+
+/* GTD Inbox Separator */
+.gtd-inbox-separator {
+    height: 1px;
+    background: var(--ios-separator, #e5e5e5);
+    margin: 8px 12px;
+    list-style: none;
+}
+
+.gtd-section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ios-label-tertiary, #999);
+    padding: 4px 16px;
+    margin-top: 4px;
+    list-style: none;
+}
+
+/* ========================================
+   Manage Areas Modal
+   ======================================== */
+
+.manage-areas-add {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.manage-areas-add input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.manage-areas-add input:focus {
+    outline: none;
+    border-color: var(--ios-blue, #007AFF);
+}
+
+.manage-areas-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    border: 1px solid var(--ios-separator, #e5e5e5);
+    border-radius: 10px;
+    overflow: hidden;
+    min-height: 50px;
+}
+
+.manage-areas-list:empty::after {
+    content: "No areas yet. Add one above.";
+    display: block;
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+.manage-areas-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--ios-bg-secondary, #f9f9f9);
+    border-bottom: 0.5px solid var(--ios-separator, #e5e5e5);
+    cursor: grab;
+    transition: background-color 0.15s ease;
+}
+
+.manage-areas-item:last-child {
+    border-bottom: none;
+}
+
+.manage-areas-item:hover {
+    background: var(--ios-bg-tertiary, #f0f0f0);
+}
+
+.manage-areas-item.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.manage-areas-item.drag-over {
+    border-top: 2px solid var(--ios-blue, #007AFF);
+}
+
+.manage-areas-drag-handle {
+    color: var(--ios-label-tertiary, #999);
+    margin-right: 12px;
+    cursor: grab;
+    font-size: 16px;
+}
+
+.manage-areas-name {
+    flex: 1;
+    font-size: 15px;
+    color: var(--ios-label, #333);
+}
+
+.manage-areas-name-input {
+    flex: 1;
+    padding: 4px 8px;
+    border: 1px solid var(--ios-blue, #007AFF);
+    border-radius: 4px;
+    font-size: 15px;
+    background: white;
+}
+
+.manage-areas-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.manage-areas-item:hover .manage-areas-actions {
+    opacity: 1;
+}
+
+.manage-areas-edit,
+.manage-areas-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: background-color 0.15s ease;
+}
+
+.manage-areas-edit {
+    color: var(--ios-blue, #007AFF);
+}
+
+.manage-areas-edit:hover {
+    background: rgba(0, 122, 255, 0.1);
+}
+
+.manage-areas-delete {
+    color: var(--ios-red, #FF3B30);
+}
+
+.manage-areas-delete:hover {
+    background: rgba(255, 59, 48, 0.1);
+}
+
 .modal-overlay {
     display: none;
     position: fixed;
@@ -2232,6 +2463,132 @@ body.sidebar-resizing * {
 [data-theme="dark"] .toolbar-dropdown-link:hover,
 [data-theme="clear"] .toolbar-dropdown-link:hover {
     color: var(--ios-blue);
+}
+
+/* Areas Dropdown Theme Styles */
+[data-theme="glass"] .toolbar-areas-btn,
+[data-theme="dark"] .toolbar-areas-btn,
+[data-theme="clear"] .toolbar-areas-btn {
+    background: transparent;
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .toolbar-areas-btn:hover,
+[data-theme="clear"] .toolbar-areas-btn:hover {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-gray3);
+}
+
+[data-theme="dark"] .toolbar-areas-btn:hover {
+    background: var(--ios-bg-tertiary);
+    border-color: var(--ios-gray3);
+}
+
+[data-theme="glass"] .toolbar-areas-dropdown,
+[data-theme="clear"] .toolbar-areas-dropdown {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .toolbar-areas-dropdown {
+    background: var(--ios-bg-tertiary);
+    border-color: var(--ios-separator);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="glass"] .toolbar-areas-item,
+[data-theme="dark"] .toolbar-areas-item,
+[data-theme="clear"] .toolbar-areas-item {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .toolbar-areas-item:hover,
+[data-theme="clear"] .toolbar-areas-item:hover {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="dark"] .toolbar-areas-item:hover {
+    background: var(--ios-bg-secondary);
+}
+
+[data-theme="glass"] .toolbar-areas-action,
+[data-theme="dark"] .toolbar-areas-action,
+[data-theme="clear"] .toolbar-areas-action {
+    color: var(--ios-blue);
+}
+
+/* Manage Areas Modal Theme Styles */
+[data-theme="glass"] .manage-areas-add input,
+[data-theme="dark"] .manage-areas-add input,
+[data-theme="clear"] .manage-areas-add input {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
+[data-theme="dark"] .manage-areas-add input {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="glass"] .manage-areas-list,
+[data-theme="dark"] .manage-areas-list,
+[data-theme="clear"] .manage-areas-list {
+    border-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .manage-areas-item,
+[data-theme="clear"] .manage-areas-item {
+    background: var(--ios-bg-secondary);
+    border-bottom-color: var(--ios-separator);
+}
+
+[data-theme="dark"] .manage-areas-item {
+    background: var(--ios-bg-tertiary);
+    border-bottom-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .manage-areas-item:hover,
+[data-theme="clear"] .manage-areas-item:hover {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="dark"] .manage-areas-item:hover {
+    background: var(--ios-bg-secondary);
+}
+
+[data-theme="glass"] .manage-areas-name,
+[data-theme="dark"] .manage-areas-name,
+[data-theme="clear"] .manage-areas-name {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .manage-areas-drag-handle,
+[data-theme="dark"] .manage-areas-drag-handle,
+[data-theme="clear"] .manage-areas-drag-handle {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .manage-areas-name-input,
+[data-theme="dark"] .manage-areas-name-input,
+[data-theme="clear"] .manage-areas-name-input {
+    background: var(--ios-bg-primary);
+    border-color: var(--ios-blue);
+    color: var(--ios-label);
+}
+
+/* GTD Separator Theme Styles */
+[data-theme="glass"] .gtd-inbox-separator,
+[data-theme="dark"] .gtd-inbox-separator,
+[data-theme="clear"] .gtd-inbox-separator {
+    background: var(--ios-separator);
+}
+
+[data-theme="glass"] .gtd-section-label,
+[data-theme="dark"] .gtd-section-label,
+[data-theme="clear"] .gtd-section-label {
+    color: var(--ios-label-tertiary);
 }
 
 [data-theme="glass"] .modal-btn-secondary,
