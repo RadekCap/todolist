@@ -117,6 +117,7 @@ class TodoApp {
         this.editingTodoId = null
         this.areas = []
         this.selectedAreaId = 'all'  // 'all', 'unassigned', or UUID
+        this.searchQuery = ''  // Search query for filtering todos
 
         // Get DOM elements
         this.loadingScreen = document.getElementById('loadingScreen')
@@ -164,6 +165,7 @@ class TodoApp {
         this.modalProjectSelect = document.getElementById('modalProjectSelect')
         this.gtdList = document.getElementById('gtdList')
         this.exportBtn = document.getElementById('exportBtn')
+        this.searchInput = document.getElementById('searchInput')
         this.versionNumberEl = document.getElementById('versionNumber')
         this.themeSelect = document.getElementById('themeSelect')
         this.unlockModal = document.getElementById('unlockModal')
@@ -398,6 +400,9 @@ class TodoApp {
         // Export button
         this.exportBtn.addEventListener('click', () => this.exportTodos())
 
+        // Search input
+        this.searchInput.addEventListener('input', () => this.handleSearchInput())
+
         // Toolbar user menu toggle
         this.toolbarUserBtn.addEventListener('click', (e) => {
             e.stopPropagation()
@@ -467,6 +472,11 @@ class TodoApp {
     closeToolbarMenu() {
         this.toolbarUserMenu.classList.remove('open')
         this.toolbarUserBtn.setAttribute('aria-expanded', 'false')
+    }
+
+    handleSearchInput() {
+        this.searchQuery = this.searchInput.value.trim().toLowerCase()
+        this.renderTodos()
     }
 
     // ========================================
@@ -1982,6 +1992,15 @@ class TodoApp {
     getFilteredTodos() {
         let filtered = this.todos
 
+        // Filter by search query (searches in title and comment/notes)
+        if (this.searchQuery) {
+            filtered = filtered.filter(t => {
+                const title = (t.text || '').toLowerCase()
+                const comment = (t.comment || '').toLowerCase()
+                return title.includes(this.searchQuery) || comment.includes(this.searchQuery)
+            })
+        }
+
         // Filter by categories (if any selected)
         if (this.selectedCategoryIds.size > 0) {
             filtered = filtered.filter(t => {
@@ -2176,9 +2195,14 @@ class TodoApp {
                     </div>
                 `
             } else {
-                const emptyMsg = this.selectedCategoryIds.size === 0
-                    ? 'No todos yet. Add one above!'
-                    : 'No todos in selected categories.'
+                let emptyMsg
+                if (this.searchQuery) {
+                    emptyMsg = 'No todos match your search.'
+                } else if (this.selectedCategoryIds.size === 0) {
+                    emptyMsg = 'No todos yet. Add one above!'
+                } else {
+                    emptyMsg = 'No todos in selected categories.'
+                }
                 this.todoList.innerHTML = `<div class="empty-state">${emptyMsg}</div>`
             }
         } else {
