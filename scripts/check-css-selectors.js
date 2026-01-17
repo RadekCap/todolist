@@ -160,6 +160,8 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.manage-areas-actions/,
     /\.manage-areas-edit/,
     /\.manage-areas-delete/,
+    // Area shortcut hints (rendered by JavaScript for dynamic areas)
+    /\.areas-item-shortcut/,
     // Empty/loading states (rendered by JavaScript)
     /\.empty-state/,
     /\.loading-state/,
