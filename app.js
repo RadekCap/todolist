@@ -334,6 +334,16 @@ class TodoApp {
                 e.preventDefault()
                 this.openModal()
             }
+
+            // Shift+0-9 to quickly switch areas
+            if (e.shiftKey && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
+                const digitMatch = e.code.match(/^Digit(\d)$/)
+                if (digitMatch) {
+                    const digit = parseInt(digitMatch[1], 10)
+                    e.preventDefault()
+                    this.selectAreaByShortcut(digit)
+                }
+            }
         })
 
         // Add/Edit todo via modal form
@@ -521,15 +531,18 @@ class TodoApp {
             this.areaListDivider.style.display = this.areas.length > 0 ? 'block' : 'none'
         }
 
-        this.areas.forEach(area => {
+        this.areas.forEach((area, index) => {
             const button = document.createElement('button')
             const isActive = this.selectedAreaId === area.id
             button.className = `toolbar-dropdown-item toolbar-areas-item ${isActive ? 'active' : ''}`
             button.setAttribute('role', 'menuitem')
             button.dataset.areaId = area.id
+            // Add keyboard shortcut hint (⇧1-9) for the first 9 areas
+            const shortcutHint = index < 9 ? `<span class="areas-item-shortcut">⇧${index + 1}</span>` : ''
             button.innerHTML = `
                 <span class="areas-item-icon">📂</span>
                 <span class="areas-item-label">${this.escapeHtml(area.name)}</span>
+                ${shortcutHint}
             `
             this.areaListContainer.appendChild(button)
         })
@@ -563,6 +576,20 @@ class TodoApp {
         this.renderGtdList()
         this.renderProjects()
         this.renderTodos()
+    }
+
+    selectAreaByShortcut(digit) {
+        // Shift+0 = All Areas
+        if (digit === 0) {
+            this.selectArea('all')
+            return
+        }
+
+        // Shift+1-9 = User-created areas by display order (1-indexed)
+        const areaIndex = digit - 1
+        if (areaIndex < this.areas.length) {
+            this.selectArea(this.areas[areaIndex].id)
+        }
     }
 
     openManageAreasModal() {
