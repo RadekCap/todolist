@@ -146,6 +146,7 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.gtd-icon/,
     /\.gtd-label/,
     /\.gtd-count/,
+    /\.gtd-shortcut/,
     // Scheduled view headers (rendered by JavaScript)
     /\.scheduled-section-header/,
     /\.section-header-text/,
