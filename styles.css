@@ -1560,6 +1560,61 @@ body.sidebar-resizing * {
     color: #333;
 }
 
+/* Keyboard Shortcuts Modal */
+.keyboard-shortcuts-modal {
+    max-width: 520px;
+}
+
+.keyboard-shortcuts-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 24px;
+    padding: 16px 0;
+}
+
+.shortcuts-section h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #666;
+    margin: 0 0 12px 0;
+    font-weight: 600;
+}
+
+.shortcuts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.shortcuts-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.shortcuts-list kbd {
+    display: inline-block;
+    padding: 3px 7px;
+    font-size: 11px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Mono', 'Monaco', monospace;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+    color: #333;
+    min-width: 20px;
+    text-align: center;
+}
+
+.shortcuts-list span {
+    flex: 1;
+    color: #666;
+}
+
 .modal-form {
     display: flex;
     flex-direction: column;
@@ -2028,6 +2083,20 @@ body.sidebar-resizing * {
 
 .gtd-item.active .gtd-count {
     color: rgba(255, 255, 255, 0.8);
+}
+
+.gtd-shortcut {
+    font-size: 11px;
+    color: #bbb;
+    margin-left: auto;
+    margin-right: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    min-width: 14px;
+    text-align: center;
+}
+
+.gtd-item.active .gtd-shortcut {
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .gtd-item.inbox .gtd-icon { color: #1976d2; }
@@ -3270,6 +3339,33 @@ body.sidebar-resizing * {
     color: var(--ios-label);
 }
 
+/* iOS Keyboard Shortcuts Modal */
+[data-theme="glass"] .shortcuts-section h3,
+[data-theme="dark"] .shortcuts-section h3,
+[data-theme="clear"] .shortcuts-section h3 {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .shortcuts-list li,
+[data-theme="dark"] .shortcuts-list li,
+[data-theme="clear"] .shortcuts-list li {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .shortcuts-list span,
+[data-theme="dark"] .shortcuts-list span,
+[data-theme="clear"] .shortcuts-list span {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .shortcuts-list kbd,
+[data-theme="dark"] .shortcuts-list kbd,
+[data-theme="clear"] .shortcuts-list kbd {
+    background: var(--ios-bg-tertiary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
 /* iOS Empty State */
 [data-theme="glass"] .empty-state,
 [data-theme="dark"] .empty-state,
@@ -3391,6 +3487,19 @@ body.sidebar-resizing * {
 [data-theme="dark"] .gtd-count,
 [data-theme="clear"] .gtd-count {
     color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .gtd-shortcut,
+[data-theme="dark"] .gtd-shortcut,
+[data-theme="clear"] .gtd-shortcut {
+    color: var(--ios-label-quaternary);
+}
+
+[data-theme="glass"] .gtd-item.active .gtd-shortcut,
+[data-theme="dark"] .gtd-item.active .gtd-shortcut,
+[data-theme="clear"] .gtd-item.active .gtd-shortcut {
+    color: var(--ios-blue);
+    opacity: 0.6;
 }
 
 /* Glass theme drag-over states */

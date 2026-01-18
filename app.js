@@ -195,6 +195,11 @@ class TodoApp {
         this.addNewAreaBtn = document.getElementById('addNewAreaBtn')
         this.manageAreasList = document.getElementById('manageAreasList')
 
+        // Keyboard shortcuts modal elements
+        this.keyboardShortcutsModal = document.getElementById('keyboardShortcutsModal')
+        this.closeKeyboardShortcutsModalBtn = document.getElementById('closeKeyboardShortcutsModal')
+        this.closeKeyboardShortcutsModalBtn2 = document.getElementById('closeKeyboardShortcutsModalBtn')
+
         this.initAuth()
         this.initEventListeners()
         this.setVersion()
@@ -328,7 +333,8 @@ class TodoApp {
             const modalOpen = this.addTodoModal.classList.contains('active') ||
                             this.unlockModal.classList.contains('active') ||
                             this.settingsModal.classList.contains('active') ||
-                            this.manageAreasModal.classList.contains('active')
+                            this.manageAreasModal.classList.contains('active') ||
+                            this.keyboardShortcutsModal.classList.contains('active')
 
             if (e.code === 'KeyN' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
                 e.preventDefault()
@@ -343,6 +349,28 @@ class TodoApp {
                     e.preventDefault()
                     this.selectAreaByShortcut(digit)
                 }
+            }
+
+            // 0-9 (no shift) to quickly switch GTD views
+            if (!e.shiftKey && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
+                const digitMatch = e.code.match(/^Digit(\d)$/)
+                if (digitMatch) {
+                    const digit = parseInt(digitMatch[1], 10)
+                    e.preventDefault()
+                    this.selectGtdStatusByShortcut(digit)
+                }
+            }
+
+            // '/' to focus search input
+            if (e.key === '/' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
+                e.preventDefault()
+                this.searchInput.focus()
+            }
+
+            // '?' to show keyboard shortcuts help
+            if (e.key === '?' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
+                e.preventDefault()
+                this.openKeyboardShortcutsModal()
             }
         })
 
@@ -470,6 +498,13 @@ class TodoApp {
             if (e.key === 'Enter') this.addArea()
         })
 
+        // Keyboard shortcuts modal controls
+        this.closeKeyboardShortcutsModalBtn.addEventListener('click', () => this.closeKeyboardShortcutsModal())
+        this.closeKeyboardShortcutsModalBtn2.addEventListener('click', () => this.closeKeyboardShortcutsModal())
+        this.keyboardShortcutsModal.addEventListener('click', (e) => {
+            if (e.target === this.keyboardShortcutsModal) this.closeKeyboardShortcutsModal()
+        })
+
         // Initialize sidebar resize
         this.initSidebarResize()
     }
@@ -592,6 +627,25 @@ class TodoApp {
         }
     }
 
+    selectGtdStatusByShortcut(digit) {
+        // Map number keys to GTD statuses
+        // 1=Inbox, 2=Next, 3=Scheduled, 4=Waiting, 5=Someday, 6=Done, 0=All
+        const statusMap = {
+            1: 'inbox',
+            2: 'next_action',
+            3: 'scheduled',
+            4: 'waiting_for',
+            5: 'someday_maybe',
+            6: 'done',
+            0: 'all'
+        }
+
+        const status = statusMap[digit]
+        if (status) {
+            this.selectGtdStatus(status)
+        }
+    }
+
     openManageAreasModal() {
         this.manageAreasModal.classList.add('active')
         this.renderManageAreasList()
@@ -612,6 +666,23 @@ class TodoApp {
         }
 
         this.newAreaInput.value = ''
+    }
+
+    openKeyboardShortcutsModal() {
+        this.keyboardShortcutsModal.classList.add('active')
+
+        this.handleKeyboardShortcutsEscapeKey = (e) => {
+            if (e.key === 'Escape') this.closeKeyboardShortcutsModal()
+        }
+        document.addEventListener('keydown', this.handleKeyboardShortcutsEscapeKey)
+    }
+
+    closeKeyboardShortcutsModal() {
+        this.keyboardShortcutsModal.classList.remove('active')
+
+        if (this.handleKeyboardShortcutsEscapeKey) {
+            document.removeEventListener('keydown', this.handleKeyboardShortcutsEscapeKey)
+        }
     }
 
     renderManageAreasList() {
@@ -1546,6 +1617,21 @@ class TodoApp {
         return icons[status] || '•'
     }
 
+    getGtdShortcut(status) {
+        // Map GTD statuses to keyboard shortcuts
+        // 1=Inbox, 2=Next, 3=Scheduled, 4=Waiting, 5=Someday, 6=Done, 0=All
+        const shortcuts = {
+            'inbox': '1',
+            'next_action': '2',
+            'scheduled': '3',
+            'waiting_for': '4',
+            'someday_maybe': '5',
+            'done': '6',
+            'all': '0'
+        }
+        return shortcuts[status] || ''
+    }
+
     renderGtdList() {
         // Global statuses (always visible)
         const globalStatuses = [
@@ -1572,10 +1658,12 @@ class TodoApp {
 
             const count = this.getGtdCount(status.id)
             const countDisplay = count > 0 ? count : ''
+            const shortcut = this.getGtdShortcut(status.id)
 
             li.innerHTML = `
                 <span class="gtd-icon">${this.getGtdIcon(status.id)}</span>
                 <span class="gtd-label">${this.escapeHtml(status.label)}</span>
+                <span class="gtd-shortcut">${shortcut}</span>
                 <span class="gtd-count">${countDisplay}</span>
             `
 

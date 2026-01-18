@@ -414,6 +414,49 @@
                 </form>
             </div>
         </div>
+
+        <!-- Keyboard Shortcuts Help Modal -->
+        <div id="keyboardShortcutsModal" class="modal-overlay">
+            <div class="modal keyboard-shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="keyboardShortcutsModalTitle">
+                <div class="modal-header">
+                    <h2 id="keyboardShortcutsModalTitle">Keyboard Shortcuts</h2>
+                    <button id="closeKeyboardShortcutsModal" class="modal-close" aria-label="Close modal">&times;</button>
+                </div>
+                <div class="keyboard-shortcuts-content">
+                    <div class="shortcuts-section">
+                        <h3>GTD Views</h3>
+                        <ul class="shortcuts-list">
+                            <li><kbd>1</kbd> <span>Inbox</span></li>
+                            <li><kbd>2</kbd> <span>Next</span></li>
+                            <li><kbd>3</kbd> <span>Scheduled</span></li>
+                            <li><kbd>4</kbd> <span>Waiting</span></li>
+                            <li><kbd>5</kbd> <span>Someday</span></li>
+                            <li><kbd>6</kbd> <span>Done</span></li>
+                            <li><kbd>0</kbd> <span>All</span></li>
+                        </ul>
+                    </div>
+                    <div class="shortcuts-section">
+                        <h3>Areas</h3>
+                        <ul class="shortcuts-list">
+                            <li><kbd>Shift</kbd> + <kbd>0</kbd> <span>All Areas</span></li>
+                            <li><kbd>Shift</kbd> + <kbd>1-9</kbd> <span>Switch to Area</span></li>
+                        </ul>
+                    </div>
+                    <div class="shortcuts-section">
+                        <h3>Actions</h3>
+                        <ul class="shortcuts-list">
+                            <li><kbd>n</kbd> <span>New Todo</span></li>
+                            <li><kbd>/</kbd> <span>Focus Search</span></li>
+                            <li><kbd>Esc</kbd> <span>Close Modal / Clear Search</span></li>
+                            <li><kbd>?</kbd> <span>Show This Help</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="closeKeyboardShortcutsModalBtn" class="modal-btn modal-btn-secondary">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 
