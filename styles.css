@@ -621,6 +621,18 @@ body.sidebar-resizing * {
     opacity: 1 !important;
 }
 
+.project-count {
+    font-size: 12px;
+    color: #999;
+    min-width: 20px;
+    text-align: right;
+    margin-right: 4px;
+}
+
+.project-item.active .project-count {
+    color: rgba(255, 255, 255, 0.8);
+}
+
 .add-project-form {
     margin-top: 15px;
     padding-top: 15px;
@@ -2973,6 +2985,18 @@ body.sidebar-resizing * {
 [data-theme="dark"] .project-item.active .project-name,
 [data-theme="clear"] .project-item.active .project-name {
     font-weight: 600;
+}
+
+[data-theme="glass"] .project-count,
+[data-theme="dark"] .project-count,
+[data-theme="clear"] .project-count {
+    color: var(--ios-secondary-label);
+}
+
+[data-theme="glass"] .project-item.active .project-count,
+[data-theme="dark"] .project-item.active .project-count,
+[data-theme="clear"] .project-item.active .project-count {
+    color: var(--ios-blue);
 }
 
 [data-theme="glass"] .add-project-form,

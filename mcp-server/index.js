@@ -164,6 +164,7 @@ const tools = [
       type: 'object',
       properties: {
         text: { type: 'string', description: 'Todo text content' },
+        comment: { type: 'string', description: 'Additional comment or description (optional)' },
         project_id: { type: 'string', description: 'Project ID (optional)' },
         category_id: { type: 'string', description: 'Category ID (optional)' },
         priority_id: { type: 'string', description: 'Priority ID (optional)' },
@@ -186,6 +187,7 @@ const tools = [
       properties: {
         id: { type: 'string', description: 'Todo ID' },
         text: { type: 'string', description: 'New todo text (optional)' },
+        comment: { type: 'string', description: 'Additional comment or description (optional, use null to remove)' },
         completed: { type: 'boolean', description: 'Completion status (optional)' },
         project_id: { type: 'string', description: 'Project ID (optional, use null to remove)' },
         category_id: { type: 'string', description: 'Category ID (optional)' },
@@ -224,6 +226,7 @@ const tools = [
             type: 'object',
             properties: {
               text: { type: 'string', description: 'Todo text content' },
+              comment: { type: 'string', description: 'Additional comment or description (optional)' },
               project_id: { type: 'string', description: 'Project ID (optional)' },
               gtd_status: { type: 'string', description: 'GTD status (default: inbox)' },
               due_date: { type: 'string', description: 'Due date (optional)' }
@@ -432,10 +435,12 @@ async function handleCreateTodo(args) {
   requireAuth();
 
   const encryptedText = await encrypt(args.text);
+  const encryptedComment = args.comment ? await encrypt(args.comment) : null;
 
   const todoData = {
     user_id: currentUser.id,
     text: encryptedText,
+    comment: encryptedComment,
     completed: false,
     gtd_status: args.gtd_status || 'inbox',
     project_id: args.project_id || null,
@@ -469,6 +474,9 @@ async function handleUpdateTodo(args) {
 
   if (args.text !== undefined) {
     updateData.text = await encrypt(args.text);
+  }
+  if (args.comment !== undefined) {
+    updateData.comment = args.comment ? await encrypt(args.comment) : null;
   }
   if (args.completed !== undefined) {
     updateData.completed = args.completed;
@@ -537,6 +545,7 @@ async function handleBatchCreateTodos(args) {
   const todosToInsert = await Promise.all(args.todos.map(async (todo) => ({
     user_id: currentUser.id,
     text: await encrypt(todo.text),
+    comment: todo.comment ? await encrypt(todo.comment) : null,
     completed: false,
     gtd_status: todo.gtd_status || 'inbox',
     project_id: todo.project_id || null,

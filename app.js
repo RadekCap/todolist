@@ -1412,7 +1412,12 @@ class TodoApp {
         // Add "All Projects" option
         const allItem = document.createElement('li')
         allItem.className = `project-item ${this.selectedProjectId === null ? 'active' : ''}`
-        allItem.innerHTML = `<span class="project-name">All Projects</span>`
+        const totalCount = this.todos.filter(t => t.gtd_status !== 'done').length
+        const totalCountDisplay = totalCount > 0 ? totalCount : ''
+        allItem.innerHTML = `
+            <span class="project-name">All Projects</span>
+            <span class="project-count">${totalCountDisplay}</span>
+        `
         allItem.addEventListener('click', () => this.selectProject(null))
 
         // Drop target for removing project
@@ -1438,11 +1443,14 @@ class TodoApp {
         filteredProjects.forEach(project => {
             const li = document.createElement('li')
             li.className = `project-item ${this.selectedProjectId === project.id ? 'active' : ''}`
+            const count = this.getProjectTodoCount(project.id)
+            const countDisplay = count > 0 ? count : ''
             li.innerHTML = `
                 <span class="project-name">
                     <span class="project-color" style="background-color: ${this.validateColor(project.color)}"></span>
                     ${this.escapeHtml(project.name)}
                 </span>
+                <span class="project-count">${countDisplay}</span>
                 <button class="project-delete" data-id="${project.id}">×</button>
             `
 
