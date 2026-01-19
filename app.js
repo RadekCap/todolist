@@ -372,6 +372,12 @@ class TodoApp {
                 e.preventDefault()
                 this.openKeyboardShortcutsModal()
             }
+
+            // Escape to unfocus text inputs (only when no modal is open)
+            if (e.key === 'Escape' && isTyping && !modalOpen) {
+                e.preventDefault()
+                document.activeElement.blur()
+            }
         })
 
         // Add/Edit todo via modal form
