@@ -2055,6 +2055,7 @@ class TodoApp {
         }
 
         this.todos = this.todos.filter(t => t.id !== id)
+        this.renderGtdList()
         this.renderTodos()
     }
 
