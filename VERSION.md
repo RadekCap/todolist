@@ -15,7 +15,7 @@ The application follows [Semantic Versioning](https://semver.org/):
 **Automatic Version Increment (PATCH):**
 - When a PR is merged to `main`, GitHub Actions automatically increments the PATCH version
 - Example: 1.0.0 → 1.0.1 → 1.0.2
-- The workflow updates both `index.html` and `VERSION.md`
+- The workflow updates both `app.js` and `VERSION.md`
 - Changes are committed automatically by `github-actions[bot]`
 
 **Manual Version Update (MINOR/MAJOR):**
@@ -24,29 +24,65 @@ When preparing a feature release or breaking change:
 1. **New features**: Manually update to next MINOR version (e.g., 1.0.5 → 1.1.0)
 2. **Breaking changes**: Manually update to next MAJOR version (e.g., 1.5.0 → 2.0.0)
 
-**IMPORTANT - Handling Manual Version Bumps:**
-- ⚠️ **Do NOT include version bumps in your PR** - The auto-increment workflow will run after merge
-- ✅ **Correct workflow**: Merge PR → Auto-increment runs → Manually update to MINOR/MAJOR in a separate commit
-- ❌ **Incorrect**: Update to 1.1.0 in PR → Merge → Auto-increment to 1.1.1 (skips intended 1.1.0)
-
-To manually update version (AFTER PR merge):
-1. Wait for auto-increment commit to complete
-2. Edit `APP_VERSION` constant in `index.html` (line ~875)
-3. Update "Current Version" at the bottom of this file
-4. Commit with message: `chore: Bump version to X.Y.Z`
-5. Push directly to `main` (no PR needed for version-only changes)
-
 ---
 
 ## Changelog
 
-### Version 1.0.0 (Current)
-**Release Date:** TBD
+### Version 2.0.0 (Current)
+**Release Date:** 2026-01-19
+
+**Major Release** - Complete GTD workflow, MCP integration, and enhanced organization features.
+
+**New Features:**
+- **MCP Server Integration**: Claude Code can now manage todos directly via MCP protocol
+  - Full CRUD operations for todos, projects, and areas
+  - Batch todo creation
+  - End-to-end encryption compatibility
+  - Comment/description field support for todos
+- **Areas of Responsibility**: Organize projects into life areas (Work, Personal, Health, etc.)
+  - Drag-and-drop reordering
+  - Quick area switching with keyboard shortcuts (Shift+1-9)
+  - Filter projects and todos by area
+- **Project Todo Counts**: Display todo counts next to each project in sidebar
+- **Enhanced GTD Workflow**:
+  - Keyboard navigation for GTD views (1-6 keys)
+  - Scheduled view with date-based sections
+  - Context support (@home, @work, @errands, etc.)
+- **Search Functionality**: Search todos by text content
+- **Keyboard Shortcuts**:
+  - `N` - New todo
+  - `Ctrl+Enter` - Submit todo form
+  - `Escape` - Close modals and unfocus inputs
+  - `1-6` - Switch GTD views
+  - `Shift+1-9` - Switch areas
+- **Theme System**: Glass, dark, and clear themes moved to toolbar
+- **UI/UX Improvements**:
+  - Drag-and-drop todos to projects
+  - Footer links moved to user menu
+  - Improved sidebar organization
+
+**Bug Fixes:**
+- Sidebar counts refresh properly after todo deletion
+- Firefox Linux keyboard shortcut compatibility
+- Safari select element rendering issues
+- CSS selector validation for dynamic elements
+
+**Technical Improvements:**
+- End-to-end encryption for todos, projects, areas, and contexts
+- Separated CSS into styles.css
+- Separated JavaScript into app.js
+- CSS selector validation in CI
+- Improved accessibility (ARIA labels, keyboard navigation)
+
+---
+
+### Version 1.0.0
+**Release Date:** 2025-12-01
 
 **Initial Release** - First versioned release of the TodoList application.
 
 **Features:**
-- User authentication (login/signup)
+- User authentication (login/signup via Supabase)
 - Todo CRUD operations (create, read, update, delete)
 - Category management with color coding
 - Priority system for todos
@@ -56,7 +92,7 @@ To manually update version (AFTER PR merge):
 - Safari compatibility fixes
 - Security features (XSS prevention, color validation)
 - Accessibility support (ARIA labels, keyboard navigation)
-- Application versioning system
+- Application versioning system with auto-increment
 
 **Technical Stack:**
 - Frontend: Vanilla JavaScript (ES6+)
@@ -70,24 +106,21 @@ To manually update version (AFTER PR merge):
 - `categories` table: id, user_id, name, color, created_at
 - `priorities` table: id, user_id, name, color, level, created_at
 
-**Known Issues:**
-- None currently identified
-
 ---
 
 ## Future Versions
 
-### Planned for 1.1.0
-- Settings page for priority management
-- Priority filter in sidebar
-- Default priorities for new users
-- Drag-and-drop priority reordering
-
-### Planned for 1.2.0
-- Todo editing functionality
+### Planned for 2.1.0
+- Todo editing inline
 - Recurring tasks
-- Task notes/descriptions
-- Search and filter improvements
+- Task notes/descriptions expansion
+- Subtasks support
+
+### Planned for 2.2.0
+- Calendar view
+- Time tracking
+- Tags system
+- Export/import functionality
 
 ---
 
@@ -96,23 +129,21 @@ To manually update version (AFTER PR merge):
 ### Automatic Updates (via GitHub Actions)
 - **PATCH versions** are incremented automatically when PRs merge to `main`
 - Workflow file: `.github/workflows/auto-version-bump.yml`
-- Updates: `index.html` (APP_VERSION) and `VERSION.md` (Current Version)
+- Updates: `app.js` (APP_VERSION) and `VERSION.md` (Current Version)
 - No manual intervention required
 
 ### Manual Release Checklist (MINOR/MAJOR versions)
 
 When preparing a feature or breaking change release:
 
-- [ ] Manually update `APP_VERSION` constant in `index.html`
+- [ ] Manually update `APP_VERSION` constant in `app.js`
 - [ ] Update this `VERSION.md` file with changelog entry
 - [ ] Update "Current Version" at bottom of this file
 - [ ] Commit: `chore: Bump version to X.Y.Z`
-- [ ] Create git tag: `git tag vX.Y.Z`
-- [ ] Push tag: `git push origin vX.Y.Z`
+- [ ] Push tag: `git tag vX.Y.Z && git push origin vX.Y.Z`
 - [ ] Create GitHub release with release notes
-- [ ] Update README.md if needed
 
 ---
 
-**Current Version:** 1.0.108
+**Current Version:** 2.0.0
 **Last Updated:** 2026-01-19
