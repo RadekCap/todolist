@@ -68,6 +68,11 @@ Create a todo "Research competitors" in project [project-id]
 Create a todo "Submit report" with due date 2024-03-15
 ```
 
+**Todo with comment/description:**
+```
+Create a todo "Review API endpoints" with comment "Check authentication and rate limiting"
+```
+
 **Full example with all options:**
 ```
 Create a todo "Review Q1 budget" with:
@@ -75,6 +80,7 @@ Create a todo "Review Q1 budget" with:
 - project: [project-id]
 - due date: 2024-02-28
 - priority: [priority-id]
+- comment: "Focus on marketing spend vs ROI"
 ```
 
 ### Listing Todos
@@ -132,6 +138,12 @@ Remove todo [id] from its project
 ```
 Set due date of todo [id] to 2024-04-01
 Remove due date from todo [id]
+```
+
+**Update comment:**
+```
+Update todo [id] comment to "Waiting for client feedback"
+Remove comment from todo [id]
 ```
 
 ### Deleting Todos
@@ -320,6 +332,14 @@ Create these todos in project [project-id]:
 - Analyze market trends
 - Draft proposal
 - Schedule stakeholder meeting
+```
+
+**Batch with comments:**
+```
+Create these todos with descriptions:
+- login... (comment: Authenticate with email and password)
+- logout... (comment: Sign out of the current session)
+- list_todos... (comment: List todos with optional filters)
 ```
 
 ## Filtering and Queries
