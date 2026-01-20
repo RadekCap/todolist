@@ -85,7 +85,9 @@ export function renderTodos(container, options = {}) {
     if (filteredTodos.length === 0) {
         // Special zen state for empty Inbox
         if (state.selectedGtdStatus === 'inbox') {
-            container.innerHTML = `
+            const zenState = document.createElement('li')
+            zenState.className = 'inbox-zen-state-wrapper'
+            zenState.innerHTML = `
                 <div class="inbox-zen-state">
                     <svg class="zen-illustration" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <!-- Calm water ripples -->
@@ -121,6 +123,7 @@ export function renderTodos(container, options = {}) {
                     <p class="zen-message">Your mind is clear. All items have been processed. Take a moment to breathe.</p>
                 </div>
             `
+            container.appendChild(zenState)
         } else {
             let emptyMsg
             if (state.searchQuery) {
@@ -130,7 +133,10 @@ export function renderTodos(container, options = {}) {
             } else {
                 emptyMsg = 'No todos in selected categories.'
             }
-            container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`
+            const emptyState = document.createElement('li')
+            emptyState.className = 'empty-state-wrapper'
+            emptyState.innerHTML = `<div class="empty-state">${emptyMsg}</div>`
+            container.appendChild(emptyState)
         }
         return
     }
