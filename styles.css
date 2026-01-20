@@ -854,6 +854,21 @@ body.sidebar-resizing * {
     gap: 8px;
 }
 
+/* Project title header (shown when a project is selected) */
+.project-title-header {
+    padding: 16px 20px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+}
+
+.project-title-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.3px;
+}
+
 .todo-item {
     background: #f8f9fa;
     padding: 15px;
@@ -3149,6 +3164,26 @@ body.sidebar-resizing * {
 [data-theme="clear"] .scheduled-section-header.later {
     background: var(--ios-gray5);
     color: var(--ios-label-secondary);
+}
+
+/* iOS Project Title Header */
+[data-theme="glass"] .project-title-header,
+[data-theme="dark"] .project-title-header,
+[data-theme="clear"] .project-title-header {
+    background: var(--ios-gray5);
+    border-radius: 0;
+    margin-bottom: 0;
+    padding: 12px 16px;
+    border-bottom: 0.5px solid var(--ios-separator);
+}
+
+[data-theme="glass"] .project-title-text,
+[data-theme="dark"] .project-title-text,
+[data-theme="clear"] .project-title-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ios-label);
+    letter-spacing: 0.2px;
 }
 
 [data-theme="glass"] .todo-item,
