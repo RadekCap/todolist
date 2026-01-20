@@ -2283,6 +2283,17 @@ class TodoApp {
             return
         }
 
+        // Show project title header when a project is selected
+        if (this.selectedProjectId !== null) {
+            const project = this.projects.find(p => p.id === this.selectedProjectId)
+            if (project) {
+                const header = document.createElement('li')
+                header.className = 'project-title-header'
+                header.innerHTML = `<span class="project-title-text">${this.escapeHtml(project.name)}</span>`
+                this.todoList.appendChild(header)
+            }
+        }
+
         const filteredTodos = this.getFilteredTodos()
 
         if (filteredTodos.length === 0) {
