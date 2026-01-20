@@ -32,7 +32,7 @@ import { renderAreasDropdown, updateAreasLabel, renderManageAreasList } from './
 import { TodoModal } from './src/ui/modals/TodoModal.js'
 
 // Application version
-const APP_VERSION = '2.0.2'
+const APP_VERSION = '2.0.3'
 
 class TodoApp {
     constructor() {
