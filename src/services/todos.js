@@ -795,6 +795,47 @@ export function getTemplateById(templateId) {
 }
 
 /**
+ * Update the recurrence rule for a template
+ * @param {string} templateId - Template todo ID
+ * @param {Object} recurrenceRule - New recurrence rule object
+ * @param {Object} endCondition - End condition { type, date?, count? }
+ * @returns {Promise<Object>} Updated template
+ */
+export async function updateTemplateRecurrence(templateId, recurrenceRule, endCondition) {
+    const updateData = {
+        recurrence_rule: recurrenceRule
+    }
+
+    // Set end condition
+    if (endCondition) {
+        updateData.recurrence_end_type = endCondition.type || 'never'
+        updateData.recurrence_end_date = endCondition.type === 'on_date' ? endCondition.date : null
+        updateData.recurrence_end_count = endCondition.type === 'after_count' ? endCondition.count : null
+    }
+
+    const { data, error } = await supabase
+        .from('todos')
+        .update(updateData)
+        .eq('id', templateId)
+        .select()
+        .single()
+
+    if (error) {
+        console.error('Error updating template recurrence:', error)
+        throw error
+    }
+
+    // Update local templates state
+    const templates = store.get('templates') || []
+    const updatedTemplates = templates.map(t =>
+        String(t.id) === String(templateId) ? { ...t, ...updateData } : t
+    )
+    store.set('templates', updatedTemplates)
+
+    return data
+}
+
+/**
  * Convert an existing todo to a recurring todo
  * Creates a template and links the existing todo as the first instance
  * @param {string} todoId - Existing todo ID

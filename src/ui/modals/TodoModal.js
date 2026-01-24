@@ -1,5 +1,5 @@
 import { store } from '../../core/store.js'
-import { addTodo, updateTodo, createRecurringTodo, convertToRecurring, getTemplateById } from '../../services/todos.js'
+import { addTodo, updateTodo, createRecurringTodo, convertToRecurring, getTemplateById, updateTemplateRecurrence } from '../../services/todos.js'
 import { buildRecurrenceRule, getNextNOccurrences, formatPreviewDate, calculateFirstOccurrence } from '../../utils/recurrence.js'
 
 /**
@@ -649,9 +649,11 @@ export class TodoModal {
                         // Convert non-recurring todo to recurring
                         const endCondition = this.getEndCondition()
                         await convertToRecurring(editingTodoId, todoData, recurrenceRule, endCondition)
-                    } else {
-                        // Already recurring, just update the todo data (not the recurrence)
+                    } else if (existingTodo && existingTodo.template_id) {
+                        // Already recurring - update both todo data and template recurrence
+                        const endCondition = this.getEndCondition()
                         await updateTodo(editingTodoId, todoData)
+                        await updateTemplateRecurrence(existingTodo.template_id, recurrenceRule, endCondition)
                     }
                 } else {
                     await updateTodo(editingTodoId, todoData)
