@@ -201,10 +201,15 @@ export class TodoModal {
 
         this.recurrenceOptions.style.display = 'flex'
 
+        // Weekdays and weekends are weekly variants
+        const isWeeklyVariant = type === 'weekly' || type === 'weekdays' || type === 'weekends'
+
         // Update interval label
         const labels = {
             daily: 'day(s)',
             weekly: 'week(s)',
+            weekdays: 'week(s)',
+            weekends: 'week(s)',
             monthly: 'month(s)',
             yearly: 'year(s)'
         }
@@ -214,7 +219,7 @@ export class TodoModal {
 
         // Show/hide type-specific options
         if (this.weekdayOptions) {
-            this.weekdayOptions.style.display = type === 'weekly' ? 'block' : 'none'
+            this.weekdayOptions.style.display = isWeeklyVariant ? 'block' : 'none'
         }
         if (this.monthlyOptions) {
             this.monthlyOptions.style.display = (type === 'monthly' || type === 'yearly') ? 'block' : 'none'
@@ -223,14 +228,29 @@ export class TodoModal {
             this.yearlyOptions.style.display = type === 'yearly' ? 'block' : 'none'
         }
 
-        // If switching to weekly, auto-select current day
-        if (type === 'weekly' && this.weekdayCheckboxes.length > 0) {
+        // Auto-select weekdays for weekday/weekend presets
+        if (type === 'weekdays') {
+            // Mon-Fri (values 1-5)
+            this.weekdayCheckboxes.forEach(cb => {
+                const day = parseInt(cb.value, 10)
+                cb.checked = day >= 1 && day <= 5
+            })
+        } else if (type === 'weekends') {
+            // Sat-Sun (values 6, 0)
+            this.weekdayCheckboxes.forEach(cb => {
+                const day = parseInt(cb.value, 10)
+                cb.checked = day === 0 || day === 6
+            })
+        } else if (type === 'weekly' && this.weekdayCheckboxes.length > 0) {
+            // If switching to weekly, auto-select current day if none selected
             const dueDate = this.dueDateInput.value ? new Date(this.dueDateInput.value) : new Date()
             const currentDay = dueDate.getDay()
             // Check if any day is selected
             const anySelected = Array.from(this.weekdayCheckboxes).some(cb => cb.checked)
-            if (!anySelected && this.weekdayCheckboxes[currentDay]) {
-                this.weekdayCheckboxes[currentDay].checked = true
+            if (!anySelected) {
+                this.weekdayCheckboxes.forEach(cb => {
+                    cb.checked = parseInt(cb.value, 10) === currentDay
+                })
             }
         }
 
@@ -284,26 +304,30 @@ export class TodoModal {
         const type = this.repeatSelect.value
         if (!type || type === 'none') return null
 
+        // Weekdays and weekends are stored as weekly with specific days
+        const effectiveType = (type === 'weekdays' || type === 'weekends') ? 'weekly' : type
+        const isWeeklyVariant = type === 'weekly' || type === 'weekdays' || type === 'weekends'
+
         const formValues = {
-            type,
+            type: effectiveType,
             interval: this.recurrenceInterval.value,
             startDate: this.dueDateInput.value || this.formatDate(new Date())
         }
 
-        if (type === 'weekly') {
+        if (isWeeklyVariant) {
             formValues.weekdays = Array.from(this.weekdayCheckboxes)
                 .filter(cb => cb.checked)
                 .map(cb => parseInt(cb.value, 10))
         }
 
-        if (type === 'monthly' || type === 'yearly') {
+        if (effectiveType === 'monthly' || effectiveType === 'yearly') {
             formValues.dayType = this.recurrenceDayType.value
             formValues.dayOfMonth = new Date(formValues.startDate).getDate()
             formValues.weekdayOrdinal = this.recurrenceOrdinal.value
             formValues.weekday = this.recurrenceWeekday.value
         }
 
-        if (type === 'yearly') {
+        if (effectiveType === 'yearly') {
             formValues.month = this.recurrenceMonth.value
         }
 
@@ -362,8 +386,24 @@ export class TodoModal {
 
         const rule = template.recurrence_rule
 
+        // Detect if this is a weekdays or weekends preset
+        let displayType = rule.type || 'none'
+        if (rule.type === 'weekly' && rule.weekdays) {
+            const weekdays = [...rule.weekdays].sort((a, b) => a - b)
+            const isWeekdays = weekdays.length === 5 &&
+                weekdays.every((d, i) => d === i + 1) // [1,2,3,4,5]
+            const isWeekends = weekdays.length === 2 &&
+                weekdays.includes(0) && weekdays.includes(6) // [0,6]
+
+            if (isWeekdays) {
+                displayType = 'weekdays'
+            } else if (isWeekends) {
+                displayType = 'weekends'
+            }
+        }
+
         // Set repeat type
-        this.repeatSelect.value = rule.type || 'none'
+        this.repeatSelect.value = displayType
 
         // Show recurrence options
         if (this.recurrenceOptions) {
@@ -379,16 +419,19 @@ export class TodoModal {
         const labels = {
             daily: 'day(s)',
             weekly: 'week(s)',
+            weekdays: 'week(s)',
+            weekends: 'week(s)',
             monthly: 'month(s)',
             yearly: 'year(s)'
         }
         if (this.recurrenceIntervalLabel) {
-            this.recurrenceIntervalLabel.textContent = labels[rule.type] || 'day(s)'
+            this.recurrenceIntervalLabel.textContent = labels[displayType] || 'day(s)'
         }
 
         // Show/hide type-specific options
+        const isWeeklyVariant = displayType === 'weekly' || displayType === 'weekdays' || displayType === 'weekends'
         if (this.weekdayOptions) {
-            this.weekdayOptions.style.display = rule.type === 'weekly' ? 'block' : 'none'
+            this.weekdayOptions.style.display = isWeeklyVariant ? 'block' : 'none'
         }
         if (this.monthlyOptions) {
             this.monthlyOptions.style.display = (rule.type === 'monthly' || rule.type === 'yearly') ? 'block' : 'none'
