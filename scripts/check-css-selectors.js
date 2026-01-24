@@ -126,6 +126,7 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.todo-context-badge/,
     /\.delete-btn/,
     /\.drag-handle/,
+    /\.recurring-icon/,
     // Category items (rendered by JavaScript)
     /\.category-item/,
     /\.category-name/,
@@ -196,6 +197,11 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.create-more-option/,
     /\.checkbox-label/,
     /\.priority-star.*svg/,
+    // Recurrence panel elements (modal form)
+    /\.recurrence-/,
+    /\.weekday-checkbox/,
+    /\.monthly-/,
+    /#recurrence/,
 ];
 
 /**

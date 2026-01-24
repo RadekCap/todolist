@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Lock files (optional - can include if you want reproducible builds)
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Debug
+npm-debug.log*
