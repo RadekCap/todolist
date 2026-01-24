@@ -142,6 +142,7 @@
                             </div>
                         </div>
                         <button id="openAddTodoModal" class="toolbar-btn add-todo-btn">+ Add Todo</button>
+                        <button id="openImportModal" class="toolbar-btn toolbar-btn-secondary">Import</button>
                         <div class="toolbar-search">
                             <input
                                 type="text"
@@ -312,6 +313,124 @@
                             <select id="modalContextSelect" class="modal-sidebar-select" aria-label="Context">
                                 <option value="">No Context</option>
                             </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Import Modal -->
+        <div id="importModal" class="modal-overlay">
+            <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
+                <div class="modal-header">
+                    <h2 id="importModalTitle">Import Todos</h2>
+                    <button id="closeImportModal" class="modal-close" aria-label="Close modal">&times;</button>
+                </div>
+                <form id="importForm" class="modal-form modal-form-split">
+                    <div class="modal-form-main">
+                        <div class="modal-field">
+                            <label for="importTextarea" class="import-label">
+                                Paste your todos below (one per line)
+                            </label>
+                            <textarea
+                                id="importTextarea"
+                                class="import-textarea"
+                                placeholder="Buy groceries&#10;Call dentist&#10;Review project proposal&#10;Send invoice"
+                                rows="12"
+                                required
+                            ></textarea>
+                            <small class="import-hint">Empty lines will be ignored. Each line becomes a separate todo.</small>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="submit" id="importBtn" class="modal-btn modal-btn-primary">Import Todos</button>
+                            <button type="button" id="cancelImportModal" class="modal-btn modal-btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="modal-form-sidebar">
+                        <p class="import-sidebar-title">Apply to all imported items:</p>
+                        <div class="modal-sidebar-field">
+                            <label for="importGtdStatusSelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">status</span>
+                            </label>
+                            <select id="importGtdStatusSelect" class="modal-sidebar-select" aria-label="GTD Status">
+                                <option value="inbox">Inbox</option>
+                                <option value="next_action">Next Action</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="waiting_for">Waiting For</option>
+                                <option value="someday_maybe">Someday/Maybe</option>
+                            </select>
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="importProjectSelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">project</span>
+                            </label>
+                            <select id="importProjectSelect" class="modal-sidebar-select">
+                                <option value="">No Project</option>
+                            </select>
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="importCategorySelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                                        <line x1="7" y1="7" x2="7.01" y2="7"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">category</span>
+                            </label>
+                            <select id="importCategorySelect" class="modal-sidebar-select">
+                                <option value="">No Category</option>
+                            </select>
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="importContextSelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="10" r="3"/>
+                                        <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">context</span>
+                            </label>
+                            <select id="importContextSelect" class="modal-sidebar-select" aria-label="Context">
+                                <option value="">No Context</option>
+                            </select>
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="importPrioritySelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                                        <line x1="4" y1="22" x2="4" y2="15"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">priority</span>
+                            </label>
+                            <select id="importPrioritySelect" class="modal-sidebar-select" aria-label="Priority">
+                                <option value="">No Priority</option>
+                            </select>
+                        </div>
+                        <div class="modal-sidebar-field">
+                            <label for="importDueDateInput">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                                        <path d="M16 2v4M8 2v4M2 10h20"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">due date</span>
+                            </label>
+                            <input type="date" id="importDueDateInput" class="modal-sidebar-input">
                         </div>
                     </div>
                 </form>

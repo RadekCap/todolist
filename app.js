@@ -30,6 +30,7 @@ import { renderProjects, updateProjectSelect } from './src/ui/ProjectList.js'
 import { renderGtdList, selectGtdStatus, selectGtdStatusByShortcut } from './src/ui/GtdList.js'
 import { renderAreasDropdown, updateAreasLabel, updateAreaHeader, renderManageAreasList } from './src/ui/AreasDropdown.js'
 import { TodoModal } from './src/ui/modals/TodoModal.js'
+import { ImportModal } from './src/ui/modals/ImportModal.js'
 
 // Application version
 const APP_VERSION = '2.0.8'
@@ -124,6 +125,23 @@ class TodoApp {
 
         // Set callback for when modal closes
         this.todoModal.onClose = () => this.render()
+
+        // Initialize ImportModal
+        this.importModal = new ImportModal({
+            modal: document.getElementById('importModal'),
+            form: document.getElementById('importForm'),
+            textarea: document.getElementById('importTextarea'),
+            projectSelect: document.getElementById('importProjectSelect'),
+            categorySelect: document.getElementById('importCategorySelect'),
+            contextSelect: document.getElementById('importContextSelect'),
+            prioritySelect: document.getElementById('importPrioritySelect'),
+            gtdStatusSelect: document.getElementById('importGtdStatusSelect'),
+            dueDateInput: document.getElementById('importDueDateInput'),
+            importBtn: document.getElementById('importBtn'),
+            closeBtn: document.getElementById('closeImportModal'),
+            cancelBtn: document.getElementById('cancelImportModal'),
+            openBtn: document.getElementById('openImportModal')
+        })
 
         this.initAuth()
         this.initEventListeners()
