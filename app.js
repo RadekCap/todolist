@@ -33,7 +33,7 @@ import { TodoModal } from './src/ui/modals/TodoModal.js'
 import { ImportModal } from './src/ui/modals/ImportModal.js'
 
 // Application version
-const APP_VERSION = '2.0.9'
+const APP_VERSION = '2.0.10'
 
 class TodoApp {
     constructor() {
