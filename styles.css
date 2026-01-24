@@ -1709,6 +1709,11 @@ body.sidebar-resizing * {
     gap: 20px;
 }
 
+.unlock-description {
+    color: #666;
+    margin-bottom: 15px;
+}
+
 /* Two-column form layout */
 .form-columns {
     display: flex;
@@ -3526,11 +3531,20 @@ body.sidebar-resizing * {
     background: #1c1c1e;
     backdrop-filter: blur(var(--ios-blur-thick));
     -webkit-backdrop-filter: blur(var(--ios-blur-thick));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
     border-radius: 20px;
     padding: 24px;
     max-width: 720px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+[data-theme="glass"] .unlock-description,
+[data-theme="dark"] .unlock-description,
+[data-theme="clear"] .unlock-description {
+    color: var(--ios-label-secondary);
 }
 
 [data-theme="glass"] .modal-form,
