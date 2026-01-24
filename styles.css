@@ -2111,6 +2111,244 @@ body.sidebar-resizing * {
     border-color: #ccc;
 }
 
+.modal-sidebar-divider {
+    grid-column: 1 / -1;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 8px 0;
+}
+
+/* Recurrence Panel Styles */
+.recurrence-options {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.recurrence-interval {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.recurrence-interval label {
+    color: #666;
+    font-weight: 500;
+}
+
+.recurrence-interval-input {
+    width: 60px;
+    padding: 6px 8px;
+    font-size: 13px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.recurrence-interval-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+#recurrenceIntervalLabel {
+    color: #666;
+}
+
+.recurrence-weekdays {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.recurrence-weekdays > label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.weekday-checkboxes {
+    display: flex;
+    gap: 4px;
+}
+
+.weekday-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.weekday-checkbox input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.weekday-checkbox span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    color: #666;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+}
+
+.weekday-checkbox input:checked + span {
+    background: var(--accent-color);
+    color: white;
+}
+
+.weekday-checkbox:hover span {
+    background: #e0e0e0;
+}
+
+.weekday-checkbox input:checked:hover + span {
+    background: var(--accent-color-hover, #0056b3);
+}
+
+.recurrence-monthly,
+.recurrence-yearly {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.recurrence-monthly > label,
+.recurrence-yearly > label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.monthly-selects {
+    display: flex;
+    gap: 6px;
+}
+
+.monthly-weekday {
+    margin-top: 6px;
+}
+
+.recurrence-select-small {
+    padding: 6px 8px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+}
+
+.recurrence-select-small:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.recurrence-end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.recurrence-end > label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+.recurrence-end-date {
+    padding: 6px 8px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.recurrence-end-date:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.recurrence-end-count {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #666;
+}
+
+.recurrence-count-input {
+    width: 50px;
+    padding: 6px 8px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.recurrence-count-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.recurrence-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.recurrence-preview > label {
+    font-size: 11px;
+    color: #888;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.recurrence-preview-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.recurrence-preview-list li {
+    font-size: 11px;
+    padding: 3px 8px;
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--accent-color);
+    border-radius: 10px;
+}
+
+/* Recurring Todo Icon */
+.recurring-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    color: var(--accent-color);
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.recurring-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
 /* Updated modal actions for split layout */
 .modal-form-split .modal-actions {
     display: flex;
@@ -3067,6 +3305,99 @@ body.sidebar-resizing * {
 [data-theme="clear"] .modal-sidebar-select:hover,
 [data-theme="clear"] .modal-sidebar-input:hover {
     border-color: var(--ios-gray3);
+}
+
+/* Dark theme recurrence panel */
+[data-theme="glass"] .modal-sidebar-divider,
+[data-theme="dark"] .modal-sidebar-divider,
+[data-theme="clear"] .modal-sidebar-divider {
+    background: var(--ios-separator);
+}
+
+[data-theme="glass"] .recurrence-interval label,
+[data-theme="dark"] .recurrence-interval label,
+[data-theme="clear"] .recurrence-interval label,
+[data-theme="glass"] #recurrenceIntervalLabel,
+[data-theme="dark"] #recurrenceIntervalLabel,
+[data-theme="clear"] #recurrenceIntervalLabel {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .recurrence-interval-input,
+[data-theme="dark"] .recurrence-interval-input,
+[data-theme="clear"] .recurrence-interval-input,
+[data-theme="glass"] .recurrence-select-small,
+[data-theme="dark"] .recurrence-select-small,
+[data-theme="clear"] .recurrence-select-small,
+[data-theme="glass"] .recurrence-end-date,
+[data-theme="dark"] .recurrence-end-date,
+[data-theme="clear"] .recurrence-end-date,
+[data-theme="glass"] .recurrence-count-input,
+[data-theme="dark"] .recurrence-count-input,
+[data-theme="clear"] .recurrence-count-input {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .recurrence-weekdays > label,
+[data-theme="dark"] .recurrence-weekdays > label,
+[data-theme="clear"] .recurrence-weekdays > label,
+[data-theme="glass"] .recurrence-monthly > label,
+[data-theme="dark"] .recurrence-monthly > label,
+[data-theme="clear"] .recurrence-monthly > label,
+[data-theme="glass"] .recurrence-yearly > label,
+[data-theme="dark"] .recurrence-yearly > label,
+[data-theme="clear"] .recurrence-yearly > label,
+[data-theme="glass"] .recurrence-end > label,
+[data-theme="dark"] .recurrence-end > label,
+[data-theme="clear"] .recurrence-end > label {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .weekday-checkbox span,
+[data-theme="dark"] .weekday-checkbox span,
+[data-theme="clear"] .weekday-checkbox span {
+    background: var(--ios-bg-secondary);
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .weekday-checkbox:hover span,
+[data-theme="dark"] .weekday-checkbox:hover span,
+[data-theme="clear"] .weekday-checkbox:hover span {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="glass"] .weekday-checkbox input:checked + span,
+[data-theme="dark"] .weekday-checkbox input:checked + span,
+[data-theme="clear"] .weekday-checkbox input:checked + span {
+    background: var(--ios-blue);
+    color: white;
+}
+
+[data-theme="glass"] .recurrence-end-count,
+[data-theme="dark"] .recurrence-end-count,
+[data-theme="clear"] .recurrence-end-count {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .recurrence-preview > label,
+[data-theme="dark"] .recurrence-preview > label,
+[data-theme="clear"] .recurrence-preview > label {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .recurrence-preview-list li,
+[data-theme="dark"] .recurrence-preview-list li,
+[data-theme="clear"] .recurrence-preview-list li {
+    background: rgba(0, 122, 255, 0.15);
+    color: var(--ios-blue);
+}
+
+[data-theme="glass"] .recurring-icon,
+[data-theme="dark"] .recurring-icon,
+[data-theme="clear"] .recurring-icon {
+    color: var(--ios-blue);
 }
 
 /* iOS Checkbox Label */
