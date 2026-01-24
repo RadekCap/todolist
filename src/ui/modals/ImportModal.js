@@ -1,5 +1,5 @@
 import { store } from '../../core/store.js'
-import { addTodo } from '../../services/todos.js'
+import { batchAddTodos } from '../../services/todos.js'
 
 /**
  * ImportModal controller
@@ -131,19 +131,20 @@ export class ImportModal {
         this.importBtn.textContent = `Importing ${lines.length} todos...`
 
         try {
-            // Import each line as a todo
-            for (const line of lines) {
-                await addTodo({
-                    text: line,
-                    projectId,
-                    categoryId,
-                    contextId,
-                    priorityId,
-                    gtdStatus,
-                    dueDate,
-                    comment: null
-                })
-            }
+            // Prepare all todos for batch import
+            const todosData = lines.map(line => ({
+                text: line,
+                projectId,
+                categoryId,
+                contextId,
+                priorityId,
+                gtdStatus,
+                dueDate,
+                comment: null
+            }))
+
+            // Import all at once - only one store update, no flickering
+            await batchAddTodos(todosData)
 
             this.close()
         } catch (error) {

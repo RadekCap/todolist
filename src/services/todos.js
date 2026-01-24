@@ -76,6 +76,65 @@ export async function addTodo(todoData) {
 }
 
 /**
+ * Add multiple todos at once (batch import)
+ * Only updates the store once after all todos are inserted
+ * @param {Array<Object>} todosData - Array of todo data objects
+ * @returns {Promise<Array>} The created todos
+ */
+export async function batchAddTodos(todosData) {
+    const currentUser = store.get('currentUser')
+
+    // Prepare all todos for insertion
+    const insertData = await Promise.all(todosData.map(async (todoData) => {
+        const { text, categoryId, projectId, priorityId, gtdStatus, contextId, dueDate, comment } = todoData
+        const encryptedText = await encrypt(text)
+        const encryptedComment = comment ? await encrypt(comment) : null
+        const isCompleted = gtdStatus === 'done'
+
+        return {
+            user_id: currentUser.id,
+            text: encryptedText,
+            completed: isCompleted,
+            category_id: categoryId || null,
+            project_id: projectId || null,
+            priority_id: priorityId || null,
+            gtd_status: gtdStatus || 'inbox',
+            context_id: contextId || null,
+            due_date: dueDate || null,
+            comment: encryptedComment,
+            // Store original text for later use
+            _originalText: text,
+            _originalComment: comment
+        }
+    }))
+
+    // Insert all at once
+    const { data, error } = await supabase
+        .from('todos')
+        .insert(insertData.map(({ _originalText, _originalComment, ...rest }) => rest))
+        .select()
+
+    if (error) {
+        console.error('Error batch adding todos:', error)
+        throw error
+    }
+
+    // Create todos with decrypted text for local state
+    const newTodos = data.map((dbTodo, index) => ({
+        ...dbTodo,
+        text: insertData[index]._originalText,
+        comment: insertData[index]._originalComment
+    }))
+
+    // Update store only once
+    const todos = [...store.get('todos'), ...newTodos]
+    store.set('todos', todos)
+    events.emit(Events.TODOS_LOADED, todos)
+
+    return newTodos
+}
+
+/**
  * Update an existing todo
  * @param {string} todoId - Todo ID
  * @param {Object} todoData - Todo data to update
