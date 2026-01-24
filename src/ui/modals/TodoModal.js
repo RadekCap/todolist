@@ -1,5 +1,5 @@
 import { store } from '../../core/store.js'
-import { addTodo, updateTodo, createRecurringTodo } from '../../services/todos.js'
+import { addTodo, updateTodo, createRecurringTodo, convertToRecurring } from '../../services/todos.js'
 import { buildRecurrenceRule, getNextNOccurrences, formatPreviewDate } from '../../utils/recurrence.js'
 
 /**
@@ -466,14 +466,41 @@ export class TodoModal {
 
         try {
             const editingTodoId = store.get('editingTodoId')
+            const recurrenceRule = this.buildRecurrenceRule()
+
             if (editingTodoId) {
                 this.addBtn.textContent = 'Saving...'
-                await updateTodo(editingTodoId, todoData)
+
+                // Check if adding recurrence to an existing non-recurring todo
+                if (recurrenceRule) {
+                    // Recurring todos require a due date
+                    if (!dueDate) {
+                        alert('A due date is required for recurring todos')
+                        this.dueDateInput.focus()
+                        this.addBtn.disabled = false
+                        this.addBtn.textContent = 'Save Changes'
+                        return
+                    }
+
+                    // Check if this todo is already recurring
+                    const todos = store.get('todos')
+                    const existingTodo = todos.find(t => String(t.id) === String(editingTodoId))
+
+                    if (existingTodo && !existingTodo.template_id) {
+                        // Convert non-recurring todo to recurring
+                        const endCondition = this.getEndCondition()
+                        await convertToRecurring(editingTodoId, todoData, recurrenceRule, endCondition)
+                    } else {
+                        // Already recurring, just update the todo data (not the recurrence)
+                        await updateTodo(editingTodoId, todoData)
+                    }
+                } else {
+                    await updateTodo(editingTodoId, todoData)
+                }
             } else {
                 this.addBtn.textContent = 'Adding...'
 
                 // Check if this is a recurring todo
-                const recurrenceRule = this.buildRecurrenceRule()
                 if (recurrenceRule) {
                     // Recurring todos require a due date
                     if (!dueDate) {
