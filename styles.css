@@ -3536,14 +3536,11 @@ body.sidebar-resizing * {
     background: #1c1c1e;
     backdrop-filter: blur(var(--ios-blur-thick));
     -webkit-backdrop-filter: blur(var(--ios-blur-thick));
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
     border-radius: 20px;
     padding: 24px;
     max-width: 720px;
-    width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
 }
 
 [data-theme="glass"] .unlock-description,
