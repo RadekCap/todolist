@@ -229,6 +229,14 @@
                         </div>
                     </div>
                     <div class="modal-form-sidebar">
+                        <!-- Tab buttons -->
+                        <div class="modal-tabs">
+                            <button type="button" class="modal-tab active" data-tab="details">Details</button>
+                            <button type="button" class="modal-tab" data-tab="repeat">Repeat</button>
+                        </div>
+
+                        <!-- Details tab panel -->
+                        <div class="modal-tab-panel active" data-panel="details">
                         <div class="modal-sidebar-field">
                             <label for="modalDueDateInput">
                                 <span class="modal-field-icon">
@@ -314,9 +322,10 @@
                                 <option value="">No Context</option>
                             </select>
                         </div>
+                        </div>
 
-                        <!-- Recurrence Panel -->
-                        <div class="modal-sidebar-divider"></div>
+                        <!-- Repeat tab panel -->
+                        <div class="modal-tab-panel" data-panel="repeat">
                         <div class="modal-sidebar-field">
                             <label for="modalRepeatSelect">
                                 <span class="modal-field-icon">
@@ -348,13 +357,13 @@
                             <div id="weekdayOptions" class="recurrence-weekdays" style="display: none;">
                                 <label>On:</label>
                                 <div class="weekday-checkboxes">
-                                    <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="0"><span>S</span></label>
                                     <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="1"><span>M</span></label>
                                     <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="2"><span>T</span></label>
                                     <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="3"><span>W</span></label>
                                     <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="4"><span>T</span></label>
                                     <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="5"><span>F</span></label>
                                     <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="6"><span>S</span></label>
+                                    <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="0"><span>S</span></label>
                                 </div>
                             </div>
 
@@ -424,6 +433,7 @@
                                 <label>Next occurrences:</label>
                                 <ul id="recurrencePreviewList" class="recurrence-preview-list"></ul>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </form>

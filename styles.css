@@ -2118,6 +2118,48 @@ body.sidebar-resizing * {
     margin: 8px 0;
 }
 
+/* Modal Tabs */
+.modal-tabs {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 12px;
+}
+
+.modal-tab {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.modal-tab:hover {
+    color: #333;
+}
+
+.modal-tab.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+}
+
+.modal-tab-panel {
+    display: none;
+    grid-column: 1 / -1;
+}
+
+.modal-tab-panel.active {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
 /* Recurrence Panel Styles */
 .recurrence-options {
     grid-column: 1 / -1;
@@ -3305,6 +3347,32 @@ body.sidebar-resizing * {
 [data-theme="clear"] .modal-sidebar-select:hover,
 [data-theme="clear"] .modal-sidebar-input:hover {
     border-color: var(--ios-gray3);
+}
+
+/* Dark theme modal tabs */
+[data-theme="glass"] .modal-tabs,
+[data-theme="dark"] .modal-tabs,
+[data-theme="clear"] .modal-tabs {
+    border-bottom-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .modal-tab,
+[data-theme="dark"] .modal-tab,
+[data-theme="clear"] .modal-tab {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .modal-tab:hover,
+[data-theme="dark"] .modal-tab:hover,
+[data-theme="clear"] .modal-tab:hover {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .modal-tab.active,
+[data-theme="dark"] .modal-tab.active,
+[data-theme="clear"] .modal-tab.active {
+    color: var(--ios-blue);
+    border-bottom-color: var(--ios-blue);
 }
 
 /* Dark theme recurrence panel */

@@ -45,11 +45,16 @@ export class TodoModal {
         this.recurrenceEndCount = document.getElementById('recurrenceEndCount')
         this.recurrencePreviewList = document.getElementById('recurrencePreviewList')
 
+        // Tab elements
+        this.tabs = document.querySelectorAll('.modal-tab')
+        this.tabPanels = document.querySelectorAll('.modal-tab-panel')
+
         this.handleEscapeKey = null
         this.onClose = null
 
         this.initEventListeners()
         this.initRecurrenceListeners()
+        this.initTabListeners()
     }
 
     initEventListeners() {
@@ -161,6 +166,24 @@ export class TodoModal {
 
         // Due date change should update preview
         this.dueDateInput.addEventListener('change', () => this.updateRecurrencePreview())
+    }
+
+    /**
+     * Initialize tab switching event listeners
+     */
+    initTabListeners() {
+        this.tabs.forEach(tab => {
+            tab.addEventListener('click', () => this.switchTab(tab.dataset.tab))
+        })
+    }
+
+    /**
+     * Switch to a specific tab
+     * @param {string} tabName - The tab name to switch to ('details' or 'repeat')
+     */
+    switchTab(tabName) {
+        this.tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabName))
+        this.tabPanels.forEach(p => p.classList.toggle('active', p.dataset.panel === tabName))
     }
 
     /**
@@ -472,8 +495,9 @@ export class TodoModal {
             this.projectSelect.value = ''
         }
 
-        // Reset recurrence panel
+        // Reset recurrence panel and switch to Details tab
         this.resetRecurrence()
+        this.switchTab('details')
 
         // Handle Escape key
         this.handleEscapeKey = (e) => {
@@ -518,8 +542,10 @@ export class TodoModal {
         // Load recurrence settings if this is a recurring todo
         if (todo.template_id) {
             this.loadRecurrenceFromTemplate(todo.template_id)
+            this.switchTab('repeat')
         } else {
             this.resetRecurrence()
+            this.switchTab('details')
         }
 
         // Handle Escape key

@@ -202,6 +202,10 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.weekday-checkbox/,
     /\.monthly-/,
     /#recurrence/,
+    // Modal tabs and dividers (may be conditionally rendered)
+    /\.modal-sidebar-divider/,
+    /\.modal-tab/,
+    /\.modal-tabs/,
 ];
 
 /**
