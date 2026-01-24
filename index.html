@@ -314,6 +314,117 @@
                                 <option value="">No Context</option>
                             </select>
                         </div>
+
+                        <!-- Recurrence Panel -->
+                        <div class="modal-sidebar-divider"></div>
+                        <div class="modal-sidebar-field">
+                            <label for="modalRepeatSelect">
+                                <span class="modal-field-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="17 1 21 5 17 9"/>
+                                        <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                        <polyline points="7 23 3 19 7 15"/>
+                                        <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                                    </svg>
+                                </span>
+                                <span class="modal-field-label">repeat</span>
+                            </label>
+                            <select id="modalRepeatSelect" class="modal-sidebar-select" aria-label="Repeat">
+                                <option value="none">Does not repeat</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                        </div>
+
+                        <div id="recurrenceOptions" class="recurrence-options" style="display: none;">
+                            <div class="recurrence-interval">
+                                <label>Every</label>
+                                <input type="number" id="recurrenceInterval" class="recurrence-interval-input" value="1" min="1" max="365">
+                                <span id="recurrenceIntervalLabel">day(s)</span>
+                            </div>
+
+                            <div id="weekdayOptions" class="recurrence-weekdays" style="display: none;">
+                                <label>On:</label>
+                                <div class="weekday-checkboxes">
+                                    <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="0"><span>S</span></label>
+                                    <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="1"><span>M</span></label>
+                                    <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="2"><span>T</span></label>
+                                    <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="3"><span>W</span></label>
+                                    <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="4"><span>T</span></label>
+                                    <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="5"><span>F</span></label>
+                                    <label class="weekday-checkbox"><input type="checkbox" name="weekday" value="6"><span>S</span></label>
+                                </div>
+                            </div>
+
+                            <div id="monthlyOptions" class="recurrence-monthly" style="display: none;">
+                                <label>On the:</label>
+                                <div class="monthly-selects">
+                                    <select id="recurrenceOrdinal" class="recurrence-select-small">
+                                        <option value="1">1st</option>
+                                        <option value="2">2nd</option>
+                                        <option value="3">3rd</option>
+                                        <option value="4">4th</option>
+                                        <option value="5">5th</option>
+                                        <option value="-1">Last</option>
+                                    </select>
+                                    <select id="recurrenceDayType" class="recurrence-select-small">
+                                        <option value="day_of_month">day</option>
+                                        <option value="weekday">weekday</option>
+                                        <option value="last_day">last day</option>
+                                    </select>
+                                </div>
+                                <div id="weekdaySelect" class="monthly-weekday" style="display: none;">
+                                    <select id="recurrenceWeekday" class="recurrence-select-small">
+                                        <option value="0">Sunday</option>
+                                        <option value="1">Monday</option>
+                                        <option value="2">Tuesday</option>
+                                        <option value="3">Wednesday</option>
+                                        <option value="4">Thursday</option>
+                                        <option value="5">Friday</option>
+                                        <option value="6">Saturday</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="yearlyOptions" class="recurrence-yearly" style="display: none;">
+                                <label>In:</label>
+                                <select id="recurrenceMonth" class="recurrence-select-small">
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+
+                            <div class="recurrence-end">
+                                <label>Ends:</label>
+                                <select id="recurrenceEndType" class="recurrence-select-small">
+                                    <option value="never">Never</option>
+                                    <option value="on_date">On date</option>
+                                    <option value="after_count">After</option>
+                                </select>
+                                <input type="date" id="recurrenceEndDate" class="recurrence-end-date" style="display: none;">
+                                <div id="recurrenceEndCountWrapper" class="recurrence-end-count" style="display: none;">
+                                    <input type="number" id="recurrenceEndCount" class="recurrence-count-input" value="10" min="1" max="999">
+                                    <span>occurrences</span>
+                                </div>
+                            </div>
+
+                            <div class="recurrence-preview">
+                                <label>Next occurrences:</label>
+                                <ul id="recurrencePreviewList" class="recurrence-preview-list"></ul>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

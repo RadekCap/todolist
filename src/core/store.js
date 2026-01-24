@@ -12,6 +12,7 @@ class Store {
 
             // Data collections
             todos: [],
+            templates: [], // Recurring todo templates
             categories: [],
             priorities: [],
             contexts: [],
@@ -121,6 +122,7 @@ class Store {
             encryptionKey: null,
             pendingUser: null,
             todos: [],
+            templates: [],
             categories: [],
             priorities: [],
             contexts: [],
