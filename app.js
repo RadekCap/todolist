@@ -28,7 +28,7 @@ import { loadPriorities } from './src/services/priorities.js'
 import { renderTodos } from './src/ui/TodoList.js'
 import { renderProjects, updateProjectSelect } from './src/ui/ProjectList.js'
 import { renderGtdList, selectGtdStatus, selectGtdStatusByShortcut } from './src/ui/GtdList.js'
-import { renderAreasDropdown, updateAreasLabel, renderManageAreasList } from './src/ui/AreasDropdown.js'
+import { renderAreasDropdown, updateAreasLabel, updateAreaHeader, renderManageAreasList } from './src/ui/AreasDropdown.js'
 import { TodoModal } from './src/ui/modals/TodoModal.js'
 
 // Application version
@@ -95,6 +95,7 @@ class TodoApp {
         this.newAreaInput = document.getElementById('newAreaInput')
         this.addNewAreaBtn = document.getElementById('addNewAreaBtn')
         this.manageAreasList = document.getElementById('manageAreasList')
+        this.areaHeader = document.getElementById('areaHeader')
 
         // Keyboard shortcuts modal elements
         this.keyboardShortcutsModal = document.getElementById('keyboardShortcutsModal')
@@ -151,6 +152,7 @@ class TodoApp {
         store.subscribe('areas', () => {
             renderAreasDropdown(this.areaListContainer, this.toolbarAreasDropdown, this.areaListDivider)
             updateAreasLabel(this.toolbarAreasLabel)
+            updateAreaHeader(this.areaHeader)
         })
         store.subscribe('categories', () => this.todoModal.updateCategorySelect())
         store.subscribe('contexts', () => this.todoModal.updateContextSelect())
@@ -914,6 +916,7 @@ class TodoApp {
     render() {
         renderGtdList(this.gtdList)
         renderProjects(this.projectList)
+        updateAreaHeader(this.areaHeader)
         renderTodos(this.todoList, {
             onEditTodo: (todoId) => this.todoModal.openEdit(todoId),
             onProjectClick: (projectId) => selectProject(projectId)
@@ -925,6 +928,7 @@ class TodoApp {
         renderProjects(this.projectList)
         renderAreasDropdown(this.areaListContainer, this.toolbarAreasDropdown, this.areaListDivider)
         updateAreasLabel(this.toolbarAreasLabel)
+        updateAreaHeader(this.areaHeader)
         renderTodos(this.todoList, {
             onEditTodo: (todoId) => this.todoModal.openEdit(todoId),
             onProjectClick: (projectId) => selectProject(projectId)

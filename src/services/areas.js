@@ -29,12 +29,16 @@ export async function loadAreas() {
     return areas
 }
 
+// Default colors for areas
+const AREA_COLORS = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7', '#fa709a', '#fee140']
+
 /**
  * Add a new area
  * @param {string} name - Area name
+ * @param {string} [color] - Optional color (hex)
  * @returns {Promise<Object>} The created area
  */
-export async function addArea(name) {
+export async function addArea(name, color = null) {
     const currentUser = store.get('currentUser')
     const areas = store.get('areas')
 
@@ -44,11 +48,15 @@ export async function addArea(name) {
     // Encrypt area name before storing
     const encryptedName = await encrypt(name)
 
+    // Use provided color or generate random one
+    const areaColor = color || AREA_COLORS[Math.floor(Math.random() * AREA_COLORS.length)]
+
     const { data, error } = await supabase
         .from('areas')
         .insert({
             user_id: currentUser.id,
             name: encryptedName,
+            color: areaColor,
             sort_order: maxSortOrder + 1
         })
         .select()
@@ -64,20 +72,29 @@ export async function addArea(name) {
 }
 
 /**
- * Rename an area
+ * Update an area (name and/or color)
  * @param {string} areaId - Area ID
- * @param {string} newName - New area name
+ * @param {Object} updates - Fields to update
+ * @param {string} [updates.name] - New area name
+ * @param {string} [updates.color] - New area color
  */
-export async function renameArea(areaId, newName) {
-    const encryptedName = await encrypt(newName)
+export async function updateArea(areaId, updates) {
+    const updateData = {}
+
+    if (updates.name !== undefined) {
+        updateData.name = await encrypt(updates.name)
+    }
+    if (updates.color !== undefined) {
+        updateData.color = updates.color
+    }
 
     const { error } = await supabase
         .from('areas')
-        .update({ name: encryptedName })
+        .update(updateData)
         .eq('id', areaId)
 
     if (error) {
-        console.error('Error renaming area:', error)
+        console.error('Error updating area:', error)
         throw error
     }
 
@@ -85,11 +102,21 @@ export async function renameArea(areaId, newName) {
     const areas = store.get('areas')
     const area = areas.find(a => a.id === areaId)
     if (area) {
-        area.name = newName
+        if (updates.name !== undefined) area.name = updates.name
+        if (updates.color !== undefined) area.color = updates.color
         store.set('areas', [...areas])
     }
 
     events.emit(Events.AREAS_LOADED, store.get('areas'))
+}
+
+/**
+ * Rename an area
+ * @param {string} areaId - Area ID
+ * @param {string} newName - New area name
+ */
+export async function renameArea(areaId, newName) {
+    await updateArea(areaId, { name: newName })
 }
 
 /**

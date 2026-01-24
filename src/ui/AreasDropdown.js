@@ -1,6 +1,6 @@
 import { store } from '../core/store.js'
-import { escapeHtml } from '../utils/security.js'
-import { selectArea, reorderAreas, renameArea, deleteArea, loadAreas } from '../services/areas.js'
+import { escapeHtml, validateColor } from '../utils/security.js'
+import { selectArea, reorderAreas, renameArea, deleteArea, updateArea, loadAreas } from '../services/areas.js'
 import { loadProjects } from '../services/projects.js'
 
 /**
@@ -26,8 +26,12 @@ export function renderAreasDropdown(listContainer, dropdown, divider) {
         button.dataset.areaId = area.id
         // Add keyboard shortcut hint (shift+1-9) for the first 9 areas
         const shortcutHint = index < 9 ? `<span class="areas-item-shortcut">\u21e7${index + 1}</span>` : ''
+        // Show color dot if area has a color
+        const colorDot = area.color
+            ? `<span class="area-color-dot" style="background-color: ${validateColor(area.color)}"></span>`
+            : `<span class="areas-item-icon">\ud83d\udcc2</span>`
         button.innerHTML = `
-            <span class="areas-item-icon">\ud83d\udcc2</span>
+            ${colorDot}
             <span class="areas-item-label">${escapeHtml(area.name)}</span>
             ${shortcutHint}
         `
@@ -50,12 +54,50 @@ export function updateAreasLabel(labelElement) {
     const state = store.state
 
     if (state.selectedAreaId === 'all') {
-        labelElement.textContent = 'All Areas'
+        labelElement.innerHTML = 'All Areas'
     } else if (state.selectedAreaId === 'unassigned') {
-        labelElement.textContent = 'Unassigned'
+        labelElement.innerHTML = 'Unassigned'
     } else {
         const area = state.areas.find(a => a.id === state.selectedAreaId)
-        labelElement.textContent = area ? area.name : 'All Areas'
+        if (area) {
+            const colorDot = area.color
+                ? `<span class="area-color-dot" style="background-color: ${validateColor(area.color)}"></span>`
+                : ''
+            labelElement.innerHTML = `${colorDot}${escapeHtml(area.name)}`
+        } else {
+            labelElement.innerHTML = 'All Areas'
+        }
+    }
+}
+
+/**
+ * Update the area header above the todo list
+ * @param {HTMLElement} headerElement - The header element
+ */
+export function updateAreaHeader(headerElement) {
+    const state = store.state
+
+    // Only show header when a specific area is selected (not "all" or "unassigned")
+    if (state.selectedAreaId === 'all' || state.selectedAreaId === 'unassigned') {
+        headerElement.style.display = 'none'
+        return
+    }
+
+    const area = state.areas.find(a => a.id === state.selectedAreaId)
+    if (!area) {
+        headerElement.style.display = 'none'
+        return
+    }
+
+    headerElement.style.display = 'flex'
+    const colorSpan = headerElement.querySelector('.area-header-color')
+    const nameSpan = headerElement.querySelector('.area-header-name')
+
+    if (colorSpan && area.color) {
+        colorSpan.style.backgroundColor = validateColor(area.color)
+    }
+    if (nameSpan) {
+        nameSpan.textContent = area.name
     }
 }
 
@@ -72,8 +114,10 @@ export function renderManageAreasList(container) {
         li.className = 'manage-areas-item'
         li.dataset.areaId = area.id
         li.draggable = true
+        const areaColor = area.color || '#667eea'
         li.innerHTML = `
             <span class="manage-areas-drag-handle">\u22ee\u22ee</span>
+            <input type="color" class="manage-areas-color" value="${validateColor(areaColor)}" title="Change color">
             <span class="manage-areas-name">${escapeHtml(area.name)}</span>
             <div class="manage-areas-actions">
                 <button class="manage-areas-edit" data-id="${area.id}" title="Rename">\u270e</button>
@@ -118,6 +162,21 @@ export function renderManageAreasList(container) {
                     .map(item => item.dataset.areaId)
                 await reorderAreas(orderedIds)
             }
+        })
+
+        // Color picker change
+        li.querySelector('.manage-areas-color').addEventListener('change', async (e) => {
+            e.stopPropagation()
+            await updateArea(area.id, { color: e.target.value })
+        })
+
+        // Prevent drag when interacting with color picker
+        li.querySelector('.manage-areas-color').addEventListener('mousedown', (e) => {
+            e.stopPropagation()
+            li.draggable = false
+        })
+        li.querySelector('.manage-areas-color').addEventListener('mouseup', () => {
+            li.draggable = true
         })
 
         // Edit button
