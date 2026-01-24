@@ -501,88 +501,89 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Unlock Modal (for session restore) -->
-        <div id="unlockModal" class="modal-overlay">
-            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="unlockModalTitle">
-                <div class="modal-header">
-                    <h2 id="unlockModalTitle">Unlock Your Data</h2>
-                </div>
-                <form id="unlockForm" class="modal-form">
-                    <div>
-                        <p class="unlock-description">
-                            Enter your password to decrypt your data. Your password is used locally to unlock your encrypted todos and categories.
-                        </p>
-                        <label for="unlockEmail">Email</label>
-                        <input
-                            type="email"
-                            id="unlockEmail"
-                            autocomplete="username email"
-                        >
-                    </div>
-                    <div>
-                        <label for="unlockPassword">Password</label>
-                        <input
-                            type="password"
-                            id="unlockPassword"
-                            placeholder="Enter your password..."
-                            autocomplete="current-password"
-                            required
-                        >
-                    </div>
-                    <div id="unlockError" class="error-message" style="display: none;"></div>
-                    <div class="modal-actions">
-                        <button type="button" id="unlockLogoutBtn" class="modal-btn modal-btn-secondary">Logout</button>
-                        <button type="submit" id="unlockBtn" class="modal-btn modal-btn-primary">Unlock</button>
-                    </div>
-                </form>
+    <!-- Modals (outside mainContainer to avoid backdrop-filter affecting fixed positioning) -->
+
+    <!-- Unlock Modal (for session restore) -->
+    <div id="unlockModal" class="modal-overlay">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="unlockModalTitle">
+            <div class="modal-header">
+                <h2 id="unlockModalTitle">Unlock Your Data</h2>
             </div>
-        </div>
-
-        <!-- Keyboard Shortcuts Help Modal -->
-        <div id="keyboardShortcutsModal" class="modal-overlay">
-            <div class="modal keyboard-shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="keyboardShortcutsModalTitle">
-                <div class="modal-header">
-                    <h2 id="keyboardShortcutsModalTitle">Keyboard Shortcuts</h2>
-                    <button id="closeKeyboardShortcutsModal" class="modal-close" aria-label="Close modal">&times;</button>
+            <form id="unlockForm" class="modal-form">
+                <div>
+                    <p class="unlock-description">
+                        Enter your password to decrypt your data. Your password is used locally to unlock your encrypted todos and categories.
+                    </p>
+                    <label for="unlockEmail">Email</label>
+                    <input
+                        type="email"
+                        id="unlockEmail"
+                        autocomplete="username email"
+                    >
                 </div>
-                <div class="keyboard-shortcuts-content">
-                    <div class="shortcuts-section">
-                        <h3>GTD Views</h3>
-                        <ul class="shortcuts-list">
-                            <li><kbd>1</kbd> <span>Inbox</span></li>
-                            <li><kbd>2</kbd> <span>Next</span></li>
-                            <li><kbd>3</kbd> <span>Scheduled</span></li>
-                            <li><kbd>4</kbd> <span>Waiting</span></li>
-                            <li><kbd>5</kbd> <span>Someday</span></li>
-                            <li><kbd>6</kbd> <span>Done</span></li>
-                            <li><kbd>0</kbd> <span>All</span></li>
-                        </ul>
-                    </div>
-                    <div class="shortcuts-section">
-                        <h3>Areas</h3>
-                        <ul class="shortcuts-list">
-                            <li><kbd>Shift</kbd> + <kbd>0</kbd> <span>All Areas</span></li>
-                            <li><kbd>Shift</kbd> + <kbd>1-9</kbd> <span>Switch to Area</span></li>
-                        </ul>
-                    </div>
-                    <div class="shortcuts-section">
-                        <h3>Actions</h3>
-                        <ul class="shortcuts-list">
-                            <li><kbd>n</kbd> <span>New Todo</span></li>
-                            <li><kbd>/</kbd> <span>Focus Search</span></li>
-                            <li><kbd>Esc</kbd> <span>Close Modal / Clear Search</span></li>
-                            <li><kbd>?</kbd> <span>Show This Help</span></li>
-                        </ul>
-                    </div>
+                <div>
+                    <label for="unlockPassword">Password</label>
+                    <input
+                        type="password"
+                        id="unlockPassword"
+                        placeholder="Enter your password..."
+                        autocomplete="current-password"
+                        required
+                    >
                 </div>
+                <div id="unlockError" class="error-message" style="display: none;"></div>
                 <div class="modal-actions">
-                    <button type="button" id="closeKeyboardShortcutsModalBtn" class="modal-btn modal-btn-secondary">Close</button>
+                    <button type="button" id="unlockLogoutBtn" class="modal-btn modal-btn-secondary">Logout</button>
+                    <button type="submit" id="unlockBtn" class="modal-btn modal-btn-primary">Unlock</button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 
+    <!-- Keyboard Shortcuts Help Modal -->
+    <div id="keyboardShortcutsModal" class="modal-overlay">
+        <div class="modal keyboard-shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="keyboardShortcutsModalTitle">
+            <div class="modal-header">
+                <h2 id="keyboardShortcutsModalTitle">Keyboard Shortcuts</h2>
+                <button id="closeKeyboardShortcutsModal" class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="keyboard-shortcuts-content">
+                <div class="shortcuts-section">
+                    <h3>GTD Views</h3>
+                    <ul class="shortcuts-list">
+                        <li><kbd>1</kbd> <span>Inbox</span></li>
+                        <li><kbd>2</kbd> <span>Next</span></li>
+                        <li><kbd>3</kbd> <span>Scheduled</span></li>
+                        <li><kbd>4</kbd> <span>Waiting</span></li>
+                        <li><kbd>5</kbd> <span>Someday</span></li>
+                        <li><kbd>6</kbd> <span>Done</span></li>
+                        <li><kbd>0</kbd> <span>All</span></li>
+                    </ul>
+                </div>
+                <div class="shortcuts-section">
+                    <h3>Areas</h3>
+                    <ul class="shortcuts-list">
+                        <li><kbd>Shift</kbd> + <kbd>0</kbd> <span>All Areas</span></li>
+                        <li><kbd>Shift</kbd> + <kbd>1-9</kbd> <span>Switch to Area</span></li>
+                    </ul>
+                </div>
+                <div class="shortcuts-section">
+                    <h3>Actions</h3>
+                    <ul class="shortcuts-list">
+                        <li><kbd>n</kbd> <span>New Todo</span></li>
+                        <li><kbd>/</kbd> <span>Focus Search</span></li>
+                        <li><kbd>Esc</kbd> <span>Close Modal / Clear Search</span></li>
+                        <li><kbd>?</kbd> <span>Show This Help</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="closeKeyboardShortcutsModalBtn" class="modal-btn modal-btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="app.js"></script>
 </body>
