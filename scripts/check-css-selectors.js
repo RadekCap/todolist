@@ -162,6 +162,12 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.manage-areas-actions/,
     /\.manage-areas-edit/,
     /\.manage-areas-delete/,
+    /\.manage-areas-color/,
+    // Area color indicators (rendered by JavaScript)
+    /\.area-color-dot/,
+    // Project title header (rendered by JavaScript)
+    /\.project-title-header/,
+    /\.project-title-text/,
     // Area shortcut hints (rendered by JavaScript for dynamic areas)
     /\.areas-item-shortcut/,
     // Empty/loading states (rendered by JavaScript)
