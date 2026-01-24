@@ -260,6 +260,7 @@ body {
 body.fullscreen-mode {
     padding: 0;
     align-items: stretch;
+    scrollbar-gutter: stable;
 }
 
 body.fullscreen-mode .container {
@@ -720,6 +721,7 @@ body.sidebar-resizing * {
 .content {
     flex: 1;
     min-width: 0;
+    scrollbar-gutter: stable;
 }
 
 /* Area Header - Shows current area with color indicator */
