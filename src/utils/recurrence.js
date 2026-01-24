@@ -402,3 +402,152 @@ export function formatPreviewDate(dateString) {
         year: 'numeric'
     })
 }
+
+/**
+ * Calculate the first occurrence date for a recurrence rule starting from today
+ * @param {Object} rule - Recurrence rule object
+ * @returns {string|null} First occurrence date in YYYY-MM-DD format
+ */
+export function calculateFirstOccurrence(rule) {
+    if (!rule || !rule.type) return null
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayStr = formatDateInternal(today)
+
+    switch (rule.type) {
+        case 'daily': {
+            // First occurrence is today
+            return todayStr
+        }
+
+        case 'weekly': {
+            const weekdays = rule.weekdays || []
+            if (weekdays.length === 0) return todayStr
+
+            // Sort weekdays
+            const sortedWeekdays = [...weekdays].sort((a, b) => a - b)
+            const todayDay = today.getDay()
+
+            // Find the next matching weekday (including today)
+            for (const wd of sortedWeekdays) {
+                if (wd >= todayDay) {
+                    const diff = wd - todayDay
+                    const result = new Date(today)
+                    result.setDate(result.getDate() + diff)
+                    return formatDateInternal(result)
+                }
+            }
+
+            // Wrap to next week
+            const diff = 7 - todayDay + sortedWeekdays[0]
+            const result = new Date(today)
+            result.setDate(result.getDate() + diff)
+            return formatDateInternal(result)
+        }
+
+        case 'monthly': {
+            const dayType = rule.dayType || 'day_of_month'
+            let result = new Date(today)
+
+            if (dayType === 'day_of_month') {
+                const targetDay = rule.dayOfMonth || today.getDate()
+                result.setDate(targetDay)
+                // If target day already passed this month, move to next month
+                if (result < today) {
+                    result.setMonth(result.getMonth() + 1)
+                    result.setDate(Math.min(targetDay, getLastDayOfMonthInternal(result.getFullYear(), result.getMonth())))
+                }
+            } else if (dayType === 'weekday') {
+                const targetWeekday = rule.weekday ?? 1
+                const ordinal = rule.weekdayOrdinal || 1
+                result = getNthWeekdayOfMonthInternal(today.getFullYear(), today.getMonth(), targetWeekday, ordinal)
+                if (!result || result < today) {
+                    // Move to next month
+                    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+                    result = getNthWeekdayOfMonthInternal(nextMonth.getFullYear(), nextMonth.getMonth(), targetWeekday, ordinal)
+                }
+            } else if (dayType === 'last_day') {
+                result.setDate(getLastDayOfMonthInternal(result.getFullYear(), result.getMonth()))
+                if (result < today) {
+                    result.setMonth(result.getMonth() + 1)
+                    result.setDate(getLastDayOfMonthInternal(result.getFullYear(), result.getMonth()))
+                }
+            }
+
+            return result ? formatDateInternal(result) : todayStr
+        }
+
+        case 'yearly': {
+            const month = (rule.month || 1) - 1 // Convert to 0-indexed
+            const dayType = rule.dayType || 'day_of_month'
+            let result = new Date(today.getFullYear(), month, 1)
+
+            if (dayType === 'day_of_month') {
+                const targetDay = rule.dayOfMonth || 1
+                result.setDate(Math.min(targetDay, getLastDayOfMonthInternal(result.getFullYear(), result.getMonth())))
+            } else if (dayType === 'weekday') {
+                const targetWeekday = rule.weekday ?? 1
+                const ordinal = rule.weekdayOrdinal || 1
+                result = getNthWeekdayOfMonthInternal(result.getFullYear(), month, targetWeekday, ordinal)
+            } else if (dayType === 'last_day') {
+                result.setDate(getLastDayOfMonthInternal(result.getFullYear(), month))
+            }
+
+            // If this year's occurrence already passed, move to next year
+            if (result && result < today) {
+                result.setFullYear(result.getFullYear() + 1)
+                if (dayType === 'weekday') {
+                    const targetWeekday = rule.weekday ?? 1
+                    const ordinal = rule.weekdayOrdinal || 1
+                    result = getNthWeekdayOfMonthInternal(result.getFullYear(), month, targetWeekday, ordinal)
+                }
+            }
+
+            return result ? formatDateInternal(result) : todayStr
+        }
+
+        default:
+            return todayStr
+    }
+}
+
+// Internal helper - same as formatDate but not exported to avoid confusion
+function formatDateInternal(date) {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+}
+
+// Internal helper for getLastDayOfMonth
+function getLastDayOfMonthInternal(year, month) {
+    return new Date(year, month + 1, 0).getDate()
+}
+
+// Internal helper for getNthWeekdayOfMonth
+function getNthWeekdayOfMonthInternal(year, month, weekday, ordinal) {
+    if (ordinal === -1) {
+        const lastDay = getLastDayOfMonthInternal(year, month)
+        for (let day = lastDay; day >= 1; day--) {
+            const date = new Date(year, month, day)
+            if (date.getDay() === weekday) {
+                return date
+            }
+        }
+        return null
+    }
+
+    let count = 0
+    for (let day = 1; day <= 31; day++) {
+        const date = new Date(year, month, day)
+        if (date.getMonth() !== month) break
+        if (date.getDay() === weekday) {
+            count++
+            if (count === ordinal) {
+                return date
+            }
+        }
+    }
+    return null
+}
