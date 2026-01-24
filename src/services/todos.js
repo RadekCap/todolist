@@ -570,7 +570,8 @@ export async function createRecurringTodo(todoData, recurrenceRule, endCondition
 export async function generateNextRecurrence(templateId, fromDate) {
     // Get template from store or fetch from DB
     let templates = store.get('templates') || []
-    let template = templates.find(t => t.id === templateId)
+    // Use string comparison to handle potential type mismatches (bigint vs string)
+    let template = templates.find(t => String(t.id) === String(templateId))
 
     if (!template) {
         // Fetch from DB if not in store
@@ -657,7 +658,7 @@ export async function generateNextRecurrence(templateId, fromDate) {
 
     // Update template in store
     template.recurrence_count = newCount
-    templates = templates.map(t => t.id === templateId ? template : t)
+    templates = templates.map(t => String(t.id) === String(templateId) ? template : t)
     store.set('templates', templates)
 
     // Decrypt and add instance to local state
@@ -688,7 +689,7 @@ export async function checkPendingRecurrences() {
         if (isRecurrenceEnded(template)) continue
 
         // Find the latest instance for this template
-        const instances = todos.filter(t => t.template_id === template.id)
+        const instances = todos.filter(t => String(t.template_id) === String(template.id))
         if (instances.length === 0) continue
 
         // Get the most recent instance's due date
@@ -720,7 +721,7 @@ export async function checkPendingRecurrences() {
 export async function stopRecurrence(templateId) {
     // Set end condition to "after_count" with current count
     const templates = store.get('templates') || []
-    const template = templates.find(t => t.id === templateId)
+    const template = templates.find(t => String(t.id) === String(templateId))
 
     if (!template) {
         console.error('Template not found:', templateId)
@@ -774,10 +775,10 @@ export async function deleteRecurringSeries(templateId) {
     }
 
     // Update local state
-    const todos = store.get('todos').filter(t => t.template_id !== templateId)
+    const todos = store.get('todos').filter(t => String(t.template_id) !== String(templateId))
     store.set('todos', todos)
 
-    const templates = (store.get('templates') || []).filter(t => t.id !== templateId)
+    const templates = (store.get('templates') || []).filter(t => String(t.id) !== String(templateId))
     store.set('templates', templates)
 
     events.emit(Events.TODOS_LOADED, todos)
@@ -790,5 +791,5 @@ export async function deleteRecurringSeries(templateId) {
  */
 export function getTemplateById(templateId) {
     const templates = store.get('templates') || []
-    return templates.find(t => t.id === templateId) || null
+    return templates.find(t => String(t.id) === String(templateId)) || null
 }
