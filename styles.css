@@ -2019,7 +2019,7 @@ body.sidebar-resizing * {
     padding: 12px;
     font-family: inherit;
     resize: vertical;
-    min-height: 200px;
+    min-height: 140px;
     background: #fafafa;
     line-height: 1.6;
 }
