@@ -722,6 +722,31 @@ body.sidebar-resizing * {
     min-width: 0;
 }
 
+/* Area Header - Shows current area with color indicator */
+.area-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: var(--ios-bg-secondary, rgba(0, 0, 0, 0.03));
+    border-radius: 10px;
+    border-left: 4px solid transparent;
+}
+
+.area-header-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.area-header-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ios-label, #333);
+}
+
 .input-container {
     display: flex;
     flex-direction: column;
@@ -1354,6 +1379,14 @@ body.sidebar-resizing * {
     font-size: 14px;
 }
 
+.area-color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
 .areas-item-label {
     flex: 1;
 }
@@ -1468,9 +1501,34 @@ body.sidebar-resizing * {
 
 .manage-areas-drag-handle {
     color: var(--ios-label-tertiary, #999);
-    margin-right: 12px;
+    margin-right: 8px;
     cursor: grab;
     font-size: 16px;
+}
+
+.manage-areas-color {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 8px;
+    background: none;
+}
+
+.manage-areas-color::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.manage-areas-color::-webkit-color-swatch {
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+}
+
+.manage-areas-color::-moz-color-swatch {
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
 }
 
 .manage-areas-name {
@@ -2741,6 +2799,19 @@ body.sidebar-resizing * {
 [data-theme="clear"] .manage-areas-name-input {
     background: var(--ios-bg-primary);
     border-color: var(--ios-blue);
+    color: var(--ios-label);
+}
+
+/* Area Header Theme Styles */
+[data-theme="glass"] .area-header,
+[data-theme="dark"] .area-header,
+[data-theme="clear"] .area-header {
+    background: var(--ios-bg-secondary);
+}
+
+[data-theme="glass"] .area-header-name,
+[data-theme="dark"] .area-header-name,
+[data-theme="clear"] .area-header-name {
     color: var(--ios-label);
 }
 
