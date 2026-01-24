@@ -98,11 +98,19 @@ export class TodoModal {
      * Initialize recurrence panel event listeners
      */
     initRecurrenceListeners() {
+        // Check if recurrence elements exist (they may not in some contexts)
+        if (!this.repeatSelect) {
+            console.warn('Recurrence panel elements not found, skipping initialization')
+            return
+        }
+
         // Repeat type change
         this.repeatSelect.addEventListener('change', () => this.updateRecurrencePanel())
 
         // Interval change
-        this.recurrenceInterval.addEventListener('input', () => this.updateRecurrencePreview())
+        if (this.recurrenceInterval) {
+            this.recurrenceInterval.addEventListener('input', () => this.updateRecurrencePreview())
+        }
 
         // Weekday checkboxes
         this.weekdayCheckboxes.forEach(cb => {
@@ -110,22 +118,38 @@ export class TodoModal {
         })
 
         // Monthly day type change
-        this.recurrenceDayType.addEventListener('change', () => {
-            this.weekdaySelect.style.display = this.recurrenceDayType.value === 'weekday' ? 'block' : 'none'
-            this.updateRecurrencePreview()
-        })
+        if (this.recurrenceDayType) {
+            this.recurrenceDayType.addEventListener('change', () => {
+                if (this.weekdaySelect) {
+                    this.weekdaySelect.style.display = this.recurrenceDayType.value === 'weekday' ? 'block' : 'none'
+                }
+                this.updateRecurrencePreview()
+            })
+        }
 
         // Ordinal, weekday, month changes
-        this.recurrenceOrdinal.addEventListener('change', () => this.updateRecurrencePreview())
-        this.recurrenceWeekday.addEventListener('change', () => this.updateRecurrencePreview())
-        this.recurrenceMonth.addEventListener('change', () => this.updateRecurrencePreview())
+        if (this.recurrenceOrdinal) {
+            this.recurrenceOrdinal.addEventListener('change', () => this.updateRecurrencePreview())
+        }
+        if (this.recurrenceWeekday) {
+            this.recurrenceWeekday.addEventListener('change', () => this.updateRecurrencePreview())
+        }
+        if (this.recurrenceMonth) {
+            this.recurrenceMonth.addEventListener('change', () => this.updateRecurrencePreview())
+        }
 
         // End type change
-        this.recurrenceEndType.addEventListener('change', () => {
-            const endType = this.recurrenceEndType.value
-            this.recurrenceEndDate.style.display = endType === 'on_date' ? 'inline-block' : 'none'
-            this.recurrenceEndCountWrapper.style.display = endType === 'after_count' ? 'flex' : 'none'
-        })
+        if (this.recurrenceEndType) {
+            this.recurrenceEndType.addEventListener('change', () => {
+                const endType = this.recurrenceEndType.value
+                if (this.recurrenceEndDate) {
+                    this.recurrenceEndDate.style.display = endType === 'on_date' ? 'inline-block' : 'none'
+                }
+                if (this.recurrenceEndCountWrapper) {
+                    this.recurrenceEndCountWrapper.style.display = endType === 'after_count' ? 'flex' : 'none'
+                }
+            })
+        }
 
         // Due date change should update preview
         this.dueDateInput.addEventListener('change', () => this.updateRecurrencePreview())
@@ -135,6 +159,8 @@ export class TodoModal {
      * Update recurrence panel visibility based on repeat type
      */
     updateRecurrencePanel() {
+        if (!this.repeatSelect || !this.recurrenceOptions) return
+
         const type = this.repeatSelect.value
 
         if (type === 'none') {
@@ -151,20 +177,28 @@ export class TodoModal {
             monthly: 'month(s)',
             yearly: 'year(s)'
         }
-        this.recurrenceIntervalLabel.textContent = labels[type] || 'day(s)'
+        if (this.recurrenceIntervalLabel) {
+            this.recurrenceIntervalLabel.textContent = labels[type] || 'day(s)'
+        }
 
         // Show/hide type-specific options
-        this.weekdayOptions.style.display = type === 'weekly' ? 'block' : 'none'
-        this.monthlyOptions.style.display = (type === 'monthly' || type === 'yearly') ? 'block' : 'none'
-        this.yearlyOptions.style.display = type === 'yearly' ? 'block' : 'none'
+        if (this.weekdayOptions) {
+            this.weekdayOptions.style.display = type === 'weekly' ? 'block' : 'none'
+        }
+        if (this.monthlyOptions) {
+            this.monthlyOptions.style.display = (type === 'monthly' || type === 'yearly') ? 'block' : 'none'
+        }
+        if (this.yearlyOptions) {
+            this.yearlyOptions.style.display = type === 'yearly' ? 'block' : 'none'
+        }
 
         // If switching to weekly, auto-select current day
-        if (type === 'weekly') {
+        if (type === 'weekly' && this.weekdayCheckboxes.length > 0) {
             const dueDate = this.dueDateInput.value ? new Date(this.dueDateInput.value) : new Date()
             const currentDay = dueDate.getDay()
             // Check if any day is selected
             const anySelected = Array.from(this.weekdayCheckboxes).some(cb => cb.checked)
-            if (!anySelected) {
+            if (!anySelected && this.weekdayCheckboxes[currentDay]) {
                 this.weekdayCheckboxes[currentDay].checked = true
             }
         }
@@ -176,6 +210,8 @@ export class TodoModal {
      * Update the recurrence preview with next occurrences
      */
     updateRecurrencePreview() {
+        if (!this.recurrencePreviewList) return
+
         const rule = this.buildRecurrenceRule()
         if (!rule) {
             this.recurrencePreviewList.innerHTML = ''
@@ -194,8 +230,9 @@ export class TodoModal {
      * Build recurrence rule from form values
      */
     buildRecurrenceRule() {
+        if (!this.repeatSelect) return null
         const type = this.repeatSelect.value
-        if (type === 'none') return null
+        if (!type || type === 'none') return null
 
         const formValues = {
             type,
@@ -239,21 +276,24 @@ export class TodoModal {
      * Reset recurrence panel to defaults
      */
     resetRecurrence() {
+        if (!this.repeatSelect) return
         this.repeatSelect.value = 'none'
-        this.recurrenceOptions.style.display = 'none'
-        this.recurrenceInterval.value = '1'
+        if (this.recurrenceOptions) this.recurrenceOptions.style.display = 'none'
+        if (this.recurrenceInterval) this.recurrenceInterval.value = '1'
         this.weekdayCheckboxes.forEach(cb => cb.checked = false)
-        this.recurrenceOrdinal.value = '1'
-        this.recurrenceDayType.value = 'day_of_month'
-        this.weekdaySelect.style.display = 'none'
-        this.recurrenceWeekday.value = '1'
-        this.recurrenceMonth.value = '1'
-        this.recurrenceEndType.value = 'never'
-        this.recurrenceEndDate.style.display = 'none'
-        this.recurrenceEndDate.value = ''
-        this.recurrenceEndCountWrapper.style.display = 'none'
-        this.recurrenceEndCount.value = '10'
-        this.recurrencePreviewList.innerHTML = ''
+        if (this.recurrenceOrdinal) this.recurrenceOrdinal.value = '1'
+        if (this.recurrenceDayType) this.recurrenceDayType.value = 'day_of_month'
+        if (this.weekdaySelect) this.weekdaySelect.style.display = 'none'
+        if (this.recurrenceWeekday) this.recurrenceWeekday.value = '1'
+        if (this.recurrenceMonth) this.recurrenceMonth.value = '1'
+        if (this.recurrenceEndType) this.recurrenceEndType.value = 'never'
+        if (this.recurrenceEndDate) {
+            this.recurrenceEndDate.style.display = 'none'
+            this.recurrenceEndDate.value = ''
+        }
+        if (this.recurrenceEndCountWrapper) this.recurrenceEndCountWrapper.style.display = 'none'
+        if (this.recurrenceEndCount) this.recurrenceEndCount.value = '10'
+        if (this.recurrencePreviewList) this.recurrencePreviewList.innerHTML = ''
     }
 
     /**
