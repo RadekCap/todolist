@@ -3511,13 +3511,23 @@ body.sidebar-resizing * {
 
 /* iOS Modal - Sheet style */
 [data-theme="glass"] .modal,
-[data-theme="dark"] .modal,
 [data-theme="clear"] .modal {
     background: var(--ios-bg-grouped);
     backdrop-filter: blur(var(--ios-blur-thick));
     -webkit-backdrop-filter: blur(var(--ios-blur-thick));
     border: none;
     box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 720px;
+}
+
+[data-theme="dark"] .modal {
+    background: #1c1c1e;
+    backdrop-filter: blur(var(--ios-blur-thick));
+    -webkit-backdrop-filter: blur(var(--ios-blur-thick));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
     border-radius: 20px;
     padding: 24px;
     max-width: 720px;
