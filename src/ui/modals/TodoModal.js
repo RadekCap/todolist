@@ -1,6 +1,6 @@
 import { store } from '../../core/store.js'
 import { addTodo, updateTodo, createRecurringTodo, convertToRecurring } from '../../services/todos.js'
-import { buildRecurrenceRule, getNextNOccurrences, formatPreviewDate } from '../../utils/recurrence.js'
+import { buildRecurrenceRule, getNextNOccurrences, formatPreviewDate, calculateFirstOccurrence } from '../../utils/recurrence.js'
 
 /**
  * TodoModal controller
@@ -114,7 +114,15 @@ export class TodoModal {
 
         // Weekday checkboxes
         this.weekdayCheckboxes.forEach(cb => {
-            cb.addEventListener('change', () => this.updateRecurrencePreview())
+            cb.addEventListener('change', () => {
+                // Recalculate due date if it was auto-filled
+                if (!this.dueDateInput.value || this._dueDateAutoFilled) {
+                    this.dueDateInput.value = ''
+                    this._dueDateAutoFilled = false
+                    this.autoFillDueDate()
+                }
+                this.updateRecurrencePreview()
+            })
         })
 
         // Monthly day type change
@@ -203,7 +211,26 @@ export class TodoModal {
             }
         }
 
+        // Auto-fill due date from first occurrence
+        this.autoFillDueDate()
         this.updateRecurrencePreview()
+    }
+
+    /**
+     * Auto-fill the due date from the first computed occurrence
+     */
+    autoFillDueDate() {
+        // Only auto-fill if due date is empty
+        if (this.dueDateInput.value) return
+
+        const rule = this.buildRecurrenceRule()
+        if (!rule) return
+
+        const firstOccurrence = calculateFirstOccurrence(rule)
+        if (firstOccurrence) {
+            this.dueDateInput.value = firstOccurrence
+            this._dueDateAutoFilled = true
+        }
     }
 
     /**
@@ -276,6 +303,7 @@ export class TodoModal {
      * Reset recurrence panel to defaults
      */
     resetRecurrence() {
+        this._dueDateAutoFilled = false
         if (!this.repeatSelect) return
         this.repeatSelect.value = 'none'
         if (this.recurrenceOptions) this.recurrenceOptions.style.display = 'none'
