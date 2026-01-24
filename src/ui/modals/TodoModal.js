@@ -1,5 +1,5 @@
 import { store } from '../../core/store.js'
-import { addTodo, updateTodo, createRecurringTodo, convertToRecurring } from '../../services/todos.js'
+import { addTodo, updateTodo, createRecurringTodo, convertToRecurring, getTemplateById } from '../../services/todos.js'
 import { buildRecurrenceRule, getNextNOccurrences, formatPreviewDate, calculateFirstOccurrence } from '../../utils/recurrence.js'
 
 /**
@@ -325,6 +325,107 @@ export class TodoModal {
     }
 
     /**
+     * Load recurrence settings from a template into the form
+     * @param {string|number} templateId - Template todo ID
+     */
+    async loadRecurrenceFromTemplate(templateId) {
+        if (!this.repeatSelect) return
+
+        const template = await getTemplateById(templateId)
+        if (!template || !template.recurrence_rule) {
+            this.resetRecurrence()
+            return
+        }
+
+        const rule = template.recurrence_rule
+
+        // Set repeat type
+        this.repeatSelect.value = rule.type || 'none'
+
+        // Show recurrence options
+        if (this.recurrenceOptions) {
+            this.recurrenceOptions.style.display = rule.type && rule.type !== 'none' ? 'flex' : 'none'
+        }
+
+        // Set interval
+        if (this.recurrenceInterval) {
+            this.recurrenceInterval.value = rule.interval || 1
+        }
+
+        // Update interval label
+        const labels = {
+            daily: 'day(s)',
+            weekly: 'week(s)',
+            monthly: 'month(s)',
+            yearly: 'year(s)'
+        }
+        if (this.recurrenceIntervalLabel) {
+            this.recurrenceIntervalLabel.textContent = labels[rule.type] || 'day(s)'
+        }
+
+        // Show/hide type-specific options
+        if (this.weekdayOptions) {
+            this.weekdayOptions.style.display = rule.type === 'weekly' ? 'block' : 'none'
+        }
+        if (this.monthlyOptions) {
+            this.monthlyOptions.style.display = (rule.type === 'monthly' || rule.type === 'yearly') ? 'block' : 'none'
+        }
+        if (this.yearlyOptions) {
+            this.yearlyOptions.style.display = rule.type === 'yearly' ? 'block' : 'none'
+        }
+
+        // Set weekday checkboxes for weekly recurrence
+        if (rule.type === 'weekly' && rule.weekdays) {
+            this.weekdayCheckboxes.forEach(cb => {
+                const dayValue = parseInt(cb.value, 10)
+                cb.checked = rule.weekdays.includes(dayValue)
+            })
+        } else {
+            this.weekdayCheckboxes.forEach(cb => cb.checked = false)
+        }
+
+        // Set monthly/yearly options
+        if (rule.type === 'monthly' || rule.type === 'yearly') {
+            if (this.recurrenceDayType) {
+                this.recurrenceDayType.value = rule.dayType || 'day_of_month'
+            }
+            if (this.recurrenceOrdinal && rule.weekdayOrdinal !== undefined) {
+                this.recurrenceOrdinal.value = String(rule.weekdayOrdinal)
+            }
+            if (this.recurrenceWeekday && rule.weekday !== undefined) {
+                this.recurrenceWeekday.value = String(rule.weekday)
+            }
+            if (this.weekdaySelect) {
+                this.weekdaySelect.style.display = rule.dayType === 'weekday' ? 'block' : 'none'
+            }
+        }
+
+        // Set yearly month
+        if (rule.type === 'yearly' && this.recurrenceMonth && rule.month !== undefined) {
+            this.recurrenceMonth.value = String(rule.month)
+        }
+
+        // Set end condition from template
+        const endType = template.recurrence_end_type || 'never'
+        if (this.recurrenceEndType) {
+            this.recurrenceEndType.value = endType
+        }
+        if (this.recurrenceEndDate) {
+            this.recurrenceEndDate.style.display = endType === 'on_date' ? 'inline-block' : 'none'
+            this.recurrenceEndDate.value = template.recurrence_end_date || ''
+        }
+        if (this.recurrenceEndCountWrapper) {
+            this.recurrenceEndCountWrapper.style.display = endType === 'after_count' ? 'flex' : 'none'
+        }
+        if (this.recurrenceEndCount && template.recurrence_end_count) {
+            this.recurrenceEndCount.value = String(template.recurrence_end_count)
+        }
+
+        // Update preview
+        this.updateRecurrencePreview()
+    }
+
+    /**
      * Format date as YYYY-MM-DD
      */
     formatDate(date) {
@@ -414,8 +515,12 @@ export class TodoModal {
             this.priorityToggle.classList.remove('active')
         }
 
-        // Reset recurrence panel (editing doesn't modify recurrence - that stays with the template)
-        this.resetRecurrence()
+        // Load recurrence settings if this is a recurring todo
+        if (todo.template_id) {
+            this.loadRecurrenceFromTemplate(todo.template_id)
+        } else {
+            this.resetRecurrence()
+        }
 
         // Handle Escape key
         this.handleEscapeKey = (e) => {
