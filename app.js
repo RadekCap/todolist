@@ -142,7 +142,11 @@ class TodoApp {
         // Subscribe to store changes and re-render
         store.subscribe('selectedGtdStatus', () => this.render())
         store.subscribe('selectedProjectId', () => this.render())
-        store.subscribe('selectedAreaId', () => this.render())
+        store.subscribe('selectedAreaId', () => {
+            renderAreasDropdown(this.areaListContainer, this.toolbarAreasDropdown, this.areaListDivider)
+            updateAreasLabel(this.toolbarAreasLabel)
+            this.render()
+        })
         store.subscribe('showProjectsView', () => this.render())
         store.subscribe('todos', () => this.renderAll())
         store.subscribe('projects', () => {
