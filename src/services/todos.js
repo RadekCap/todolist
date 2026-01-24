@@ -793,3 +793,95 @@ export function getTemplateById(templateId) {
     const templates = store.get('templates') || []
     return templates.find(t => String(t.id) === String(templateId)) || null
 }
+
+/**
+ * Convert an existing todo to a recurring todo
+ * Creates a template and links the existing todo as the first instance
+ * @param {string} todoId - Existing todo ID
+ * @param {Object} todoData - Updated todo data
+ * @param {Object} recurrenceRule - Recurrence rule object
+ * @param {Object} endCondition - End condition { type, date?, count? }
+ * @returns {Promise<Object>} The updated todo (now linked to template)
+ */
+export async function convertToRecurring(todoId, todoData, recurrenceRule, endCondition) {
+    const currentUser = store.get('currentUser')
+    const { text, categoryId, projectId, priorityId, gtdStatus, contextId, dueDate, comment } = todoData
+
+    // Encrypt text and comment for the template
+    const encryptedText = await encrypt(text)
+    const encryptedComment = comment ? await encrypt(comment) : null
+
+    // Create the template
+    const { data: templateData, error: templateError } = await supabase
+        .from('todos')
+        .insert({
+            user_id: currentUser.id,
+            text: encryptedText,
+            completed: false,
+            category_id: categoryId || null,
+            project_id: projectId || null,
+            priority_id: priorityId || null,
+            gtd_status: 'scheduled',
+            context_id: contextId || null,
+            due_date: dueDate || null,
+            comment: encryptedComment,
+            is_template: true,
+            recurrence_rule: recurrenceRule,
+            recurrence_end_type: endCondition.type || 'never',
+            recurrence_end_date: endCondition.date || null,
+            recurrence_end_count: endCondition.count || null,
+            recurrence_count: 1 // This existing todo counts as instance 1
+        })
+        .select()
+
+    if (templateError) {
+        console.error('Error creating recurring template:', templateError)
+        throw templateError
+    }
+
+    const template = templateData[0]
+
+    // Update the existing todo to link to the template and update its data
+    const { data: updatedData, error: updateError } = await supabase
+        .from('todos')
+        .update({
+            text: encryptedText,
+            category_id: categoryId || null,
+            project_id: projectId || null,
+            priority_id: priorityId || null,
+            gtd_status: gtdStatus || 'scheduled',
+            context_id: contextId || null,
+            due_date: dueDate || null,
+            comment: encryptedComment,
+            template_id: template.id
+        })
+        .eq('id', todoId)
+        .select()
+
+    if (updateError) {
+        console.error('Error updating todo with template link:', updateError)
+        throw updateError
+    }
+
+    // Update local state
+    const todos = store.get('todos')
+    const todoIndex = todos.findIndex(t => String(t.id) === String(todoId))
+    if (todoIndex !== -1) {
+        todos[todoIndex] = {
+            ...todos[todoIndex],
+            ...updatedData[0],
+            text, // Use decrypted text
+            comment,
+            template_id: template.id
+        }
+        store.set('todos', [...todos])
+    }
+
+    // Add template to store
+    const templates = store.get('templates') || []
+    templates.push(template)
+    store.set('templates', templates)
+
+    events.emit(Events.TODOS_UPDATED)
+    return todos[todoIndex]
+}
