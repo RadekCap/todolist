@@ -177,7 +177,30 @@ export async function reorderAreas(orderedIds) {
  */
 export function selectArea(areaId) {
     store.set('selectedAreaId', areaId)
+    // Persist selection to localStorage
+    localStorage.setItem('selectedAreaId', areaId)
     events.emit(Events.VIEW_CHANGED)
+}
+
+/**
+ * Restore selected area from localStorage
+ * Should be called after areas are loaded
+ */
+export function restoreSelectedArea() {
+    const savedAreaId = localStorage.getItem('selectedAreaId')
+    if (!savedAreaId) return
+
+    const areas = store.get('areas')
+
+    // Validate the saved area still exists
+    if (savedAreaId === 'all' || savedAreaId === 'unassigned') {
+        store.set('selectedAreaId', savedAreaId)
+    } else if (areas.some(a => a.id === savedAreaId)) {
+        store.set('selectedAreaId', savedAreaId)
+    } else {
+        // Saved area no longer exists, clear localStorage
+        localStorage.removeItem('selectedAreaId')
+    }
 }
 
 /**
