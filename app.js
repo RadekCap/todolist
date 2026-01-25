@@ -19,7 +19,7 @@ import {
 import { exportTodos } from './src/services/export.js'
 import { loadTodos, addTodo, toggleTodo, deleteTodo, getFilteredTodos, getGtdCount } from './src/services/todos.js'
 import { loadProjects, addProject, deleteProject, selectProject } from './src/services/projects.js'
-import { loadAreas, addArea, selectArea, selectAreaByShortcut } from './src/services/areas.js'
+import { loadAreas, addArea, selectArea, selectAreaByShortcut, restoreSelectedArea } from './src/services/areas.js'
 import { loadCategories } from './src/services/categories.js'
 import { loadContexts } from './src/services/contexts.js'
 import { loadPriorities } from './src/services/priorities.js'
@@ -525,6 +525,9 @@ class TodoApp {
             loadProjects(),
             loadTodos()
         ])
+
+        // Restore persisted UI state
+        restoreSelectedArea()
 
         // Load non-essential items without waiting
         loadThemeFromDatabase()

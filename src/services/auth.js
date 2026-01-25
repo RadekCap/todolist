@@ -97,6 +97,8 @@ export async function signup(email, password) {
 export async function logout() {
     await supabase.auth.signOut()
     sessionStorage.removeItem('_ep')
+    // Clear persisted UI state
+    localStorage.removeItem('selectedAreaId')
     store.reset()
     events.emit(Events.AUTH_LOGOUT)
 }
