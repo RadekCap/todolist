@@ -462,8 +462,8 @@ export function getGtdCount(status) {
         return todos.filter(t => t.gtd_status !== 'done').length
     }
     if (status === 'scheduled') {
-        // Count all non-done items with a due date
-        return todos.filter(t => t.due_date && t.gtd_status !== 'done').length
+        // Count items with 'scheduled' GTD status (matches getFilteredTodos display logic)
+        return todos.filter(t => t.gtd_status === 'scheduled').length
     }
     return todos.filter(t => t.gtd_status === status).length
 }
