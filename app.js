@@ -14,6 +14,7 @@ import {
 } from './src/services/auth.js'
 import {
     initTheme, loadThemeFromDatabase, changeTheme, applyTheme,
+    initDensity, loadDensityFromDatabase, changeDensity,
     loadUserSettings, saveUserSettings
 } from './src/services/settings.js'
 import { exportTodos } from './src/services/export.js'
@@ -70,6 +71,7 @@ class TodoApp {
         this.searchInput = document.getElementById('searchInput')
         this.versionNumberEl = document.getElementById('versionNumber')
         this.themeSelect = document.getElementById('themeSelect')
+        this.densitySelect = document.getElementById('densitySelect')
         this.unlockModal = document.getElementById('unlockModal')
         this.unlockForm = document.getElementById('unlockForm')
         this.unlockPassword = document.getElementById('unlockPassword')
@@ -156,6 +158,7 @@ class TodoApp {
         this.initEventListeners()
         this.setVersion()
         initTheme(this.themeSelect)
+        initDensity(this.densitySelect)
         this.subscribeToEvents()
     }
 
@@ -300,6 +303,9 @@ class TodoApp {
 
         // Theme selector
         this.themeSelect.addEventListener('change', () => changeTheme(this.themeSelect.value))
+
+        // Density selector
+        this.densitySelect.addEventListener('change', () => changeDensity(this.densitySelect.value))
 
         // Export button
         this.exportBtn.addEventListener('click', () => exportTodos(getFilteredTodos()))
@@ -557,6 +563,7 @@ class TodoApp {
 
         // Load non-essential items without waiting
         loadThemeFromDatabase()
+        loadDensityFromDatabase()
         this.loadUserSettingsDisplay()
 
         this.hideLoadingScreen()
