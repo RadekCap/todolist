@@ -110,6 +110,7 @@ export const Events = {
     MODAL_CLOSE: 'modal:close',
     VIEW_CHANGED: 'view:changed',
     THEME_CHANGED: 'theme:changed',
+    DENSITY_CHANGED: 'density:changed',
 
     // Render events
     RENDER_TODOS: 'render:todos',

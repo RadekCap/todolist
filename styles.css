@@ -1215,6 +1215,26 @@ body.sidebar-resizing * {
     border-color: var(--accent-color);
 }
 
+/* Toolbar density selector */
+.toolbar-density-select {
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 13px;
+    background: #f8f8f8;
+    cursor: pointer;
+    margin-right: 8px;
+}
+
+.toolbar-density-select:hover {
+    background: #e8e8e8;
+}
+
+.toolbar-density-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
 /* Toolbar user menu */
 .toolbar-user-menu {
     position: relative;
@@ -3180,6 +3200,34 @@ body.sidebar-resizing * {
     border-color: var(--ios-blue);
 }
 
+[data-theme="glass"] .toolbar-density-select,
+[data-theme="clear"] .toolbar-density-select {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
+[data-theme="dark"] .toolbar-density-select {
+    background: var(--ios-bg-tertiary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .toolbar-density-select:hover,
+[data-theme="clear"] .toolbar-density-select:hover {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="dark"] .toolbar-density-select:hover {
+    background: var(--ios-bg-secondary);
+}
+
+[data-theme="glass"] .toolbar-density-select:focus,
+[data-theme="dark"] .toolbar-density-select:focus,
+[data-theme="clear"] .toolbar-density-select:focus {
+    border-color: var(--ios-blue);
+}
+
 [data-theme="glass"] .toolbar-user-btn,
 [data-theme="dark"] .toolbar-user-btn,
 [data-theme="clear"] .toolbar-user-btn {
@@ -4550,4 +4598,90 @@ body.sidebar-resizing * {
     font-size: 12px;
     font-weight: 500;
     padding: 3px 8px;
+}
+
+/* ========================================
+   COMPACT DENSITY MODE
+   ======================================== */
+
+/* Compact mode - Base styles */
+[data-density="compact"] .todo-item {
+    padding: 10px 12px;
+    gap: 8px;
+}
+
+[data-density="compact"] .todo-checkbox {
+    width: 18px;
+    height: 18px;
+}
+
+[data-density="compact"] .drag-handle {
+    font-size: 14px;
+    padding: 1px 4px;
+}
+
+[data-density="compact"] .todo-category-badge,
+[data-density="compact"] .todo-priority-badge,
+[data-density="compact"] .todo-gtd-badge,
+[data-density="compact"] .todo-context-badge,
+[data-density="compact"] .todo-date {
+    padding: 2px 6px;
+    font-size: 11px;
+}
+
+[data-density="compact"] .delete-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+/* Compact mode - iOS themed styles */
+[data-density="compact"][data-theme="glass"] .todo-item,
+[data-density="compact"][data-theme="dark"] .todo-item,
+[data-density="compact"][data-theme="clear"] .todo-item {
+    padding: 10px 12px;
+}
+
+[data-density="compact"][data-theme="glass"] .todo-checkbox,
+[data-density="compact"][data-theme="dark"] .todo-checkbox,
+[data-density="compact"][data-theme="clear"] .todo-checkbox {
+    width: 18px;
+    height: 18px;
+}
+
+[data-density="compact"][data-theme="glass"] .todo-category-badge,
+[data-density="compact"][data-theme="dark"] .todo-category-badge,
+[data-density="compact"][data-theme="clear"] .todo-category-badge,
+[data-density="compact"][data-theme="glass"] .todo-priority-badge,
+[data-density="compact"][data-theme="dark"] .todo-priority-badge,
+[data-density="compact"][data-theme="clear"] .todo-priority-badge {
+    padding: 2px 6px;
+    font-size: 11px;
+}
+
+[data-density="compact"][data-theme="glass"] .todo-date,
+[data-density="compact"][data-theme="dark"] .todo-date,
+[data-density="compact"][data-theme="clear"] .todo-date {
+    padding: 2px 6px;
+    font-size: 11px;
+}
+
+[data-density="compact"][data-theme="glass"] .todo-gtd-badge,
+[data-density="compact"][data-theme="dark"] .todo-gtd-badge,
+[data-density="compact"][data-theme="clear"] .todo-gtd-badge {
+    padding: 2px 6px;
+    font-size: 11px;
+}
+
+[data-density="compact"][data-theme="glass"] .todo-context-badge,
+[data-density="compact"][data-theme="dark"] .todo-context-badge,
+[data-density="compact"][data-theme="clear"] .todo-context-badge {
+    padding: 2px 6px;
+    font-size: 11px;
+}
+
+[data-density="compact"][data-theme="glass"] .delete-btn,
+[data-density="compact"][data-theme="dark"] .delete-btn,
+[data-density="compact"][data-theme="clear"] .delete-btn {
+    padding: 4px 10px;
+    font-size: 12px;
 }
