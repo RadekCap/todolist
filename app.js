@@ -26,14 +26,14 @@ import { loadPriorities } from './src/services/priorities.js'
 
 // UI Components
 import { renderTodos } from './src/ui/TodoList.js'
-import { renderProjects, updateProjectSelect } from './src/ui/ProjectList.js'
+import { renderProjects, updateProjectSelect, renderManageProjectsList } from './src/ui/ProjectList.js'
 import { renderGtdList, selectGtdStatus, selectGtdStatusByShortcut } from './src/ui/GtdList.js'
 import { renderAreasDropdown, updateAreasLabel, updateAreaHeader, renderManageAreasList } from './src/ui/AreasDropdown.js'
 import { TodoModal } from './src/ui/modals/TodoModal.js'
 import { ImportModal } from './src/ui/modals/ImportModal.js'
 
 // Application version
-const APP_VERSION = '2.0.32'
+const APP_VERSION = '2.1.0'
 
 class TodoApp {
     constructor() {
@@ -97,6 +97,15 @@ class TodoApp {
         this.addNewAreaBtn = document.getElementById('addNewAreaBtn')
         this.manageAreasList = document.getElementById('manageAreasList')
         this.areaHeader = document.getElementById('areaHeader')
+
+        // Manage Projects modal elements
+        this.manageProjectsBtn = document.getElementById('manageProjectsBtn')
+        this.manageProjectsModal = document.getElementById('manageProjectsModal')
+        this.closeManageProjectsModalBtn = document.getElementById('closeManageProjectsModal')
+        this.closeManageProjectsModalBtn2 = document.getElementById('closeManageProjectsModalBtn')
+        this.newProjectModalInput = document.getElementById('newProjectModalInput')
+        this.addNewProjectBtn = document.getElementById('addNewProjectBtn')
+        this.manageProjectsList = document.getElementById('manageProjectsList')
 
         // Keyboard shortcuts modal elements
         this.keyboardShortcutsModal = document.getElementById('keyboardShortcutsModal')
@@ -357,6 +366,22 @@ class TodoApp {
             if (e.key === 'Enter') this.handleAddArea()
         })
 
+        // Open manage projects modal
+        this.manageProjectsBtn.addEventListener('click', () => this.openManageProjectsModal())
+
+        // Manage projects modal controls
+        this.closeManageProjectsModalBtn.addEventListener('click', () => this.closeManageProjectsModal())
+        this.closeManageProjectsModalBtn2.addEventListener('click', () => this.closeManageProjectsModal())
+        this.manageProjectsModal.addEventListener('click', (e) => {
+            if (e.target === this.manageProjectsModal) this.closeManageProjectsModal()
+        })
+
+        // Add new project in modal
+        this.addNewProjectBtn.addEventListener('click', () => this.handleAddProjectInModal())
+        this.newProjectModalInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.handleAddProjectInModal()
+        })
+
         // Keyboard shortcuts modal
         this.closeKeyboardShortcutsModalBtn.addEventListener('click', () => this.closeKeyboardShortcutsModal())
         this.closeKeyboardShortcutsModalBtn2.addEventListener('click', () => this.closeKeyboardShortcutsModal())
@@ -379,6 +404,7 @@ class TodoApp {
                         this.unlockModal.classList.contains('active') ||
                         this.settingsModal.classList.contains('active') ||
                         this.manageAreasModal.classList.contains('active') ||
+                        this.manageProjectsModal.classList.contains('active') ||
                         this.keyboardShortcutsModal.classList.contains('active')
 
         // 'n' to create new item
@@ -704,6 +730,47 @@ class TodoApp {
         }
 
         this.newAreaInput.value = ''
+    }
+
+    openManageProjectsModal() {
+        this.manageProjectsModal.classList.add('active')
+        renderManageProjectsList(this.manageProjectsList)
+
+        this.handleManageProjectsEscapeKey = (e) => {
+            if (e.key === 'Escape') this.closeManageProjectsModal()
+        }
+        document.addEventListener('keydown', this.handleManageProjectsEscapeKey)
+
+        setTimeout(() => this.newProjectModalInput.focus(), 100)
+    }
+
+    closeManageProjectsModal() {
+        this.manageProjectsModal.classList.remove('active')
+
+        if (this.handleManageProjectsEscapeKey) {
+            document.removeEventListener('keydown', this.handleManageProjectsEscapeKey)
+        }
+
+        this.newProjectModalInput.value = ''
+    }
+
+    async handleAddProjectInModal() {
+        const name = this.newProjectModalInput.value.trim()
+        if (!name) return
+
+        this.addNewProjectBtn.disabled = true
+        this.addNewProjectBtn.textContent = 'Adding...'
+
+        try {
+            await addProject(name)
+            this.newProjectModalInput.value = ''
+            renderManageProjectsList(this.manageProjectsList)
+        } catch (error) {
+            console.error('Failed to add project:', error)
+        } finally {
+            this.addNewProjectBtn.disabled = false
+            this.addNewProjectBtn.textContent = 'Add'
+        }
     }
 
     openKeyboardShortcutsModal() {

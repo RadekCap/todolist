@@ -11,17 +11,18 @@ export async function loadProjects() {
     const { data, error } = await supabase
         .from('projects')
         .select('*')
-        .order('created_at', { ascending: true })
+        .order('sort_order', { ascending: true })
 
     if (error) {
         console.error('Error loading projects:', error)
         throw error
     }
 
-    // Decrypt project names
+    // Decrypt project names and descriptions
     const projects = await Promise.all(data.map(async (project) => ({
         ...project,
-        name: await decrypt(project.name)
+        name: await decrypt(project.name),
+        description: project.description ? await decrypt(project.description) : null
     })))
 
     store.set('projects', projects)
@@ -37,6 +38,10 @@ export async function loadProjects() {
 export async function addProject(name) {
     const currentUser = store.get('currentUser')
     const selectedAreaId = store.get('selectedAreaId')
+    const projects = store.get('projects')
+
+    // Get next sort order
+    const maxSortOrder = projects.reduce((max, p) => Math.max(max, p.sort_order || 0), 0)
 
     // Encrypt project name before storing
     const encryptedName = await encrypt(name)
@@ -56,7 +61,8 @@ export async function addProject(name) {
             user_id: currentUser.id,
             name: encryptedName,
             color: randomColor,
-            area_id: areaId
+            area_id: areaId,
+            sort_order: maxSortOrder + 1
         })
         .select()
 
@@ -132,4 +138,87 @@ export function getFilteredProjects() {
     }
 
     return projects.filter(p => p.area_id === selectedAreaId)
+}
+
+/**
+ * Update a project (name, color, description, area_id)
+ * @param {string} projectId - Project ID
+ * @param {Object} updates - Fields to update
+ * @param {string} [updates.name] - New project name
+ * @param {string} [updates.color] - New project color
+ * @param {string} [updates.description] - New project description
+ * @param {string|null} [updates.area_id] - New area ID or null
+ */
+export async function updateProject(projectId, updates) {
+    const updateData = {}
+
+    if (updates.name !== undefined) {
+        updateData.name = await encrypt(updates.name)
+    }
+    if (updates.color !== undefined) {
+        updateData.color = updates.color
+    }
+    if (updates.description !== undefined) {
+        updateData.description = updates.description ? await encrypt(updates.description) : null
+    }
+    if (updates.area_id !== undefined) {
+        updateData.area_id = updates.area_id
+    }
+
+    const { error } = await supabase
+        .from('projects')
+        .update(updateData)
+        .eq('id', projectId)
+
+    if (error) {
+        console.error('Error updating project:', error)
+        throw error
+    }
+
+    // Update local state
+    const projects = store.get('projects')
+    const project = projects.find(p => p.id === projectId)
+    if (project) {
+        if (updates.name !== undefined) project.name = updates.name
+        if (updates.color !== undefined) project.color = updates.color
+        if (updates.description !== undefined) project.description = updates.description
+        if (updates.area_id !== undefined) project.area_id = updates.area_id
+        store.set('projects', [...projects])
+    }
+
+    events.emit(Events.PROJECTS_LOADED, store.get('projects'))
+}
+
+/**
+ * Rename a project
+ * @param {string} projectId - Project ID
+ * @param {string} newName - New project name
+ */
+export async function renameProject(projectId, newName) {
+    await updateProject(projectId, { name: newName })
+}
+
+/**
+ * Reorder projects
+ * @param {Array<string>} orderedIds - Array of project IDs in new order
+ */
+export async function reorderProjects(orderedIds) {
+    const projects = store.get('projects')
+
+    // Update local state first for immediate feedback
+    const reorderedProjects = orderedIds.map((id, index) => {
+        const project = projects.find(p => p.id === id)
+        return { ...project, sort_order: index }
+    })
+    store.set('projects', reorderedProjects)
+
+    // Update database
+    for (let i = 0; i < orderedIds.length; i++) {
+        await supabase
+            .from('projects')
+            .update({ sort_order: i })
+            .eq('id', orderedIds[i])
+    }
+
+    events.emit(Events.PROJECTS_LOADED, store.get('projects'))
 }
