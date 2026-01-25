@@ -28,7 +28,23 @@ When preparing a feature release or breaking change:
 
 ## Changelog
 
-### Version 2.0.0 (Current)
+### Version 2.1.0 (Current)
+**Release Date:** 2026-01-25
+
+**New Features:**
+- **Manage Projects Modal**: Comprehensive project management interface
+  - Drag-and-drop reordering of projects
+  - Inline rename projects with editable name field
+  - Change project color with color picker
+  - Add/edit project description field
+  - Assign projects to areas via dropdown
+  - Delete projects with confirmation
+- **Project Description Display**: Project descriptions now appear in the header above todos when viewing a project
+- **Improved UI**: "Manage Projects" button added to sidebar projects section
+
+---
+
+### Version 2.0.0
 **Release Date:** 2026-01-19
 
 **Major Release** - Complete GTD workflow, MCP integration, and enhanced organization features.

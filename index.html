@@ -101,6 +101,7 @@
                                 >
                                 <button id="addProjectBtn" class="add-project-btn">Add Project</button>
                             </div>
+                            <button id="manageProjectsBtn" class="manage-projects-btn">Manage Projects</button>
                         </div>
                     </div>
 
@@ -620,6 +621,32 @@
                     <ul id="manageAreasList" class="manage-areas-list"></ul>
                     <div class="modal-actions">
                         <button type="button" id="closeManageAreasModalBtn" class="modal-btn modal-btn-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Projects Modal -->
+        <div id="manageProjectsModal" class="modal-overlay">
+            <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="manageProjectsModalTitle">
+                <div class="modal-header">
+                    <h2 id="manageProjectsModalTitle">Manage Projects</h2>
+                    <button id="closeManageProjectsModal" class="modal-close" aria-label="Close modal">&times;</button>
+                </div>
+                <div class="modal-form">
+                    <div class="manage-projects-add">
+                        <input
+                            type="text"
+                            id="newProjectModalInput"
+                            placeholder="New project name..."
+                            autocomplete="off"
+                            maxlength="100"
+                        >
+                        <button type="button" id="addNewProjectBtn" class="modal-btn modal-btn-primary">Add</button>
+                    </div>
+                    <ul id="manageProjectsList" class="manage-projects-list"></ul>
+                    <div class="modal-actions">
+                        <button type="button" id="closeManageProjectsModalBtn" class="modal-btn modal-btn-secondary">Close</button>
                     </div>
                 </div>
             </div>

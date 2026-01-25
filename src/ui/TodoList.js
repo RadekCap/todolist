@@ -75,7 +75,13 @@ export function renderTodos(container, options = {}) {
         if (project) {
             const header = document.createElement('li')
             header.className = 'project-title-header'
-            header.innerHTML = `<span class="project-title-text">${escapeHtml(project.name)}</span>`
+            const descriptionHtml = project.description
+                ? `<span class="project-title-description">${escapeHtml(project.description)}</span>`
+                : ''
+            header.innerHTML = `
+                <span class="project-title-text">${escapeHtml(project.name)}</span>
+                ${descriptionHtml}
+            `
             container.appendChild(header)
         }
     }

@@ -896,6 +896,14 @@ body.sidebar-resizing * {
     letter-spacing: 0.3px;
 }
 
+.project-title-description {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 4px;
+}
+
 .todo-item {
     background: #f8f9fa;
     padding: 15px;
@@ -1582,6 +1590,222 @@ body.sidebar-resizing * {
 }
 
 .manage-areas-delete:hover {
+    background: rgba(255, 59, 48, 0.1);
+}
+
+/* Manage Projects Button in Sidebar */
+.manage-projects-btn {
+    width: 100%;
+    padding: 8px 12px;
+    margin-top: 8px;
+    background: transparent;
+    border: 1px dashed var(--ios-separator, #e5e5e5);
+    border-radius: 8px;
+    color: var(--ios-label-secondary, #666);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.manage-projects-btn:hover {
+    background: var(--ios-bg-tertiary, #f0f0f0);
+    border-color: var(--ios-blue, #007AFF);
+    color: var(--ios-blue, #007AFF);
+}
+
+/* Manage Projects Modal Styles */
+.manage-projects-add {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.manage-projects-add input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.manage-projects-add input:focus {
+    outline: none;
+    border-color: var(--ios-blue, #007AFF);
+}
+
+.manage-projects-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    border: 1px solid var(--ios-separator, #e5e5e5);
+    border-radius: 10px;
+    overflow: hidden;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.manage-projects-list:empty::after {
+    content: "No projects yet. Add one above.";
+    display: block;
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+.manage-projects-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--ios-bg-secondary, #f9f9f9);
+    border-bottom: 0.5px solid var(--ios-separator, #e5e5e5);
+    gap: 12px;
+}
+
+.manage-projects-item:last-child {
+    border-bottom: none;
+}
+
+.manage-projects-item:hover {
+    background: var(--ios-bg-tertiary, #f0f0f0);
+}
+
+.manage-projects-item.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.manage-projects-item.drag-over {
+    border-top: 2px solid var(--ios-blue, #007AFF);
+}
+
+.manage-projects-drag-handle {
+    color: var(--ios-label-tertiary, #999);
+    cursor: grab;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.manage-projects-color {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.manage-projects-color::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.manage-projects-color::-webkit-color-swatch {
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+}
+
+.manage-projects-color::-moz-color-swatch {
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+}
+
+.manage-projects-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.manage-projects-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ios-label, #333);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.manage-projects-description {
+    font-size: 12px;
+    color: var(--ios-label-secondary, #666);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.manage-projects-name-input,
+.manage-projects-description-input {
+    padding: 4px 8px;
+    border: 1px solid var(--ios-blue, #007AFF);
+    border-radius: 4px;
+    font-size: 14px;
+    background: var(--ios-bg-primary, #fff);
+    color: var(--ios-label, #333);
+}
+
+.manage-projects-name-input {
+    font-weight: 500;
+}
+
+.manage-projects-description-input {
+    font-size: 12px;
+}
+
+.manage-projects-area {
+    padding: 6px 10px;
+    border: 1px solid var(--ios-separator, #e5e5e5);
+    border-radius: 6px;
+    font-size: 12px;
+    background: var(--ios-bg-primary, #fff);
+    color: var(--ios-label, #333);
+    cursor: pointer;
+    max-width: 120px;
+    flex-shrink: 0;
+}
+
+.manage-projects-area:focus {
+    outline: none;
+    border-color: var(--ios-blue, #007AFF);
+}
+
+.manage-projects-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    flex-shrink: 0;
+}
+
+.manage-projects-item:hover .manage-projects-actions {
+    opacity: 1;
+}
+
+.manage-projects-edit,
+.manage-projects-delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+}
+
+.manage-projects-edit {
+    color: var(--ios-blue, #007AFF);
+}
+
+.manage-projects-edit:hover {
+    background: rgba(0, 122, 255, 0.1);
+}
+
+.manage-projects-delete {
+    color: var(--ios-red, #FF3B30);
+}
+
+.manage-projects-delete:hover {
     background: rgba(255, 59, 48, 0.1);
 }
 
@@ -3145,6 +3369,97 @@ body.sidebar-resizing * {
     color: var(--ios-label);
 }
 
+/* Manage Projects Modal Theme Styles */
+[data-theme="glass"] .manage-projects-btn,
+[data-theme="dark"] .manage-projects-btn,
+[data-theme="clear"] .manage-projects-btn {
+    border-color: var(--ios-separator);
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .manage-projects-btn:hover,
+[data-theme="dark"] .manage-projects-btn:hover,
+[data-theme="clear"] .manage-projects-btn:hover {
+    background: var(--ios-bg-tertiary);
+    border-color: var(--ios-blue);
+    color: var(--ios-blue);
+}
+
+[data-theme="glass"] .manage-projects-add input,
+[data-theme="dark"] .manage-projects-add input,
+[data-theme="clear"] .manage-projects-add input {
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
+[data-theme="dark"] .manage-projects-add input {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="glass"] .manage-projects-list,
+[data-theme="dark"] .manage-projects-list,
+[data-theme="clear"] .manage-projects-list {
+    border-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .manage-projects-item,
+[data-theme="clear"] .manage-projects-item {
+    background: var(--ios-bg-secondary);
+    border-bottom-color: var(--ios-separator);
+}
+
+[data-theme="dark"] .manage-projects-item {
+    background: var(--ios-bg-tertiary);
+    border-bottom-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .manage-projects-item:hover,
+[data-theme="clear"] .manage-projects-item:hover {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="dark"] .manage-projects-item:hover {
+    background: var(--ios-bg-secondary);
+}
+
+[data-theme="glass"] .manage-projects-name,
+[data-theme="dark"] .manage-projects-name,
+[data-theme="clear"] .manage-projects-name {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .manage-projects-description,
+[data-theme="dark"] .manage-projects-description,
+[data-theme="clear"] .manage-projects-description {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .manage-projects-drag-handle,
+[data-theme="dark"] .manage-projects-drag-handle,
+[data-theme="clear"] .manage-projects-drag-handle {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .manage-projects-name-input,
+[data-theme="dark"] .manage-projects-name-input,
+[data-theme="clear"] .manage-projects-name-input,
+[data-theme="glass"] .manage-projects-description-input,
+[data-theme="dark"] .manage-projects-description-input,
+[data-theme="clear"] .manage-projects-description-input {
+    background: var(--ios-bg-primary);
+    border-color: var(--ios-blue);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .manage-projects-area,
+[data-theme="dark"] .manage-projects-area,
+[data-theme="clear"] .manage-projects-area {
+    background: var(--ios-bg-primary);
+    border-color: var(--ios-separator);
+    color: var(--ios-label);
+}
+
 /* Area Header Theme Styles */
 [data-theme="glass"] .area-header,
 [data-theme="dark"] .area-header,
@@ -3760,6 +4075,12 @@ body.sidebar-resizing * {
     font-weight: 600;
     color: var(--ios-label);
     letter-spacing: 0.2px;
+}
+
+[data-theme="glass"] .project-title-description,
+[data-theme="dark"] .project-title-description,
+[data-theme="clear"] .project-title-description {
+    color: var(--ios-label-secondary);
 }
 
 [data-theme="glass"] .todo-item,
