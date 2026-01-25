@@ -405,8 +405,8 @@ export function getFilteredTodos() {
 
     // Filter by GTD status
     if (state.selectedGtdStatus === 'scheduled') {
-        // Show items with 'scheduled' GTD status, sorted by due date
-        filtered = filtered.filter(t => t.gtd_status === 'scheduled')
+        // Show all items with a due date (excluding done) - this is a virtual/computed view
+        filtered = filtered.filter(t => t.due_date && t.gtd_status !== 'done')
         // Sort by due date (earliest first), items without dates go last
         return filtered.slice().sort((a, b) => {
             if (!a.due_date && !b.due_date) return 0
@@ -462,8 +462,8 @@ export function getGtdCount(status) {
         return todos.filter(t => t.gtd_status !== 'done').length
     }
     if (status === 'scheduled') {
-        // Count items with 'scheduled' GTD status (matches getFilteredTodos display logic)
-        return todos.filter(t => t.gtd_status === 'scheduled').length
+        // Count all items with a due date (excluding done) - matches getFilteredTodos display logic
+        return todos.filter(t => t.due_date && t.gtd_status !== 'done').length
     }
     return todos.filter(t => t.gtd_status === status).length
 }
