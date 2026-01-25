@@ -1686,7 +1686,8 @@ body.sidebar-resizing * {
     flex-shrink: 0;
 }
 
-.manage-projects-color {
+.manage-projects-color,
+.manage-projects-item input[type="color"].manage-projects-color {
     width: 24px;
     height: 24px;
     padding: 0;
