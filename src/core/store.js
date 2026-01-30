@@ -29,7 +29,11 @@ class Store {
             // UI state
             showProjectsView: false,
             editingTodoId: null,
-            searchQuery: ''
+            searchQuery: '',
+
+            // Multi-select state
+            selectedTodoIds: new Set(),
+            lastSelectedTodoId: null // For shift-click range selection
         }
 
         this._listeners = new Map()
@@ -135,7 +139,9 @@ class Store {
             selectedGtdStatus: 'inbox',
             showProjectsView: false,
             editingTodoId: null,
-            searchQuery: ''
+            searchQuery: '',
+            selectedTodoIds: new Set(),
+            lastSelectedTodoId: null
         }
     }
 }
