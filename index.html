@@ -189,6 +189,34 @@
                         <span class="area-header-name"></span>
                     </div>
 
+                    <!-- Selection Bar (appears when todos are selected) -->
+                    <div id="selectionBar" class="selection-bar">
+                        <div class="selection-bar-left">
+                            <span id="selectionCount" class="selection-count">0 selected</span>
+                            <button id="selectAllBtn" class="selection-bar-btn selection-bar-btn-secondary">Select All</button>
+                            <button id="clearSelectionBtn" class="selection-bar-btn selection-bar-btn-secondary">Clear</button>
+                        </div>
+                        <div class="selection-bar-right">
+                            <button id="completeSelectedBtn" class="selection-bar-btn selection-bar-btn-success">Complete</button>
+                            <button id="deleteSelectedBtn" class="selection-bar-btn selection-bar-btn-danger">Delete</button>
+                            <select id="selectionGtdStatusSelect" class="selection-bar-select" aria-label="Change GTD Status">
+                                <option value="">Set Status...</option>
+                                <option value="inbox">Inbox</option>
+                                <option value="next_action">Next Action</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="waiting_for">Waiting For</option>
+                                <option value="someday_maybe">Someday/Maybe</option>
+                                <option value="done">Done</option>
+                            </select>
+                            <select id="selectionProjectSelect" class="selection-bar-select" aria-label="Change Project">
+                                <option value="">Move to Project...</option>
+                            </select>
+                            <select id="selectionPrioritySelect" class="selection-bar-select" aria-label="Change Priority">
+                                <option value="">Set Priority...</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <ul id="todoList" class="todo-list"></ul>
                 </div>
             </div>

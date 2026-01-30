@@ -116,6 +116,7 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     // Todo items (rendered by JavaScript)
     /\.todo-item/,
     /\.todo-checkbox/,
+    /\.todo-select-checkbox/,
     /\.todo-content/,
     /\.todo-text/,
     /\.todo-comment/,
@@ -220,6 +221,13 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.modal-sidebar-divider/,
     /\.modal-tab/,
     /\.modal-tabs/,
+    // Selection bar (rendered by JavaScript)
+    /\.selection-bar/,
+    /\.selection-count/,
+    /\.selection-bar-left/,
+    /\.selection-bar-right/,
+    /\.selection-bar-btn/,
+    /\.selection-bar-select/,
 ];
 
 /**

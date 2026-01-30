@@ -324,6 +324,206 @@ export async function updateTodoGtdStatus(todoId, gtdStatus) {
 }
 
 /**
+ * Bulk delete multiple todos
+ * @param {Array<string>} todoIds - Array of todo IDs to delete
+ */
+export async function bulkDeleteTodos(todoIds) {
+    if (!todoIds || todoIds.length === 0) return
+
+    const { error } = await supabase
+        .from('todos')
+        .delete()
+        .in('id', todoIds)
+
+    if (error) {
+        console.error('Error bulk deleting todos:', error)
+        throw error
+    }
+
+    const todos = store.get('todos').filter(t => !todoIds.includes(t.id))
+    store.set('todos', todos)
+
+    // Clear selection
+    store.set('selectedTodoIds', new Set())
+    store.set('lastSelectedTodoId', null)
+
+    events.emit(Events.TODOS_UPDATED)
+}
+
+/**
+ * Bulk update GTD status for multiple todos
+ * @param {Array<string>} todoIds - Array of todo IDs
+ * @param {string} gtdStatus - New GTD status
+ */
+export async function bulkUpdateTodosStatus(todoIds, gtdStatus) {
+    if (!todoIds || todoIds.length === 0) return
+
+    const isCompleted = gtdStatus === 'done'
+
+    const { error } = await supabase
+        .from('todos')
+        .update({ gtd_status: gtdStatus, completed: isCompleted })
+        .in('id', todoIds)
+
+    if (error) {
+        console.error('Error bulk updating todo status:', error)
+        throw error
+    }
+
+    // Update local state
+    const todos = store.get('todos').map(t => {
+        if (todoIds.includes(t.id)) {
+            return { ...t, gtd_status: gtdStatus, completed: isCompleted }
+        }
+        return t
+    })
+    store.set('todos', todos)
+
+    // Clear selection
+    store.set('selectedTodoIds', new Set())
+    store.set('lastSelectedTodoId', null)
+
+    events.emit(Events.TODOS_UPDATED)
+}
+
+/**
+ * Bulk update project for multiple todos
+ * @param {Array<string>} todoIds - Array of todo IDs
+ * @param {string|null} projectId - New project ID or null
+ */
+export async function bulkUpdateTodosProject(todoIds, projectId) {
+    if (!todoIds || todoIds.length === 0) return
+
+    const { error } = await supabase
+        .from('todos')
+        .update({ project_id: projectId || null })
+        .in('id', todoIds)
+
+    if (error) {
+        console.error('Error bulk updating todo project:', error)
+        throw error
+    }
+
+    // Update local state
+    const todos = store.get('todos').map(t => {
+        if (todoIds.includes(t.id)) {
+            return { ...t, project_id: projectId || null }
+        }
+        return t
+    })
+    store.set('todos', todos)
+
+    // Clear selection
+    store.set('selectedTodoIds', new Set())
+    store.set('lastSelectedTodoId', null)
+
+    events.emit(Events.TODOS_UPDATED)
+}
+
+/**
+ * Bulk update priority for multiple todos
+ * @param {Array<string>} todoIds - Array of todo IDs
+ * @param {string|null} priorityId - New priority ID or null
+ */
+export async function bulkUpdateTodosPriority(todoIds, priorityId) {
+    if (!todoIds || todoIds.length === 0) return
+
+    const { error } = await supabase
+        .from('todos')
+        .update({ priority_id: priorityId || null })
+        .in('id', todoIds)
+
+    if (error) {
+        console.error('Error bulk updating todo priority:', error)
+        throw error
+    }
+
+    // Update local state
+    const todos = store.get('todos').map(t => {
+        if (todoIds.includes(t.id)) {
+            return { ...t, priority_id: priorityId || null }
+        }
+        return t
+    })
+    store.set('todos', todos)
+
+    // Clear selection
+    store.set('selectedTodoIds', new Set())
+    store.set('lastSelectedTodoId', null)
+
+    events.emit(Events.TODOS_UPDATED)
+}
+
+/**
+ * Toggle selection of a single todo
+ * @param {string} todoId - Todo ID to toggle
+ */
+export function toggleTodoSelection(todoId) {
+    const selectedIds = new Set(store.get('selectedTodoIds'))
+    if (selectedIds.has(todoId)) {
+        selectedIds.delete(todoId)
+    } else {
+        selectedIds.add(todoId)
+    }
+    store.set('selectedTodoIds', selectedIds)
+    store.set('lastSelectedTodoId', todoId)
+}
+
+/**
+ * Select a range of todos (for shift-click)
+ * @param {string} todoId - End of range todo ID
+ * @param {Array<string>} visibleTodoIds - Array of currently visible todo IDs in order
+ */
+export function selectTodoRange(todoId, visibleTodoIds) {
+    const lastSelectedId = store.get('lastSelectedTodoId')
+    if (!lastSelectedId) {
+        // No previous selection, just select this one
+        const selectedIds = new Set([todoId])
+        store.set('selectedTodoIds', selectedIds)
+        store.set('lastSelectedTodoId', todoId)
+        return
+    }
+
+    const startIndex = visibleTodoIds.indexOf(lastSelectedId)
+    const endIndex = visibleTodoIds.indexOf(todoId)
+
+    if (startIndex === -1 || endIndex === -1) {
+        // One of the items not found, just select the clicked one
+        const selectedIds = new Set([todoId])
+        store.set('selectedTodoIds', selectedIds)
+        store.set('lastSelectedTodoId', todoId)
+        return
+    }
+
+    const [from, to] = startIndex < endIndex ? [startIndex, endIndex] : [endIndex, startIndex]
+    const idsToSelect = visibleTodoIds.slice(from, to + 1)
+
+    const selectedIds = new Set(store.get('selectedTodoIds'))
+    idsToSelect.forEach(id => selectedIds.add(id))
+    store.set('selectedTodoIds', selectedIds)
+}
+
+/**
+ * Select all visible todos
+ * @param {Array<string>} visibleTodoIds - Array of currently visible todo IDs
+ */
+export function selectAllTodos(visibleTodoIds) {
+    const selectedIds = new Set(visibleTodoIds)
+    store.set('selectedTodoIds', selectedIds)
+    if (visibleTodoIds.length > 0) {
+        store.set('lastSelectedTodoId', visibleTodoIds[visibleTodoIds.length - 1])
+    }
+}
+
+/**
+ * Clear all todo selections
+ */
+export function clearTodoSelection() {
+    store.set('selectedTodoIds', new Set())
+    store.set('lastSelectedTodoId', null)
+}
+
+/**
  * Update todo project
  * @param {string} todoId - Todo ID
  * @param {string|null} projectId - Project ID or null

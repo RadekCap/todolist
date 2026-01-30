@@ -4684,3 +4684,209 @@ body.sidebar-resizing * {
     padding: 4px 10px;
     font-size: 12px;
 }
+
+/* ===========================================
+   Multi-Select / Selection Bar Styles
+   =========================================== */
+
+/* Selection checkbox on todo items */
+.todo-select-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--ios-blue);
+    flex-shrink: 0;
+    margin-right: 4px;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+}
+
+.todo-item:hover .todo-select-checkbox,
+.todo-item.selected .todo-select-checkbox {
+    opacity: 1;
+}
+
+/* Selected todo item styling */
+.todo-item.selected {
+    background: rgba(0, 122, 255, 0.1);
+    border-left-color: var(--ios-blue) !important;
+    box-shadow: inset 0 0 0 2px rgba(0, 122, 255, 0.15);
+}
+
+.todo-item.selected:hover {
+    background: rgba(0, 122, 255, 0.15);
+}
+
+/* Selection Bar - Floating action bar */
+.selection-bar {
+    display: none;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--ios-material-thick);
+    backdrop-filter: blur(var(--ios-blur-regular));
+    -webkit-backdrop-filter: blur(var(--ios-blur-regular));
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--ios-separator);
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideDown 0.2s ease-out;
+}
+
+.selection-bar.visible {
+    display: flex;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.selection-bar-left,
+.selection-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.selection-count {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ios-label);
+    padding: 0 8px;
+    min-width: 80px;
+}
+
+.selection-bar-btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.selection-bar-btn-secondary {
+    background: var(--ios-gray5);
+    color: var(--ios-label);
+}
+
+.selection-bar-btn-secondary:hover {
+    background: var(--ios-gray4);
+}
+
+.selection-bar-btn-success {
+    background: #34c759;
+    color: white;
+}
+
+.selection-bar-btn-success:hover {
+    background: #2fb150;
+}
+
+.selection-bar-btn-danger {
+    background: var(--ios-red);
+    color: white;
+}
+
+.selection-bar-btn-danger:hover {
+    background: #e32d22;
+}
+
+.selection-bar-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.selection-bar-select {
+    padding: 8px 12px;
+    border: 1px solid var(--ios-separator);
+    border-radius: 6px;
+    font-size: 13px;
+    background: var(--ios-bg-secondary);
+    color: var(--ios-label);
+    cursor: pointer;
+    min-width: 140px;
+}
+
+.selection-bar-select:hover {
+    border-color: var(--ios-gray3);
+}
+
+.selection-bar-select:focus {
+    outline: none;
+    border-color: var(--ios-blue);
+}
+
+/* Dark theme adjustments for selection */
+[data-theme="dark"] .todo-item.selected {
+    background: rgba(10, 132, 255, 0.2);
+    box-shadow: inset 0 0 0 2px rgba(10, 132, 255, 0.2);
+}
+
+[data-theme="dark"] .todo-item.selected:hover {
+    background: rgba(10, 132, 255, 0.25);
+}
+
+[data-theme="dark"] .selection-bar {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .selection-bar-btn-secondary {
+    background: var(--ios-gray4);
+    color: var(--ios-label);
+}
+
+[data-theme="dark"] .selection-bar-btn-secondary:hover {
+    background: var(--ios-gray3);
+}
+
+/* Clear theme adjustments for selection */
+[data-theme="clear"] .todo-item.selected {
+    background: rgba(28, 28, 30, 0.08);
+    border-left-color: var(--ios-blue) !important;
+    box-shadow: inset 0 0 0 2px rgba(28, 28, 30, 0.1);
+}
+
+[data-theme="clear"] .todo-item.selected:hover {
+    background: rgba(28, 28, 30, 0.12);
+}
+
+/* Compact density adjustments for selection */
+[data-density="compact"] .selection-bar {
+    padding: 8px 12px;
+    gap: 8px;
+}
+
+[data-density="compact"] .selection-bar-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+[data-density="compact"] .selection-bar-select {
+    padding: 6px 10px;
+    font-size: 12px;
+}
+
+[data-density="compact"] .selection-count {
+    font-size: 13px;
+}
+
+[data-density="compact"] .todo-select-checkbox {
+    width: 16px;
+    height: 16px;
+}

@@ -18,7 +18,7 @@ import {
     loadUserSettings, saveUserSettings
 } from './src/services/settings.js'
 import { exportTodos } from './src/services/export.js'
-import { loadTodos, addTodo, toggleTodo, deleteTodo, getFilteredTodos, getGtdCount } from './src/services/todos.js'
+import { loadTodos, addTodo, toggleTodo, deleteTodo, getFilteredTodos, getGtdCount, clearTodoSelection } from './src/services/todos.js'
 import { loadProjects, addProject, deleteProject, selectProject } from './src/services/projects.js'
 import { loadAreas, addArea, selectArea, selectAreaByShortcut, restoreSelectedArea } from './src/services/areas.js'
 import { loadCategories } from './src/services/categories.js'
@@ -32,6 +32,7 @@ import { renderGtdList, selectGtdStatus, selectGtdStatusByShortcut } from './src
 import { renderAreasDropdown, updateAreasLabel, updateAreaHeader, renderManageAreasList } from './src/ui/AreasDropdown.js'
 import { TodoModal } from './src/ui/modals/TodoModal.js'
 import { ImportModal } from './src/ui/modals/ImportModal.js'
+import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPrioritySelect } from './src/ui/SelectionBar.js'
 
 // Application version
 const APP_VERSION = '2.1.7'
@@ -114,6 +115,17 @@ class TodoApp {
         this.closeKeyboardShortcutsModalBtn = document.getElementById('closeKeyboardShortcutsModal')
         this.closeKeyboardShortcutsModalBtn2 = document.getElementById('closeKeyboardShortcutsModalBtn')
 
+        // Selection bar elements
+        this.selectionBar = document.getElementById('selectionBar')
+        this.selectionCount = document.getElementById('selectionCount')
+        this.selectAllBtn = document.getElementById('selectAllBtn')
+        this.clearSelectionBtn = document.getElementById('clearSelectionBtn')
+        this.deleteSelectedBtn = document.getElementById('deleteSelectedBtn')
+        this.completeSelectedBtn = document.getElementById('completeSelectedBtn')
+        this.selectionGtdStatusSelect = document.getElementById('selectionGtdStatusSelect')
+        this.selectionProjectSelect = document.getElementById('selectionProjectSelect')
+        this.selectionPrioritySelect = document.getElementById('selectionPrioritySelect')
+
         // Initialize TodoModal
         this.todoModal = new TodoModal({
             modal: document.getElementById('addTodoModal'),
@@ -156,10 +168,25 @@ class TodoApp {
 
         this.initAuth()
         this.initEventListeners()
+        this.initSelectionBar()
         this.setVersion()
         initTheme(this.themeSelect)
         initDensity(this.densitySelect)
         this.subscribeToEvents()
+    }
+
+    initSelectionBar() {
+        initSelectionBar({
+            selectionBar: this.selectionBar,
+            selectionCount: this.selectionCount,
+            selectAllBtn: this.selectAllBtn,
+            clearSelectionBtn: this.clearSelectionBtn,
+            deleteSelectedBtn: this.deleteSelectedBtn,
+            completeSelectedBtn: this.completeSelectedBtn,
+            gtdStatusSelect: this.selectionGtdStatusSelect,
+            projectSelect: this.selectionProjectSelect,
+            prioritySelect: this.selectionPrioritySelect
+        })
     }
 
     setVersion() {
@@ -170,9 +197,16 @@ class TodoApp {
 
     subscribeToEvents() {
         // Subscribe to store changes and re-render
-        store.subscribe('selectedGtdStatus', () => this.render())
-        store.subscribe('selectedProjectId', () => this.render())
+        store.subscribe('selectedGtdStatus', () => {
+            clearTodoSelection() // Clear selection when switching views
+            this.render()
+        })
+        store.subscribe('selectedProjectId', () => {
+            clearTodoSelection() // Clear selection when switching views
+            this.render()
+        })
         store.subscribe('selectedAreaId', () => {
+            clearTodoSelection() // Clear selection when switching views
             renderAreasDropdown(this.areaListContainer, this.toolbarAreasDropdown, this.areaListDivider)
             updateAreasLabel(this.toolbarAreasLabel)
             this.render()
@@ -182,6 +216,7 @@ class TodoApp {
         store.subscribe('projects', () => {
             renderProjects(this.projectList)
             this.todoModal.updateProjectSelect()
+            updateSelectionBarProjectSelect(this.selectionProjectSelect)
         })
         store.subscribe('areas', () => {
             renderAreasDropdown(this.areaListContainer, this.toolbarAreasDropdown, this.areaListDivider)
@@ -190,7 +225,11 @@ class TodoApp {
         })
         store.subscribe('categories', () => this.todoModal.updateCategorySelect())
         store.subscribe('contexts', () => this.todoModal.updateContextSelect())
-        store.subscribe('priorities', () => this.todoModal.updatePrioritySelect())
+        store.subscribe('priorities', () => {
+            this.todoModal.updatePrioritySelect()
+            updateSelectionBarPrioritySelect(this.selectionPrioritySelect)
+        })
+        store.subscribe('selectedTodoIds', () => this.render())
     }
 
     async initAuth() {
@@ -451,10 +490,16 @@ class TodoApp {
             this.openKeyboardShortcutsModal()
         }
 
-        // Escape to unfocus text inputs
-        if (e.key === 'Escape' && isTyping && !modalOpen) {
-            e.preventDefault()
-            document.activeElement.blur()
+        // Escape to unfocus text inputs or clear selection
+        if (e.key === 'Escape' && !modalOpen) {
+            const selectedIds = store.get('selectedTodoIds')
+            if (selectedIds && selectedIds.size > 0) {
+                e.preventDefault()
+                clearTodoSelection()
+            } else if (isTyping) {
+                e.preventDefault()
+                document.activeElement.blur()
+            }
         }
     }
 

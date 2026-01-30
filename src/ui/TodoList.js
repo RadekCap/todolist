@@ -1,7 +1,7 @@
 import { store } from '../core/store.js'
 import { escapeHtml, validateColor } from '../utils/security.js'
 import { formatDateBadge, getDateGroup, getDateGroupLabel } from '../utils/dates.js'
-import { getFilteredTodos, toggleTodo, deleteTodo, updateTodoProject, updateTodoGtdStatus, getProjectTodoCount } from '../services/todos.js'
+import { getFilteredTodos, toggleTodo, deleteTodo, updateTodoProject, updateTodoGtdStatus, getProjectTodoCount, toggleTodoSelection, selectTodoRange } from '../services/todos.js'
 import { getCategoryById } from '../services/categories.js'
 import { getPriorityById } from '../services/priorities.js'
 import { getContextById } from '../services/contexts.js'
@@ -166,7 +166,8 @@ export function renderTodos(container, options = {}) {
         const li = document.createElement('li')
         // Derive completed state from gtd_status (unified status)
         const isCompleted = todo.gtd_status === 'done'
-        li.className = `todo-item ${isCompleted ? 'completed' : ''}`
+        const isSelected = state.selectedTodoIds.has(todo.id)
+        li.className = `todo-item ${isCompleted ? 'completed' : ''} ${isSelected ? 'selected' : ''}`
         li.dataset.todoId = todo.id
 
         const category = todo.category_id ? (getCategoryById(todo.category_id) ?? null) : null
@@ -210,6 +211,13 @@ export function renderTodos(container, options = {}) {
         }
 
         li.innerHTML = `
+            <input
+                type="checkbox"
+                class="todo-select-checkbox"
+                ${isSelected ? 'checked' : ''}
+                data-id="${todo.id}"
+                aria-label="Select todo"
+            >
             <span class="drag-handle" draggable="true">\u22ee\u22ee</span>
             <input
                 type="checkbox"
@@ -229,6 +237,28 @@ export function renderTodos(container, options = {}) {
             ${categoryBadge}
             <button class="delete-btn" data-id="${todo.id}">Delete</button>
         `
+
+        // Selection checkbox events
+        const selectCheckbox = li.querySelector('.todo-select-checkbox')
+        selectCheckbox.addEventListener('click', (e) => {
+            e.stopPropagation()
+            const visibleTodoIds = filteredTodos.map(t => t.id)
+            if (e.shiftKey) {
+                // Shift-click: select range
+                selectTodoRange(todo.id, visibleTodoIds)
+            } else {
+                // Regular click: toggle selection
+                toggleTodoSelection(todo.id)
+            }
+        })
+
+        // Also allow Cmd/Ctrl+click on the todo item itself for selection
+        li.addEventListener('click', (e) => {
+            if ((e.metaKey || e.ctrlKey) && !e.target.closest('.todo-checkbox') && !e.target.closest('.delete-btn') && !e.target.closest('.todo-text')) {
+                e.preventDefault()
+                toggleTodoSelection(todo.id)
+            }
+        })
 
         // Drag handle events
         const dragHandle = li.querySelector('.drag-handle')
