@@ -35,7 +35,7 @@ import { ImportModal } from './src/ui/modals/ImportModal.js'
 import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPrioritySelect } from './src/ui/SelectionBar.js'
 
 // Application version
-const APP_VERSION = '2.1.7'
+const APP_VERSION = '2.1.8'
 
 class TodoApp {
     constructor() {
