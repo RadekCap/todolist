@@ -634,15 +634,15 @@ class TodoApp {
         const urlParams = new URLSearchParams(window.location.search)
         const view = urlParams.get('view')
 
-        if (view === 'tomorrow') {
+        if (view === 'today' || view === 'tomorrow') {
             // Select scheduled view
             selectGtdStatus('scheduled')
 
-            // Scroll to tomorrow section after render
+            // Scroll to the appropriate section after render
             setTimeout(() => {
-                const tomorrowSection = document.querySelector('.scheduled-section-header.tomorrow')
-                if (tomorrowSection) {
-                    tomorrowSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                const section = document.querySelector(`.scheduled-section-header.${view}`)
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' })
                 }
             }, 100)
 

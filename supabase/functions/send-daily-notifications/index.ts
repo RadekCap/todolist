@@ -10,7 +10,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 interface TodoSummary {
-  due_tomorrow: number
+  due_today: number
   overdue: number
 }
 
@@ -54,7 +54,7 @@ Deno.serve(async (_req) => {
       const summary = await getTodoSummary(supabase, user.user_id, user.timezone)
 
       // Skip if nothing to notify about
-      if (summary.due_tomorrow === 0 && summary.overdue === 0) {
+      if (summary.due_today === 0 && summary.overdue === 0) {
         continue
       }
 
@@ -119,11 +119,6 @@ async function getTodoSummary(
   const userNow = new Date(now.toLocaleString('en-US', { timeZone: timezone }))
   const today = userNow.toISOString().split('T')[0]
 
-  // Calculate tomorrow
-  const tomorrow = new Date(userNow)
-  tomorrow.setDate(userNow.getDate() + 1)
-  const tomorrowStr = tomorrow.toISOString().split('T')[0]
-
   const { data: todos, error } = await supabase
     .from('todos')
     .select('due_date')
@@ -134,24 +129,24 @@ async function getTodoSummary(
 
   if (error) throw error
 
-  let due_tomorrow = 0
+  let due_today = 0
   let overdue = 0
 
   for (const todo of todos || []) {
-    if (todo.due_date === tomorrowStr) {
-      due_tomorrow++
+    if (todo.due_date === today) {
+      due_today++
     } else if (todo.due_date < today) {
       overdue++
     }
   }
 
-  return { due_tomorrow, overdue }
+  return { due_today, overdue }
 }
 
 async function sendEmail(email: string, summary: TodoSummary): Promise<void> {
   const subject = summary.overdue > 0
-    ? `${summary.overdue} overdue + ${summary.due_tomorrow} due tomorrow`
-    : `${summary.due_tomorrow} todo${summary.due_tomorrow > 1 ? 's' : ''} due tomorrow`
+    ? `${summary.overdue} overdue + ${summary.due_today} due today`
+    : `${summary.due_today} todo${summary.due_today > 1 ? 's' : ''} due today`
 
   const html = `
     <!DOCTYPE html>
@@ -163,7 +158,7 @@ async function sendEmail(email: string, summary: TodoSummary): Promise<void> {
         h1 { color: #1a1a1a; font-size: 24px; margin-bottom: 20px; }
         .stat { padding: 16px 20px; margin: 12px 0; border-radius: 8px; font-size: 16px; }
         .overdue { background: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; }
-        .tomorrow { background: #dbeafe; border-left: 4px solid #3b82f6; color: #1e40af; }
+        .today { background: #dbeafe; border-left: 4px solid #3b82f6; color: #1e40af; }
         .number { font-size: 28px; font-weight: bold; display: block; margin-bottom: 4px; }
         .cta { display: inline-block; padding: 14px 28px; background: #3b82f6; color: white; text-decoration: none; border-radius: 8px; margin-top: 24px; font-weight: 500; }
         .footer { color: #666; font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; }
@@ -180,14 +175,14 @@ async function sendEmail(email: string, summary: TodoSummary): Promise<void> {
           </div>
         ` : ''}
 
-        ${summary.due_tomorrow > 0 ? `
-          <div class="stat tomorrow">
-            <span class="number">${summary.due_tomorrow}</span>
-            due tomorrow
+        ${summary.due_today > 0 ? `
+          <div class="stat today">
+            <span class="number">${summary.due_today}</span>
+            due today
           </div>
         ` : ''}
 
-        <a href="https://radekcap.github.io/todolist/?view=tomorrow" class="cta">
+        <a href="https://radekcap.github.io/todolist/?view=today" class="cta">
           View Details
         </a>
 
