@@ -15,7 +15,8 @@ import {
 import {
     initTheme, loadThemeFromDatabase, changeTheme, applyTheme,
     initDensity, loadDensityFromDatabase, changeDensity,
-    loadUserSettings, saveUserSettings
+    loadUserSettings, saveUserSettings,
+    loadNotificationSettings, saveNotificationSettings
 } from './src/services/settings.js'
 import { exportTodos } from './src/services/export.js'
 import { loadTodos, addTodo, toggleTodo, deleteTodo, getFilteredTodos, getGtdCount, clearTodoSelection } from './src/services/todos.js'
@@ -62,6 +63,10 @@ class TodoApp {
         this.saveSettingsBtn = document.getElementById('saveSettingsBtn')
         this.migrateDataBtn = document.getElementById('migrateDataBtn')
         this.migrateStatus = document.getElementById('migrateStatus')
+        this.emailNotificationsEnabled = document.getElementById('emailNotificationsEnabled')
+        this.notificationSettingsDetails = document.getElementById('notificationSettingsDetails')
+        this.notificationTime = document.getElementById('notificationTime')
+        this.timezoneSelect = document.getElementById('timezoneSelect')
         this.todoList = document.getElementById('todoList')
         this.projectList = document.getElementById('projectList')
         this.newProjectInput = document.getElementById('newProjectInput')
@@ -318,6 +323,14 @@ class TodoApp {
 
         // Migrate data
         this.migrateDataBtn.addEventListener('click', () => this.migrateExistingData())
+
+        // Email notifications toggle
+        this.emailNotificationsEnabled.addEventListener('change', () => {
+            this.notificationSettingsDetails.style.display = this.emailNotificationsEnabled.checked ? 'block' : 'none'
+        })
+
+        // Populate timezone dropdown
+        this.populateTimezoneSelect()
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => this.handleKeyboardShortcut(e))
@@ -606,12 +619,36 @@ class TodoApp {
         // Restore persisted UI state
         restoreSelectedArea()
 
+        // Handle URL parameters (e.g., ?view=tomorrow from email notifications)
+        this.handleUrlParameters()
+
         // Load non-essential items without waiting
         loadThemeFromDatabase()
         loadDensityFromDatabase()
         this.loadUserSettingsDisplay()
 
         this.hideLoadingScreen()
+    }
+
+    handleUrlParameters() {
+        const urlParams = new URLSearchParams(window.location.search)
+        const view = urlParams.get('view')
+
+        if (view === 'tomorrow') {
+            // Select scheduled view
+            selectGtdStatus('scheduled')
+
+            // Scroll to tomorrow section after render
+            setTimeout(() => {
+                const tomorrowSection = document.querySelector('.scheduled-section-header.tomorrow')
+                if (tomorrowSection) {
+                    tomorrowSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }
+            }, 100)
+
+            // Clean up URL without reloading
+            window.history.replaceState({}, document.title, window.location.pathname)
+        }
     }
 
     async loadUserSettingsDisplay() {
@@ -842,7 +879,7 @@ class TodoApp {
         }
     }
 
-    openSettingsModal() {
+    async openSettingsModal() {
         this.settingsModal.classList.add('active')
 
         const currentUser = store.get('currentUser')
@@ -852,6 +889,13 @@ class TodoApp {
         } else {
             this.usernameInput.value = ''
         }
+
+        // Load notification settings
+        const notificationSettings = await loadNotificationSettings()
+        this.emailNotificationsEnabled.checked = notificationSettings.enabled
+        this.notificationSettingsDetails.style.display = notificationSettings.enabled ? 'block' : 'none'
+        this.notificationTime.value = notificationSettings.time
+        this.timezoneSelect.value = notificationSettings.timezone
 
         this.handleSettingsEscapeKey = (e) => {
             if (e.key === 'Escape') this.closeSettingsModal()
@@ -869,10 +913,21 @@ class TodoApp {
         }
 
         this.usernameInput.value = ''
+        this.emailNotificationsEnabled.checked = false
+        this.notificationSettingsDetails.style.display = 'none'
 
         if (this.settingsBtn && typeof this.settingsBtn.focus === 'function') {
             this.settingsBtn.focus()
         }
+    }
+
+    populateTimezoneSelect() {
+        const timezones = Intl.supportedValuesOf('timeZone')
+        const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+        this.timezoneSelect.innerHTML = timezones.map(tz =>
+            `<option value="${tz}"${tz === userTimezone ? ' selected' : ''}>${tz.replace(/_/g, ' ')}</option>`
+        ).join('')
     }
 
     async saveSettings() {
@@ -883,11 +938,23 @@ class TodoApp {
 
         const result = await saveUserSettings({ username })
 
+        // Save notification settings
+        const notificationResult = await saveNotificationSettings({
+            enabled: this.emailNotificationsEnabled.checked,
+            time: this.notificationTime.value,
+            timezone: this.timezoneSelect.value
+        })
+
         this.saveSettingsBtn.disabled = false
         this.saveSettingsBtn.textContent = 'Save Settings'
 
         if (!result.success) {
             alert(result.error || 'Failed to save settings')
+            return
+        }
+
+        if (!notificationResult.success) {
+            alert(notificationResult.error || 'Failed to save notification settings')
             return
         }
 
