@@ -624,6 +624,36 @@
                         </button>
                         <div id="migrateStatus" style="margin-top: 10px; font-size: 13px; display: none;"></div>
                     </div>
+                    <div style="border-top: 1px solid #e0e0e0; padding-top: 15px; margin-top: 15px;">
+                        <label>Email Notifications</label>
+                        <p style="color: #666; font-size: 13px; margin: 5px 0 10px 0;">
+                            Receive daily email summaries of your scheduled todos.
+                        </p>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <input type="checkbox" id="emailNotificationsEnabled" style="width: auto; margin: 0;">
+                            <label for="emailNotificationsEnabled" style="margin: 0; font-weight: normal;">Enable daily email notifications</label>
+                        </div>
+                        <div id="notificationSettingsDetails" style="display: none; margin-top: 15px;">
+                            <div style="margin-bottom: 10px;">
+                                <label for="notificationTime" style="display: block; margin-bottom: 5px;">Send at:</label>
+                                <select id="notificationTime" class="modal-sidebar-select" style="width: 100%;">
+                                    <option value="06:00:00">6:00 AM</option>
+                                    <option value="07:00:00">7:00 AM</option>
+                                    <option value="08:00:00" selected>8:00 AM</option>
+                                    <option value="09:00:00">9:00 AM</option>
+                                    <option value="10:00:00">10:00 AM</option>
+                                    <option value="12:00:00">12:00 PM</option>
+                                    <option value="18:00:00">6:00 PM</option>
+                                    <option value="20:00:00">8:00 PM</option>
+                                    <option value="21:00:00">9:00 PM</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="timezoneSelect" style="display: block; margin-bottom: 5px;">Timezone:</label>
+                                <select id="timezoneSelect" class="modal-sidebar-select" style="width: 100%;"></select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="modal-actions">
                         <button type="button" id="cancelSettingsModal" class="modal-btn modal-btn-secondary">Cancel</button>
                         <button type="submit" id="saveSettingsBtn" class="modal-btn modal-btn-primary">Save Settings</button>
