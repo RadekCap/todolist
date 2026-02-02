@@ -582,7 +582,7 @@ export function getFilteredTodos() {
     }
 
     // Filter by area (through project.area_id)
-    // Inbox items are always shown regardless of area selection
+    // Inbox items and items without a project are always shown regardless of area selection
     if (state.selectedAreaId !== 'all') {
         filtered = filtered.filter(t => {
             // Inbox items are always visible
@@ -590,11 +590,16 @@ export function getFilteredTodos() {
                 return true
             }
 
+            // Todos without a project are always visible (they're unassigned to any area)
+            if (!t.project_id) {
+                return true
+            }
+
             // Get the project's area
-            const project = t.project_id ? state.projects.find(p => p.id === t.project_id) : null
+            const project = state.projects.find(p => p.id === t.project_id)
 
             if (state.selectedAreaId === 'unassigned') {
-                // Show items where the project has no area, or item has no project
+                // Show items where the project has no area
                 return !project || project.area_id === null
             } else {
                 // Show items where the project belongs to the selected area
