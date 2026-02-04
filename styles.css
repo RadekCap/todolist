@@ -910,6 +910,7 @@ body.sidebar-resizing * {
     margin-bottom: 10px;
     border-radius: 8px;
     display: flex;
+    flex-wrap: nowrap; /* Prevent Safari iOS from incorrectly wrapping flex items */
     align-items: center;
     gap: 12px;
     transition: background 0.3s, transform 0.3s, opacity 0.3s, box-shadow 0.3s;
@@ -958,6 +959,7 @@ body.sidebar-resizing * {
     opacity: 0.6;
     transition: opacity 0.2s, color 0.2s, transform 0.2s, background-color 0.2s;
     border-radius: 4px;
+    flex-shrink: 0; /* Prevent Safari iOS from shrinking */
 }
 
 .drag-handle:hover {
@@ -982,6 +984,7 @@ body.sidebar-resizing * {
     height: 20px;
     cursor: pointer;
     accent-color: var(--accent-color);
+    flex-shrink: 0; /* Prevent Safari iOS from shrinking */
 }
 
 .todo-content {
@@ -1020,6 +1023,7 @@ body.sidebar-resizing * {
     font-weight: 600;
     color: white;
     white-space: nowrap;
+    flex-shrink: 0; /* Prevent Safari iOS from shrinking badges causing vertical text */
 }
 
 .todo-date {
@@ -1030,6 +1034,7 @@ body.sidebar-resizing * {
     color: #666;
     background: #f0f0f0;
     white-space: nowrap;
+    flex-shrink: 0; /* Prevent Safari iOS from shrinking badges causing vertical text */
 }
 
 .todo-date.overdue {
@@ -1049,6 +1054,7 @@ body.sidebar-resizing * {
     font-weight: 600;
     color: white;
     white-space: nowrap;
+    flex-shrink: 0; /* Prevent Safari iOS from shrinking badges causing vertical text */
 }
 
 .delete-btn {
@@ -1060,6 +1066,7 @@ body.sidebar-resizing * {
     cursor: pointer;
     font-size: 14px;
     transition: background 0.3s;
+    flex-shrink: 0; /* Prevent Safari iOS from shrinking buttons */
 }
 
 .delete-btn:hover {
@@ -2790,6 +2797,7 @@ body.sidebar-resizing * {
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
+    flex-shrink: 0; /* Prevent Safari iOS from shrinking badges causing vertical text */
 }
 
 .todo-gtd-badge.inbox {
@@ -2831,6 +2839,7 @@ body.sidebar-resizing * {
     background: #eceff1;
     color: #546e7a;
     white-space: nowrap;
+    flex-shrink: 0; /* Prevent Safari iOS from shrinking badges causing vertical text */
 }
 
 /* ========================================
