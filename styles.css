@@ -722,6 +722,7 @@ body.sidebar-resizing * {
     flex: 1;
     min-width: 0;
     scrollbar-gutter: stable;
+    overflow-x: hidden; /* Prevent horizontal overflow that can cause Safari iOS layout issues */
 }
 
 /* Area Header - Shows current area with color indicator */
@@ -836,6 +837,7 @@ body.sidebar-resizing * {
 .todo-list {
     list-style: none;
     min-height: 360px;
+    width: 100%; /* Ensure full width for Safari iOS layout calculation */
 }
 
 /* Scheduled view section headers */
@@ -988,15 +990,18 @@ body.sidebar-resizing * {
 }
 
 .todo-content {
-    flex: 1;
+    flex: 1 1 0%; /* Explicit flex-basis of 0% helps Safari iOS calculate width correctly */
     min-width: 0;
+    overflow: hidden; /* Prevent Safari iOS from incorrectly calculating text layout */
 }
 
 .todo-text {
     color: #333;
     font-size: 16px;
     word-break: break-word;
+    overflow-wrap: break-word; /* Ensure proper word wrapping on Safari iOS */
     cursor: pointer;
+    display: block; /* Ensure block display to prevent inline flex issues on Safari iOS */
 }
 
 .todo-comment {
@@ -1005,6 +1010,8 @@ body.sidebar-resizing * {
     margin-top: 4px;
     line-height: 1.4;
     word-break: break-word;
+    overflow-wrap: break-word; /* Ensure proper word wrapping on Safari iOS */
+    display: block; /* Ensure block display to prevent inline flex issues on Safari iOS */
 }
 
 .todo-item.completed .todo-text {
