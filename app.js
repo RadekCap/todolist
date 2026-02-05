@@ -18,8 +18,7 @@ import {
     loadUserSettings, saveUserSettings,
     loadNotificationSettings, saveNotificationSettings
 } from './src/services/settings.js'
-import { exportTodos } from './src/services/export.js'
-import { loadTodos, addTodo, toggleTodo, deleteTodo, getFilteredTodos, getGtdCount, clearTodoSelection } from './src/services/todos.js'
+import { loadTodos, addTodo, toggleTodo, deleteTodo, getGtdCount, clearTodoSelection } from './src/services/todos.js'
 import { loadProjects, addProject, deleteProject, selectProject } from './src/services/projects.js'
 import { loadAreas, addArea, selectArea, selectAreaByShortcut, restoreSelectedArea } from './src/services/areas.js'
 import { loadCategories } from './src/services/categories.js'
@@ -33,10 +32,11 @@ import { renderGtdList, selectGtdStatus, selectGtdStatusByShortcut } from './src
 import { renderAreasDropdown, updateAreasLabel, updateAreaHeader, renderManageAreasList } from './src/ui/AreasDropdown.js'
 import { TodoModal } from './src/ui/modals/TodoModal.js'
 import { ImportModal } from './src/ui/modals/ImportModal.js'
+import { ExportModal } from './src/ui/modals/ExportModal.js'
 import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPrioritySelect } from './src/ui/SelectionBar.js'
 
 // Application version
-const APP_VERSION = '2.1.13'
+const APP_VERSION = '2.2.0'
 
 class TodoApp {
     constructor() {
@@ -169,6 +169,15 @@ class TodoApp {
             closeBtn: document.getElementById('closeImportModal'),
             cancelBtn: document.getElementById('cancelImportModal'),
             openBtn: document.getElementById('openImportModal')
+        })
+
+        // Initialize ExportModal
+        this.exportModal = new ExportModal({
+            modal: document.getElementById('exportModal'),
+            formatSelect: document.getElementById('exportFormatSelect'),
+            confirmBtn: document.getElementById('confirmExportBtn'),
+            closeBtn: document.getElementById('closeExportModal'),
+            cancelBtn: document.getElementById('cancelExportModal')
         })
 
         this.initAuth()
@@ -360,7 +369,7 @@ class TodoApp {
         this.densitySelect.addEventListener('change', () => changeDensity(this.densitySelect.value))
 
         // Export button
-        this.exportBtn.addEventListener('click', () => exportTodos(getFilteredTodos()))
+        this.exportBtn.addEventListener('click', () => this.exportModal.open())
 
         // Search input
         this.searchInput.addEventListener('input', () => {
@@ -463,7 +472,9 @@ class TodoApp {
                         this.settingsModal.classList.contains('active') ||
                         this.manageAreasModal.classList.contains('active') ||
                         this.manageProjectsModal.classList.contains('active') ||
-                        this.keyboardShortcutsModal.classList.contains('active')
+                        this.keyboardShortcutsModal.classList.contains('active') ||
+                        this.exportModal.modal.classList.contains('active') ||
+                        this.importModal.modal.classList.contains('active')
 
         // 'n' to create new item
         if (e.code === 'KeyN' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {

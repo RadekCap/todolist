@@ -475,6 +475,34 @@
             </div>
         </div>
 
+        <!-- Export Modal -->
+        <div id="exportModal" class="modal-overlay">
+            <div class="modal" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+                <div class="modal-header">
+                    <h2 id="exportModalTitle">Export Todos</h2>
+                    <button id="closeExportModal" class="modal-close" aria-label="Close modal">&times;</button>
+                </div>
+                <div class="modal-form">
+                    <div class="modal-field">
+                        <label for="exportFormatSelect">Export Format</label>
+                        <select id="exportFormatSelect" class="modal-sidebar-select" style="width: 100%;">
+                            <option value="text">Plain Text (.txt)</option>
+                            <option value="json">JSON (.json)</option>
+                            <option value="csv">CSV (.csv)</option>
+                            <option value="xml">XML (.xml)</option>
+                        </select>
+                        <small style="color: #999; font-size: 12px; display: block; margin-top: 5px;">
+                            Choose the format for your exported todos
+                        </small>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelExportModal" class="modal-btn modal-btn-secondary">Cancel</button>
+                        <button type="button" id="confirmExportBtn" class="modal-btn modal-btn-primary">Export</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Import Modal -->
         <div id="importModal" class="modal-overlay">
             <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="importModalTitle">
