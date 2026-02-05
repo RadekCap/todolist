@@ -62,12 +62,13 @@ export function getExportFileName() {
 }
 
 /**
- * Download content as a text file
+ * Download content as a file
  * @param {string} content - File content
  * @param {string} filename - File name with extension
+ * @param {string} mimeType - MIME type for the file
  */
-export function downloadTextFile(content, filename) {
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+export function downloadFile(content, filename, mimeType = 'text/plain;charset=utf-8') {
+    const blob = new Blob([content], { type: mimeType })
     const url = URL.createObjectURL(blob)
 
     const link = document.createElement('a')
@@ -84,7 +85,7 @@ export function downloadTextFile(content, filename) {
  * Export filtered todos as plain text
  * @param {Array} filteredTodos - Array of todo objects to export
  */
-export function exportTodos(filteredTodos) {
+export function exportTodosAsText(filteredTodos) {
     const state = store.state
 
     if (filteredTodos.length === 0) {
@@ -152,5 +153,199 @@ export function exportTodos(filteredTodos) {
     const content = lines.join('\n')
 
     // Download as file
-    downloadTextFile(content, `todolist-export-${getExportFileName()}.txt`)
+    downloadFile(content, `todolist-export-${getExportFileName()}.txt`, 'text/plain;charset=utf-8')
+}
+
+/**
+ * Export filtered todos as JSON
+ * @param {Array} filteredTodos - Array of todo objects to export
+ */
+export function exportTodosAsJSON(filteredTodos) {
+    const state = store.state
+
+    if (filteredTodos.length === 0) {
+        alert('No todos to export')
+        return
+    }
+
+    const exportData = {
+        metadata: {
+            view: getExportViewName(),
+            exportedAt: new Date().toISOString(),
+            totalCount: filteredTodos.length,
+            completedCount: filteredTodos.filter(t => t.gtd_status === 'done').length
+        },
+        todos: filteredTodos.map(todo => {
+            const category = todo.category_id ? state.categories.find(c => c.id === todo.category_id) : null
+            const project = todo.project_id ? state.projects.find(p => p.id === todo.project_id) : null
+            const context = todo.context_id ? state.contexts.find(c => c.id === todo.context_id) : null
+            const priority = todo.priority_id ? state.priorities.find(p => p.id === todo.priority_id) : null
+
+            return {
+                id: todo.id,
+                text: todo.text,
+                completed: todo.gtd_status === 'done',
+                gtdStatus: todo.gtd_status,
+                dueDate: todo.due_date || null,
+                category: category ? category.name : null,
+                project: project ? project.name : null,
+                context: context ? context.name : null,
+                priority: priority ? priority.name : null,
+                comment: todo.comment || null,
+                createdAt: todo.created_at
+            }
+        })
+    }
+
+    const content = JSON.stringify(exportData, null, 2)
+    downloadFile(content, `todolist-export-${getExportFileName()}.json`, 'application/json;charset=utf-8')
+}
+
+/**
+ * Export filtered todos as CSV
+ * @param {Array} filteredTodos - Array of todo objects to export
+ */
+export function exportTodosAsCSV(filteredTodos) {
+    const state = store.state
+
+    if (filteredTodos.length === 0) {
+        alert('No todos to export')
+        return
+    }
+
+    // Helper function to escape CSV values
+    const escapeCSV = (value) => {
+        if (value === null || value === undefined) return ''
+        const stringValue = String(value)
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+            return `"${stringValue.replace(/"/g, '""')}"`
+        }
+        return stringValue
+    }
+
+    // CSV header
+    const headers = ['ID', 'Text', 'Completed', 'GTD Status', 'Due Date', 'Category', 'Project', 'Context', 'Priority', 'Comment', 'Created At']
+    const csvLines = [headers.join(',')]
+
+    // CSV rows
+    filteredTodos.forEach(todo => {
+        const category = todo.category_id ? state.categories.find(c => c.id === todo.category_id) : null
+        const project = todo.project_id ? state.projects.find(p => p.id === todo.project_id) : null
+        const context = todo.context_id ? state.contexts.find(c => c.id === todo.context_id) : null
+        const priority = todo.priority_id ? state.priorities.find(p => p.id === todo.priority_id) : null
+
+        const row = [
+            escapeCSV(todo.id),
+            escapeCSV(todo.text),
+            todo.gtd_status === 'done' ? 'Yes' : 'No',
+            escapeCSV(todo.gtd_status),
+            escapeCSV(todo.due_date),
+            escapeCSV(category ? category.name : ''),
+            escapeCSV(project ? project.name : ''),
+            escapeCSV(context ? context.name : ''),
+            escapeCSV(priority ? priority.name : ''),
+            escapeCSV(todo.comment),
+            escapeCSV(todo.created_at)
+        ]
+        csvLines.push(row.join(','))
+    })
+
+    const content = csvLines.join('\n')
+    downloadFile(content, `todolist-export-${getExportFileName()}.csv`, 'text/csv;charset=utf-8')
+}
+
+/**
+ * Export filtered todos as XML
+ * @param {Array} filteredTodos - Array of todo objects to export
+ */
+export function exportTodosAsXML(filteredTodos) {
+    const state = store.state
+
+    if (filteredTodos.length === 0) {
+        alert('No todos to export')
+        return
+    }
+
+    // Helper function to escape XML special characters
+    const escapeXML = (value) => {
+        if (value === null || value === undefined) return ''
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;')
+    }
+
+    const xmlLines = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xmlLines.push('<todolist>')
+    xmlLines.push('  <metadata>')
+    xmlLines.push(`    <view>${escapeXML(getExportViewName())}</view>`)
+    xmlLines.push(`    <exportedAt>${escapeXML(new Date().toISOString())}</exportedAt>`)
+    xmlLines.push(`    <totalCount>${filteredTodos.length}</totalCount>`)
+    xmlLines.push(`    <completedCount>${filteredTodos.filter(t => t.gtd_status === 'done').length}</completedCount>`)
+    xmlLines.push('  </metadata>')
+    xmlLines.push('  <todos>')
+
+    filteredTodos.forEach(todo => {
+        const category = todo.category_id ? state.categories.find(c => c.id === todo.category_id) : null
+        const project = todo.project_id ? state.projects.find(p => p.id === todo.project_id) : null
+        const context = todo.context_id ? state.contexts.find(c => c.id === todo.context_id) : null
+        const priority = todo.priority_id ? state.priorities.find(p => p.id === todo.priority_id) : null
+
+        xmlLines.push('    <todo>')
+        xmlLines.push(`      <id>${escapeXML(todo.id)}</id>`)
+        xmlLines.push(`      <text>${escapeXML(todo.text)}</text>`)
+        xmlLines.push(`      <completed>${todo.gtd_status === 'done'}</completed>`)
+        xmlLines.push(`      <gtdStatus>${escapeXML(todo.gtd_status)}</gtdStatus>`)
+        if (todo.due_date) {
+            xmlLines.push(`      <dueDate>${escapeXML(todo.due_date)}</dueDate>`)
+        }
+        if (category) {
+            xmlLines.push(`      <category>${escapeXML(category.name)}</category>`)
+        }
+        if (project) {
+            xmlLines.push(`      <project>${escapeXML(project.name)}</project>`)
+        }
+        if (context) {
+            xmlLines.push(`      <context>${escapeXML(context.name)}</context>`)
+        }
+        if (priority) {
+            xmlLines.push(`      <priority>${escapeXML(priority.name)}</priority>`)
+        }
+        if (todo.comment) {
+            xmlLines.push(`      <comment>${escapeXML(todo.comment)}</comment>`)
+        }
+        xmlLines.push(`      <createdAt>${escapeXML(todo.created_at)}</createdAt>`)
+        xmlLines.push('    </todo>')
+    })
+
+    xmlLines.push('  </todos>')
+    xmlLines.push('</todolist>')
+
+    const content = xmlLines.join('\n')
+    downloadFile(content, `todolist-export-${getExportFileName()}.xml`, 'application/xml;charset=utf-8')
+}
+
+/**
+ * Export filtered todos in the specified format
+ * @param {Array} filteredTodos - Array of todo objects to export
+ * @param {string} format - Export format ('text', 'json', 'csv', 'xml')
+ */
+export function exportTodos(filteredTodos, format = 'text') {
+    switch (format.toLowerCase()) {
+        case 'json':
+            exportTodosAsJSON(filteredTodos)
+            break
+        case 'csv':
+            exportTodosAsCSV(filteredTodos)
+            break
+        case 'xml':
+            exportTodosAsXML(filteredTodos)
+            break
+        case 'text':
+        default:
+            exportTodosAsText(filteredTodos)
+            break
+    }
 }
