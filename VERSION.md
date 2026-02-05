@@ -28,7 +28,21 @@ When preparing a feature release or breaking change:
 
 ## Changelog
 
-### Version 2.1.0 (Current)
+### Version 2.2.0 (Current)
+**Release Date:** 2026-02-05
+
+**New Features:**
+- **Multi-Format Export**: Export todos in multiple file formats
+  - Plain Text (.txt) - Human-readable format with metadata
+  - JSON (.json) - Structured data with metadata, ideal for programmatic use
+  - CSV (.csv) - Spreadsheet-compatible format for Excel/Google Sheets
+  - XML (.xml) - Hierarchical data format for systems integration
+- **Export Modal**: New modal interface for selecting export format
+- **Security**: All user-generated content is properly escaped in XML and CSV formats
+
+---
+
+### Version 2.1.0
 **Release Date:** 2026-01-25
 
 **New Features:**
@@ -161,5 +175,5 @@ When preparing a feature or breaking change release:
 
 ---
 
-**Current Version:** 2.1.13
-**Last Updated:** 2026-02-04
+**Current Version:** 2.2.0
+**Last Updated:** 2026-02-05
