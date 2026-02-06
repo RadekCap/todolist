@@ -52,6 +52,7 @@ class TodoApp {
         this.toolbarUserMenu = document.getElementById('toolbarUserMenu')
         this.toolbarUserBtn = document.getElementById('toolbarUserBtn')
         this.settingsBtn = document.getElementById('settingsBtn')
+        this.keyboardShortcutsBtn = document.getElementById('keyboardShortcutsBtn')
         this.refreshBtn = document.getElementById('refreshBtn')
         this.lockBtn = document.getElementById('lockBtn')
         this.logoutBtn = document.getElementById('logoutBtn')
@@ -318,6 +319,11 @@ class TodoApp {
             this.closeToolbarMenu()
             this.openSettingsModal()
         })
+        // Keyboard shortcuts from menu
+        this.keyboardShortcutsBtn.addEventListener('click', () => {
+            this.closeToolbarMenu()
+            this.openKeyboardShortcutsModal()
+        })
         this.closeSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
         this.cancelSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
         this.settingsModal.addEventListener('click', (e) => {
@@ -508,8 +514,8 @@ class TodoApp {
             this.searchInput.focus()
         }
 
-        // '?' to show keyboard shortcuts help
-        if (e.key === '?' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
+        // 'k' or '?' to show keyboard shortcuts help
+        if ((e.key === 'k' || e.key === '?') && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
             e.preventDefault()
             this.openKeyboardShortcutsModal()
         }
