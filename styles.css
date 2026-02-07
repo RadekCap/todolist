@@ -2673,6 +2673,23 @@ body.sidebar-resizing * {
     .modal-form-sidebar {
         grid-template-columns: 1fr;
     }
+
+    .content-toolbar .toolbar-btn.add-todo-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .toolbar-areas-label {
+        max-width: 60px;
+    }
+
+    .toolbar-username {
+        max-width: 50px;
+    }
+
+    .toolbar-search {
+        min-width: 60px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -2705,6 +2722,72 @@ body.sidebar-resizing * {
 
     .form-columns {
         flex-direction: column;
+    }
+
+    /* Mobile toolbar layout */
+    .content-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .toolbar-spacer {
+        display: none;
+    }
+
+    .content-toolbar .toolbar-btn.add-todo-btn {
+        font-size: 13px;
+        padding: 8px 14px;
+        white-space: nowrap;
+        width: auto;
+        margin-bottom: 0;
+    }
+
+    .toolbar-search {
+        flex: 1 1 auto;
+        min-width: 80px;
+        margin-left: 0;
+    }
+
+    .content-toolbar .toolbar-btn-secondary {
+        padding: 5px 10px;
+        font-size: 12px;
+        margin-right: 0;
+    }
+
+    .toolbar-theme-select,
+    .toolbar-density-select {
+        padding: 5px 8px;
+        font-size: 12px;
+        margin-right: 0;
+    }
+
+    .toolbar-username {
+        max-width: 80px;
+    }
+
+    .toolbar-areas-label {
+        max-width: 90px;
+    }
+
+    /* Mobile sidebar buttons */
+    .add-project-form {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .add-project-input {
+        flex: 1;
+        margin-bottom: 0;
+    }
+
+    .add-project-btn {
+        width: auto;
+        flex-shrink: 0;
+    }
+
+    .manage-projects-btn {
+        width: auto;
     }
 }
 
