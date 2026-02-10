@@ -2690,6 +2690,34 @@ body.sidebar-resizing * {
     .toolbar-search {
         min-width: 60px;
     }
+
+    /* Extra-small mobile todo items */
+    .todo-item {
+        padding: 10px;
+        gap: 6px;
+    }
+
+    .todo-text {
+        font-size: 14px;
+    }
+
+    .todo-comment {
+        font-size: 12px;
+    }
+
+    .todo-gtd-badge,
+    .todo-priority-badge,
+    .todo-context-badge,
+    .todo-date,
+    .todo-category-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+
+    .delete-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -2788,6 +2816,107 @@ body.sidebar-resizing * {
 
     .manage-projects-btn {
         width: auto;
+    }
+
+    /* === MOBILE TODO ITEM LAYOUT === */
+    .todo-item {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .todo-item .drag-handle {
+        display: none;
+    }
+
+    .todo-item .todo-select-checkbox {
+        display: none;
+    }
+
+    .todo-checkbox {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        min-height: 22px;
+    }
+
+    .todo-item:hover {
+        transform: none;
+    }
+
+    .delete-btn {
+        order: 1;
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+    .recurring-icon {
+        order: 0;
+    }
+
+    .todo-gtd-badge,
+    .todo-priority-badge,
+    .todo-context-badge,
+    .todo-date,
+    .todo-category-badge {
+        order: 2;
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+
+    /* Themed todo items must also set flex-wrap (higher specificity overrides base) */
+    [data-theme="glass"] .todo-item,
+    [data-theme="dark"] .todo-item,
+    [data-theme="clear"] .todo-item {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 16px;
+    }
+
+    [data-theme="glass"] .todo-item:hover,
+    [data-theme="dark"] .todo-item:hover,
+    [data-theme="clear"] .todo-item:hover {
+        transform: none;
+    }
+
+    [data-theme="glass"] .todo-item .drag-handle,
+    [data-theme="dark"] .todo-item .drag-handle,
+    [data-theme="clear"] .todo-item .drag-handle {
+        display: none;
+    }
+
+    /* Compact density + mobile */
+    [data-density="compact"] .todo-item {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px 10px;
+    }
+
+    [data-density="compact"] .todo-item .drag-handle,
+    [data-density="compact"] .todo-item .todo-select-checkbox {
+        display: none;
+    }
+
+    [data-density="compact"][data-theme="glass"] .todo-item,
+    [data-density="compact"][data-theme="dark"] .todo-item,
+    [data-density="compact"][data-theme="clear"] .todo-item {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px 12px;
+    }
+
+    [data-density="compact"] .todo-gtd-badge,
+    [data-density="compact"] .todo-priority-badge,
+    [data-density="compact"] .todo-context-badge,
+    [data-density="compact"] .todo-date,
+    [data-density="compact"] .todo-category-badge {
+        order: 2;
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+
+    [data-density="compact"] .delete-btn {
+        order: 1;
     }
 }
 
