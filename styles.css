@@ -2950,6 +2950,52 @@ body.sidebar-resizing * {
         padding: 4px 8px;
         font-size: 12px;
     }
+
+    /* === MOBILE MANAGE PROJECTS DIALOG === */
+    /* Line 1: color + project name/description + edit/delete */
+    /* Line 2: area dropdown (full width) */
+    .manage-projects-item {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 6px 10px;
+        padding: 12px;
+        align-items: center;
+    }
+
+    .manage-projects-drag-handle {
+        display: none;
+    }
+
+    .manage-projects-color {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .manage-projects-details {
+        grid-column: 2;
+        grid-row: 1;
+        min-width: 0;
+    }
+
+    .manage-projects-actions {
+        grid-column: 3;
+        grid-row: 1;
+        opacity: 1;
+    }
+
+    .manage-projects-area {
+        grid-column: 2 / -1;
+        grid-row: 2;
+        max-width: none;
+        width: 100%;
+    }
+
+    .manage-projects-edit,
+    .manage-projects-delete {
+        padding: 6px 10px;
+        font-size: 16px;
+    }
 }
 
 /* ========================================
