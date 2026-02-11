@@ -36,7 +36,7 @@ import { ExportModal } from './src/ui/modals/ExportModal.js'
 import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPrioritySelect } from './src/ui/SelectionBar.js'
 
 // Application version
-const APP_VERSION = '2.2.4'
+const APP_VERSION = '2.2.5'
 
 class TodoApp {
     constructor() {
