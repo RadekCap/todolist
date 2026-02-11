@@ -128,6 +128,7 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.delete-btn/,
     /\.drag-handle/,
     /\.recurring-icon/,
+    /\.todo-meta/,
     // Category items (rendered by JavaScript)
     /\.category-item/,
     /\.category-name/,

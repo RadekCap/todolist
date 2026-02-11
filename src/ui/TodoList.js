@@ -225,16 +225,17 @@ export function renderTodos(container, options = {}) {
                 ${isCompleted ? 'checked' : ''}
                 data-id="${todo.id}"
             >
-            ${recurringIcon}
             <div class="todo-content">
-                <span class="todo-text">${escapeHtml(todo.text)}</span>
+                <span class="todo-text">${recurringIcon}${escapeHtml(todo.text)}</span>
                 ${commentHtml}
             </div>
-            ${gtdBadge}
-            ${priorityBadge}
-            ${contextBadge}
-            ${dateBadge}
-            ${categoryBadge}
+            <div class="todo-meta">
+                ${gtdBadge}
+                ${priorityBadge}
+                ${contextBadge}
+                ${dateBadge}
+                ${categoryBadge}
+            </div>
             <button class="delete-btn" data-id="${todo.id}">Delete</button>
         `
 
