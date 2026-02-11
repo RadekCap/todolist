@@ -1023,6 +1023,10 @@ body.sidebar-resizing * {
     color: #aaa;
 }
 
+.todo-meta {
+    display: contents; /* Desktop: badges behave as direct flex children */
+}
+
 .todo-category-badge {
     padding: 4px 10px;
     border-radius: 12px;
@@ -2642,6 +2646,7 @@ body.sidebar-resizing * {
     color: var(--accent-color);
     opacity: 0.7;
     flex-shrink: 0;
+    vertical-align: text-bottom;
 }
 
 .recurring-icon svg {
@@ -2694,7 +2699,7 @@ body.sidebar-resizing * {
     /* Extra-small mobile todo items */
     .todo-item {
         padding: 10px;
-        gap: 6px;
+        gap: 2px 6px;
     }
 
     .todo-text {
@@ -2703,6 +2708,10 @@ body.sidebar-resizing * {
 
     .todo-comment {
         font-size: 12px;
+    }
+
+    .todo-meta {
+        gap: 3px;
     }
 
     .todo-gtd-badge,
@@ -2818,11 +2827,16 @@ body.sidebar-resizing * {
         width: auto;
     }
 
-    /* === MOBILE TODO ITEM LAYOUT === */
+    /* === MOBILE TODO ITEM TWO-LINE LAYOUT === */
+    /* Line 1: checkbox + text + delete button */
+    /* Line 2: badges (aligned under text) */
     .todo-item {
-        flex-wrap: wrap;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 4px 10px;
         padding: 12px;
+        align-items: center;
     }
 
     .todo-item .drag-handle {
@@ -2834,24 +2848,33 @@ body.sidebar-resizing * {
     }
 
     .todo-checkbox {
+        grid-column: 1;
+        grid-row: 1;
         width: 22px;
         height: 22px;
         min-width: 22px;
         min-height: 22px;
     }
 
-    .todo-item:hover {
-        transform: none;
+    .todo-content {
+        grid-column: 2;
+        grid-row: 1;
+        min-width: 0;
     }
 
     .delete-btn {
-        order: 1;
+        grid-column: 3;
+        grid-row: 1;
         padding: 6px 12px;
         font-size: 13px;
     }
 
-    .recurring-icon {
-        order: 0;
+    .todo-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        grid-column: 2 / -1;
+        grid-row: 2;
     }
 
     .todo-gtd-badge,
@@ -2859,17 +2882,22 @@ body.sidebar-resizing * {
     .todo-context-badge,
     .todo-date,
     .todo-category-badge {
-        order: 2;
         font-size: 11px;
         padding: 3px 8px;
     }
 
-    /* Themed todo items must also set flex-wrap (higher specificity overrides base) */
+    .todo-item:hover {
+        transform: none;
+    }
+
+    /* Themed todo items must also use grid layout */
     [data-theme="glass"] .todo-item,
     [data-theme="dark"] .todo-item,
     [data-theme="clear"] .todo-item {
-        flex-wrap: wrap;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 4px 10px;
         padding: 12px 16px;
     }
 
@@ -2887,8 +2915,10 @@ body.sidebar-resizing * {
 
     /* Compact density + mobile */
     [data-density="compact"] .todo-item {
-        flex-wrap: wrap;
-        gap: 6px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 2px 8px;
         padding: 8px 10px;
     }
 
@@ -2900,8 +2930,10 @@ body.sidebar-resizing * {
     [data-density="compact"][data-theme="glass"] .todo-item,
     [data-density="compact"][data-theme="dark"] .todo-item,
     [data-density="compact"][data-theme="clear"] .todo-item {
-        flex-wrap: wrap;
-        gap: 6px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-rows: auto auto;
+        gap: 2px 8px;
         padding: 8px 12px;
     }
 
@@ -2910,13 +2942,13 @@ body.sidebar-resizing * {
     [data-density="compact"] .todo-context-badge,
     [data-density="compact"] .todo-date,
     [data-density="compact"] .todo-category-badge {
-        order: 2;
         font-size: 10px;
         padding: 2px 6px;
     }
 
     [data-density="compact"] .delete-btn {
-        order: 1;
+        padding: 4px 8px;
+        font-size: 12px;
     }
 }
 
