@@ -2669,16 +2669,47 @@ body.sidebar-resizing * {
 }
 
 @media (max-width: 600px) {
+    /* Modal sidebar keeps 3-column grid on mobile */
+
     .modal-form-sidebar {
-        grid-template-columns: repeat(2, 1fr);
+        gap: 8px 8px;
+        padding: 10px;
+    }
+
+    .modal-sidebar-field label {
+        gap: 4px;
+    }
+
+    .modal-field-icon {
+        display: none;
+    }
+
+    .modal-field-label {
+        font-size: 11px;
+    }
+
+    .modal-sidebar-select,
+    .modal-sidebar-input {
+        padding: 5px 4px;
+        font-size: 12px;
+    }
+
+    .modal-tab {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .modal-tab-panel.active {
+        gap: 10px;
+    }
+
+    .modal {
+        padding: 20px;
+        width: 95%;
     }
 }
 
 @media (max-width: 400px) {
-    .modal-form-sidebar {
-        grid-template-columns: 1fr;
-    }
-
     .content-toolbar .toolbar-btn.add-todo-btn {
         padding: 6px 10px;
         font-size: 12px;
