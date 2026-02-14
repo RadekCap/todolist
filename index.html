@@ -78,9 +78,15 @@
                         </div>
                     </div>
 
-                    <!-- GTD Section -->
-                    <div class="gtd-section">
-                        <ul id="gtdList" class="gtd-list"></ul>
+                    <!-- GTD Section (expanded by default) -->
+                    <div class="sidebar-section" id="gtdSection">
+                        <div class="sidebar-section-header" role="button" aria-expanded="true" aria-controls="gtdContent">
+                            <h2>Status</h2>
+                            <span class="sidebar-section-toggle" aria-hidden="true">▼</span>
+                        </div>
+                        <div class="sidebar-section-content" id="gtdContent">
+                            <ul id="gtdList" class="gtd-list"></ul>
+                        </div>
                     </div>
 
                     <!-- Projects Section (expanded by default) -->

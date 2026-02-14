@@ -73,6 +73,7 @@ class TodoApp {
         this.newProjectInput = document.getElementById('newProjectInput')
         this.addProjectBtn = document.getElementById('addProjectBtn')
         this.projectsSection = document.getElementById('projectsSection')
+        this.gtdSection = document.getElementById('gtdSection')
         this.gtdList = document.getElementById('gtdList')
         this.exportBtn = document.getElementById('exportBtn')
         this.searchInput = document.getElementById('searchInput')
@@ -357,6 +358,9 @@ class TodoApp {
         })
 
         // Collapsible sidebar sections
+        this.gtdSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
+            this.toggleSidebarSection(this.gtdSection)
+        })
         this.projectsSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
             this.toggleSidebarSection(this.projectsSection)
         })
