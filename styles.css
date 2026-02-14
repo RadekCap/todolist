@@ -3033,10 +3033,6 @@ body.sidebar-resizing * {
    GTD Sidebar Section
    ======================================== */
 
-.gtd-section {
-    margin-bottom: 25px;
-}
-
 .gtd-list {
     list-style: none;
     padding-left: 1px; /* Prevents Safari from clipping left border of items with border-radius */
@@ -4773,13 +4769,6 @@ body.sidebar-resizing * {
 /* ========================================
    Glass Theme - GTD Elements
    ======================================== */
-
-/* iOS GTD Section */
-[data-theme="glass"] .gtd-section,
-[data-theme="dark"] .gtd-section,
-[data-theme="clear"] .gtd-section {
-    margin-bottom: 20px;
-}
 
 [data-theme="glass"] .gtd-list,
 [data-theme="dark"] .gtd-list,
