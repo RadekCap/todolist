@@ -5,6 +5,7 @@ import { getFilteredTodos, toggleTodo, deleteTodo, updateTodoProject, updateTodo
 import { getCategoryById } from '../services/categories.js'
 import { getPriorityById } from '../services/priorities.js'
 import { getContextById } from '../services/contexts.js'
+import { getDailyQuote } from '../services/quotes.js'
 
 /**
  * Get human-readable label for a GTD status
@@ -127,9 +128,22 @@ export function renderTodos(container, options = {}) {
                     </svg>
                     <h3 class="zen-title">Inbox Zero</h3>
                     <p class="zen-message">Your mind is clear. All items have been processed. Take a moment to breathe.</p>
+                    <div class="zen-quote-container" id="zenQuoteContainer"></div>
                 </div>
             `
             container.appendChild(zenState)
+
+            // Load daily quote asynchronously
+            const quoteContainer = document.getElementById('zenQuoteContainer')
+            getDailyQuote().then(({ quote, author }) => {
+                quoteContainer.innerHTML = `
+                    <blockquote class="zen-quote">
+                        <p class="zen-quote-text">\u201C${escapeHtml(quote)}\u201D</p>
+                        <footer class="zen-quote-author">\u2014 ${escapeHtml(author)}</footer>
+                    </blockquote>
+                `
+                quoteContainer.classList.add('loaded')
+            })
         } else {
             let emptyMsg
             if (state.searchQuery) {
