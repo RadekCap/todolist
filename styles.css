@@ -1120,6 +1120,36 @@ body.sidebar-resizing * {
     line-height: 1.5;
 }
 
+.zen-quote-container {
+    max-width: 360px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+    margin-top: 8px;
+}
+
+.zen-quote-container.loaded {
+    opacity: 1;
+}
+
+.zen-quote {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.zen-quote-text {
+    font-size: 14px;
+    font-style: italic;
+    color: #777;
+    line-height: 1.6;
+    margin: 0 0 8px 0;
+}
+
+.zen-quote-author {
+    font-size: 12px;
+    color: #aaa;
+}
+
 .loading-state {
     text-align: center;
     color: var(--accent-color);
@@ -4743,6 +4773,18 @@ body.sidebar-resizing * {
 [data-theme="dark"] .inbox-zen-state .zen-illustration,
 [data-theme="clear"] .inbox-zen-state .zen-illustration {
     opacity: 0.9;
+}
+
+[data-theme="glass"] .zen-quote-text,
+[data-theme="dark"] .zen-quote-text,
+[data-theme="clear"] .zen-quote-text {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .zen-quote-author,
+[data-theme="dark"] .zen-quote-author,
+[data-theme="clear"] .zen-quote-author {
+    color: var(--ios-label-tertiary);
 }
 
 /* iOS Messages */
