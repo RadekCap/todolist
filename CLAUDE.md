@@ -4,41 +4,134 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A single-page todo list application with user authentication, categories, and cloud sync. The entire application is contained in one HTML file with embedded CSS and JavaScript.
+A single-page todo list application with user authentication, GTD workflow, projects, areas, recurring tasks, end-to-end encryption, and cloud sync via Supabase.
 
 **Live URL:** https://radekcap.github.io/todolist/
 
 ## Architecture
 
-### Single-File Structure
-All code lives in `index.html`:
-- HTML structure (authentication forms, modal, todo UI)
-- CSS styling (embedded `<style>` tag, ~700 lines)
-- JavaScript application logic (embedded `<script type="module">`, ~600 lines)
+### Modular Structure
+The application uses ES6 modules with no build step. Code is organized across several top-level files and a `src/` directory:
 
-### Class-Based Design
-The application uses a single `TodoApp` class that manages:
-- **State**: `currentUser`, `todos`, `categories`, `selectedCategoryId`
-- **Lifecycle**: Authentication flow, data loading, rendering
-- **Event handling**: User interactions with todos, categories, and modals
+```
+index.html          - HTML structure only (no embedded CSS/JS)
+app.js              - Application orchestrator (TodoApp class)
+styles.css          - All styling (themes, responsive, density modes)
+src/
+  core/             - Foundation: Supabase client, state store, event bus
+  services/         - Business logic: auth, todos, projects, areas, settings, export
+  ui/               - Rendering: TodoList, GtdList, ProjectList, AreasDropdown, modals
+  utils/            - Helpers: security (XSS), crypto (E2E encryption), dates, recurrence
+```
+
+### Layered Design
+
+```
+app.js (TodoApp)         ← Orchestrator: DOM refs, event listeners, modal management
+    ↓ imports
+src/ui/                  ← Rendering: builds DOM, handles display logic
+    ↓ imports
+src/services/            ← Business logic: Supabase CRUD, filtering, encryption
+    ↓ imports
+src/core/                ← Foundation: Supabase client, reactive Store, EventBus
+src/utils/               ← Shared helpers: security, crypto, dates, recurrence
+```
+
+### Key Architectural Patterns
+
+- **TodoApp class** (`app.js`): Orchestrator that coordinates modules. Holds DOM references, wires up event listeners, delegates to services and UI components.
+- **Reactive Store** (`src/core/store.js`): Centralized state with `get()`, `set()`, `subscribe()`. Modules subscribe to state changes for reactive updates.
+- **Event Bus** (`src/core/events.js`): Decoupled cross-module communication. Services emit events (e.g., `TODO_ADDED`), UI subscribes and re-renders.
+- **Service modules** (`src/services/`): Each service handles one domain (todos, projects, areas, etc.) with async Supabase operations.
+- **UI components** (`src/ui/`): Render functions that read from the store and build DOM elements.
 
 ### Data Flow
 ```
-Supabase Auth → User Login → Load Categories & Todos → Render UI
-                                                      ↓
-User Actions → Update Supabase → Reload Data → Re-render UI
+Supabase Auth → User Login → Load All Data → Render UI
+                                              ↓
+User Actions → Service Function → Update Supabase → Emit Event → Re-render
 ```
+
+## File Reference
+
+### Top-Level Files
+
+| File | Lines | Purpose |
+|------|-------|---------|
+| `index.html` | ~850 | HTML structure: auth forms, sidebar, toolbar, modals |
+| `app.js` | ~1170 | TodoApp orchestrator class |
+| `styles.css` | ~5260 | All CSS: themes (Glass/Dark/Clear), density, responsive |
+| `package.json` | - | Dev dependencies for CSS validation only |
+
+### src/core/
+
+| File | Purpose |
+|------|---------|
+| `supabase.js` | Supabase client initialization (CDN import) |
+| `store.js` | Reactive state store singleton |
+| `events.js` | Event bus singleton + `Events` enum constants |
+
+### src/services/
+
+| File | Purpose |
+|------|---------|
+| `auth.js` | Login, signup, logout, encryption key management |
+| `todos.js` | Todo CRUD, filtering, GTD counts, recurrence, selection |
+| `projects.js` | Project CRUD, area assignment |
+| `areas.js` | Area CRUD, keyboard shortcuts (Shift+1-9) |
+| `categories.js` | Category loading |
+| `contexts.js` | Context loading (@home, @work) |
+| `priorities.js` | Priority loading |
+| `settings.js` | User preferences: theme, density, notifications |
+| `export.js` | Export to Text/JSON/CSV/XML |
+| `quotes.js` | Daily motivational quote for empty Inbox |
+
+### src/ui/
+
+| File | Purpose |
+|------|---------|
+| `TodoList.js` | Todo list rendering with date grouping, status badges |
+| `GtdList.js` | GTD status sidebar (Inbox, Next, Scheduled, Waiting, Someday, Done) |
+| `ProjectList.js` | Project sidebar, management modal, drag-and-drop reordering |
+| `AreasDropdown.js` | Area toolbar dropdown and management |
+| `SelectionBar.js` | Multi-select bulk operations bar |
+| `modals/TodoModal.js` | Add/edit todo form with recurrence UI |
+| `modals/ExportModal.js` | Export format selection |
+| `modals/ImportModal.js` | Import with file parsing and batch insert |
+
+### src/utils/
+
+| File | Purpose |
+|------|---------|
+| `security.js` | `escapeHtml()` and `validateColor()` for XSS prevention |
+| `crypto.js` | AES-256-GCM encryption with PBKDF2 key derivation |
+| `dates.js` | Date formatting, grouping (Overdue/Today/Tomorrow) |
+| `recurrence.js` | Recurring task rule building and occurrence calculation |
+
+### Other Directories
+
+| Directory | Purpose |
+|-----------|---------|
+| `migrations/` | 14 SQL migration files for progressive schema updates |
+| `mcp-server/` | MCP protocol server for Claude AI integration |
+| `scripts/` | CSS selector validation, git hook setup |
+| `supabase/` | Local dev config, edge functions |
+| `.github/workflows/` | CI/CD: auto version bump, CSS validation, GitHub Pages deploy |
 
 ## Database (Supabase)
 
-**Connection:** Embedded in index.html (lines ~805-807)
+**Connection:** `src/core/supabase.js`
 - URL: `https://rkvmujdayjmszmyzbhal.supabase.co`
-- Uses Supabase JavaScript client from CDN
+- Uses Supabase JavaScript client from CDN (`@supabase/supabase-js@2.47.0`)
 
 ### Tables
-- **`todos`**: id, user_id, text, completed, category_id, due_date, created_at
+- **`todos`**: id, user_id, text, completed, category_id, due_date, gtd_status, context_id, comment, is_template, recurrence_rule, next_occurrence, parent_template_id, created_at
 - **`categories`**: id, user_id, name, color, created_at
-- **`priorities`** (future): id, user_id, name, color, level, created_at
+- **`projects`**: id, user_id, name, description, color, display_order, area_id, created_at
+- **`areas`**: id, user_id, name, color, created_at
+- **`contexts`**: id, user_id, name, created_at
+- **`priorities`**: id, user_id, name, color, level, created_at
+- **`user_settings`**: id, user_id, theme, username, encryption_salt, density_mode, created_at
 
 ### Row Level Security (RLS)
 All tables use RLS policies to ensure users only access their own data:
@@ -47,34 +140,45 @@ auth.uid() = user_id
 ```
 
 ### Database Migrations
-- **DATABASE_MIGRATION.md**: Raw SQL for migrations
-- **IMPLEMENTATION_GUIDE.md**: Step-by-step Supabase UI guide
+Migration files live in `migrations/` (001 through 014), each containing SQL with table creation, RLS policies, triggers, and indexes.
 
 To add new database features:
-1. Write SQL in DATABASE_MIGRATION.md
-2. Create step-by-step guide if complex
-3. Update frontend to use new schema
+1. Create a new migration file in `migrations/` (e.g., `015_description.sql`)
+2. Run migration in Supabase SQL Editor
+3. Update the relevant service in `src/services/` to read/write the new field
+4. Update UI components in `src/ui/` as needed
 
 ## Security Patterns
 
 ### XSS Prevention
-**Always use these methods for user-generated content:**
+**Always use these functions from `src/utils/security.js`:**
 
 ```javascript
-escapeHtml(text)      // Escapes HTML entities (index.html:1161)
-validateColor(color)  // Validates hex colors (index.html:1167)
+import { escapeHtml, validateColor } from './src/utils/security.js'
+
+// Escapes HTML entities to prevent XSS
+escapeHtml(text)
+
+// Validates hex color format, returns default if invalid
+validateColor(color)
 ```
 
 **Usage:**
 ```javascript
-// ✅ CORRECT - Prevents XSS
-li.innerHTML = `<span>${this.escapeHtml(todo.text)}</span>`
-li.style.color = this.validateColor(category.color)
+// CORRECT - Prevents XSS
+li.innerHTML = `<span>${escapeHtml(todo.text)}</span>`
+li.style.color = validateColor(category.color)
 
-// ❌ WRONG - Vulnerable to XSS
+// WRONG - Vulnerable to XSS
 li.innerHTML = `<span>${todo.text}</span>`
 li.style.color = category.color
 ```
+
+### End-to-End Encryption
+- Uses AES-256-GCM via Web Crypto API (`src/utils/crypto.js`)
+- PBKDF2 key derivation from user password
+- Todo text and category names are encrypted before storage
+- Encryption is optional and managed per-user
 
 ### Authentication
 - Supabase handles all auth (email/password)
@@ -83,126 +187,110 @@ li.style.color = category.color
 
 ## Modal Pattern
 
-The application uses a modal for adding todos instead of inline forms.
+The application uses modals for adding/editing todos, managing projects, managing areas, import/export, and settings.
 
 **Key implementation details:**
-- Modal has `role="dialog"`, `aria-modal="true"`, `aria-labelledby` for accessibility
-- ESC key closes modal (event listener added/removed in open/close)
+- Modals have `role="dialog"`, `aria-modal="true"`, `aria-labelledby` for accessibility
+- ESC key closes modals (event listener added/removed in open/close)
 - Focus returns to trigger button after closing
-- Pre-selects current category when opened
+- Pre-selects current context (GTD status, project, etc.) when opened
 
 **When adding new modals:**
-1. Add ARIA attributes for accessibility
-2. Implement ESC key handler with cleanup
-3. Manage focus (trap and return)
-4. Pre-populate contextual data
-
-## Safari Compatibility
-
-**Issue:** Safari doesn't update `<select>` elements reliably during synchronous DOM operations.
-
-**No longer needed:** The inline form was replaced with a modal, eliminating the Safari-specific `setTimeout(0)` workaround that was previously required.
-
-## Key Methods Reference
-
-### TodoApp Class Methods
-
-**Data Operations:**
-- `loadCategories()` - Fetches from Supabase, calls `renderCategories()` and `updateCategorySelect()`
-- `loadTodos()` - Fetches from Supabase, calls `renderTodos()`
-- `addTodo()` - Inserts to Supabase, closes modal, re-renders
-- `toggleTodo(id)` - Updates completion status
-- `deleteTodo(id)` - Removes from Supabase and local state
-
-**Rendering:**
-- `renderCategories()` - Builds sidebar category list with event listeners
-- `renderTodos()` - Builds todo list items with checkboxes and delete buttons
-- `updateCategorySelect()` - Rebuilds modal category dropdown options
-
-**Category Filtering:**
-- `selectCategory(categoryId)` - Sets filter (null = all, 'uncategorized', or UUID)
-- `getFilteredTodos()` - Returns todos based on `selectedCategoryId`
-
-**Modal Management:**
-- `openModal()` - Shows modal, pre-selects category, adds ESC listener, focuses input
-- `closeModal()` - Hides modal, removes ESC listener, returns focus to button
+1. Add HTML structure in `index.html` with ARIA attributes
+2. Create modal class or functions in `src/ui/modals/`
+3. Wire up open/close in `app.js`
+4. Implement ESC key handler with cleanup
+5. Manage focus (trap and return)
 
 ## Common Development Workflows
 
 ### Adding a New Database Column
 
-1. **Update DATABASE_MIGRATION.md** with SQL:
+1. **Create migration file** in `migrations/`:
    ```sql
    ALTER TABLE todos ADD COLUMN new_field TYPE;
    ```
 
 2. **Run migration** in Supabase SQL Editor
 
-3. **Update frontend** to read/write the field:
+3. **Update service** in `src/services/` to read/write the field:
    ```javascript
-   // In addTodo():
-   .insert({
-       user_id: this.currentUser.id,
-       text: text,
-       new_field: value  // Add new field
-   })
+   // In the relevant service function:
+   const { data, error } = await supabase
+       .from('todos')
+       .insert({ ..., new_field: value })
    ```
 
-4. **Update UI** to display the field
+4. **Update UI** in `src/ui/` to display the field
 
 ### Adding a New Modal Form Field
 
-1. **Add to modal HTML** with proper label and ARIA:
+1. **Add HTML** in `index.html` within the modal's form:
    ```html
-   <div>
-       <label for="modalNewField">Field Name (optional)</label>
-       <input type="text" id="modalNewField">
+   <div class="modal-sidebar-field">
+       <label for="modalNewField">
+           <span class="modal-field-label">field name</span>
+       </label>
+       <input type="text" id="modalNewField" class="modal-sidebar-input">
    </div>
    ```
 
-2. **Get DOM reference** in constructor:
+2. **Get DOM reference** in the modal class (`src/ui/modals/TodoModal.js`):
    ```javascript
-   this.modalNewField = document.getElementById('modalNewField')
+   this.newField = document.getElementById('modalNewField')
    ```
 
-3. **Use in addTodo()**:
-   ```javascript
-   const newFieldValue = this.modalNewField.value || null
-   ```
+3. **Use in submit handler** and **clear on close**
 
-4. **Clear in closeModal()**:
-   ```javascript
-   this.modalNewField.value = ''
-   ```
+### Adding a New Service
+
+1. Create `src/services/newservice.js` with async functions
+2. Import `supabase` from `src/core/supabase.js`
+3. Import `store` and `events` as needed
+4. Export from `src/services/index.js`
+5. Import and use in `app.js`
 
 ### Handling User Input
 
 **Always sanitize before rendering:**
 ```javascript
-// Text content
-element.innerHTML = `<span>${this.escapeHtml(userInput)}</span>`
+import { escapeHtml, validateColor } from './src/utils/security.js'
+
+// Text content in innerHTML
+element.innerHTML = `<span>${escapeHtml(userInput)}</span>`
 
 // Colors from user/database
-element.style.backgroundColor = this.validateColor(userColor)
+element.style.backgroundColor = validateColor(userColor)
 
-// Setting element properties directly (safe)
-element.textContent = userInput  // Safe - no HTML parsing
+// Setting element properties directly (safe - no HTML parsing)
+element.textContent = userInput
 ```
+
+## CI/CD
+
+### GitHub Actions Workflows
+- **`auto-version-bump.yml`**: Auto-increments PATCH version on merge to main, updates `APP_VERSION` in `app.js` and `VERSION.md`
+- **`css-selector-check.yml`**: Validates CSS selectors in `styles.css` match elements in `index.html`
+- **`deploy-pages.yml`**: Deploys to GitHub Pages from root directory
+
+### Pre-commit Hook
+- Installed via `npm install` (runs `scripts/setup-hooks.js`)
+- Validates CSS selectors before each commit
+- Run manually: `npm run check:css`
 
 ## Deployment
 
 **GitHub Pages:**
 - Deployed from `main` branch, root directory
-- Auto-deploys on push to main (configured in repo settings)
-- Deployment time: ~30-60 seconds after merge
-
-**No build step required** - it's a static HTML file
+- Auto-deploys on push to main
+- No build step required - static files served directly
 
 ## Testing Locally
 
 1. Clone repository
-2. Open `index.html` in a browser
-3. Application connects to production Supabase (no local DB needed)
+2. Run `npm install` (installs dev dependencies and pre-commit hook)
+3. Open `index.html` in a browser
+4. Application connects to production Supabase (no local DB needed)
 
 **Note:** All users share the same Supabase instance but are isolated by RLS policies.
 
@@ -210,19 +298,17 @@ element.textContent = userInput  // Safe - no HTML parsing
 
 When creating PRs:
 1. **Security-focused code reviews** - All user input must be sanitized
-2. **Accessibility checks** - Copilot reviews for ARIA attributes, keyboard navigation
-3. **Browser testing** - Test in Chrome, Firefox, Safari, Edge
-4. **Database changes** - Include migration SQL and step-by-step guide
-
-## Current Feature Branches
-
-- **Priority system** (PR #16): Database schema ready, frontend pending
-- **Modal forms** (PR #15): Completed, includes accessibility improvements
+2. **Accessibility checks** - ARIA attributes, keyboard navigation
+3. **CSS validation** - Ensure `npm run check:css` passes
+4. **Browser testing** - Test in Chrome, Firefox, Safari, Edge
+5. **Database changes** - Include migration SQL file in `migrations/`
 
 ## Code Style
 
-- **Use existing patterns** - Follow TodoApp class structure
+- **ES6 modules** - Use `import`/`export`, no CommonJS
 - **Async/await** for all Supabase operations (not `.then()`)
+- **Follow existing patterns** - Services export functions, UI exports render functions
 - **Error handling** - Log to console, show user-friendly messages
 - **Security first** - Always use `escapeHtml()` and `validateColor()`
 - **Accessibility** - Include ARIA attributes for dynamic content
+- **No build step** - All code must work as static files served directly
