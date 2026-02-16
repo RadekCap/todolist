@@ -1,32 +1,18 @@
-import { supabase } from '../core/supabase.js'
-import { store } from '../core/store.js'
-import { events, Events } from '../core/events.js'
-import { decrypt } from './auth.js'
+import { Events } from '../core/events.js'
+import { loadCollection, getById } from './data-loader.js'
 
 /**
  * Load all categories for the current user
  * @returns {Promise<Array>} Array of decrypted categories
  */
 export async function loadCategories() {
-    const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('created_at', { ascending: true })
-
-    if (error) {
-        console.error('Error loading categories:', error)
-        throw error
-    }
-
-    // Decrypt category names
-    const categories = await Promise.all(data.map(async (category) => ({
-        ...category,
-        name: await decrypt(category.name)
-    })))
-
-    store.set('categories', categories)
-    events.emit(Events.CATEGORIES_LOADED, categories)
-    return categories
+    return loadCollection({
+        table: 'categories',
+        storeKey: 'categories',
+        event: Events.CATEGORIES_LOADED,
+        orderBy: 'created_at',
+        decryptFields: ['name']
+    })
 }
 
 /**
@@ -35,6 +21,5 @@ export async function loadCategories() {
  * @returns {Object|null} Category object or null
  */
 export function getCategoryById(id) {
-    const categories = store.get('categories')
-    return categories.find(c => c.id === id) || null
+    return getById('categories', id)
 }

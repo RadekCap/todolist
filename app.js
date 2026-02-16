@@ -182,6 +182,9 @@ class TodoApp {
             cancelBtn: document.getElementById('cancelExportModal')
         })
 
+        // AbortController for document-level listeners (cleaned up on sign-out)
+        this.globalAbortController = new AbortController()
+
         this.initAuth()
         this.initEventListeners()
         this.initSelectionBar()
@@ -348,9 +351,6 @@ class TodoApp {
         // Populate timezone dropdown
         this.populateTimezoneSelect()
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => this.handleKeyboardShortcut(e))
-
         // Add project
         this.addProjectBtn.addEventListener('click', () => this.handleAddProject())
         this.newProjectInput.addEventListener('keypress', (e) => {
@@ -381,26 +381,20 @@ class TodoApp {
         // Export button
         this.exportBtn.addEventListener('click', () => this.exportModal.open())
 
-        // Search input
+        // Search input (debounced to avoid re-rendering on every keystroke)
+        this._searchDebounceTimer = null
         this.searchInput.addEventListener('input', () => {
-            store.set('searchQuery', this.searchInput.value.trim().toLowerCase())
-            this.render()
+            clearTimeout(this._searchDebounceTimer)
+            this._searchDebounceTimer = setTimeout(() => {
+                store.set('searchQuery', this.searchInput.value.trim().toLowerCase())
+                this.render()
+            }, 150)
         })
 
         // Toolbar user menu toggle
         this.toolbarUserBtn.addEventListener('click', (e) => {
             e.stopPropagation()
             this.toggleToolbarMenu()
-        })
-
-        // Close menus when clicking outside
-        document.addEventListener('click', (e) => {
-            if (this.toolbarUserMenu && !this.toolbarUserMenu.contains(e.target)) {
-                this.closeToolbarMenu()
-            }
-            if (this.toolbarAreasMenu && !this.toolbarAreasMenu.contains(e.target)) {
-                this.closeAreasMenu()
-            }
         })
 
         // Areas dropdown
@@ -468,6 +462,9 @@ class TodoApp {
 
         // Initialize sidebar resize
         this.initSidebarResize()
+
+        // Register document-level listeners (cleaned up on sign-out)
+        this.initGlobalListeners()
     }
 
     handleKeyboardShortcut(e) {
@@ -706,6 +703,10 @@ class TodoApp {
     }
 
     handleSignOut() {
+        // Clean up document-level event listeners
+        this.globalAbortController.abort()
+        this.globalAbortController = new AbortController()
+
         store.reset()
         this.authContainer.classList.add('active')
         this.appContainer.classList.remove('active')
@@ -715,6 +716,9 @@ class TodoApp {
         this.signupForm.reset()
         this.authMessage.innerHTML = ''
         this.closeUnlockModal()
+
+        // Re-register document-level listeners for next session
+        this.initGlobalListeners()
     }
 
     lockApp() {
@@ -1137,12 +1141,30 @@ class TodoApp {
         }
 
         this.sidebarResizeHandle.addEventListener('mousedown', startResize)
-        document.addEventListener('mousemove', doResize)
-        document.addEventListener('mouseup', stopResize)
+        document.addEventListener('mousemove', doResize, { signal: this.globalAbortController.signal })
+        document.addEventListener('mouseup', stopResize, { signal: this.globalAbortController.signal })
 
         this.sidebarResizeHandle.addEventListener('touchstart', startResize, { passive: false })
-        document.addEventListener('touchmove', doResize, { passive: false })
-        document.addEventListener('touchend', stopResize)
+        document.addEventListener('touchmove', doResize, { passive: false, signal: this.globalAbortController.signal })
+        document.addEventListener('touchend', stopResize, { signal: this.globalAbortController.signal })
+    }
+
+    /**
+     * Register document-level event listeners using AbortController.
+     * These are cleaned up on sign-out and re-registered for the next session.
+     */
+    initGlobalListeners() {
+        const signal = this.globalAbortController.signal
+
+        document.addEventListener('keydown', (e) => this.handleKeyboardShortcut(e), { signal })
+        document.addEventListener('click', (e) => {
+            if (this.toolbarUserMenu && !this.toolbarUserMenu.contains(e.target)) {
+                this.closeToolbarMenu()
+            }
+            if (this.toolbarAreasMenu && !this.toolbarAreasMenu.contains(e.target)) {
+                this.closeAreasMenu()
+            }
+        }, { signal })
     }
 
     render() {

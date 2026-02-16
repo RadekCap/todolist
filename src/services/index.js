@@ -2,6 +2,7 @@
 export * from './auth.js'
 export * from './settings.js'
 export * from './export.js'
+export * from './data-loader.js'
 export * from './todos.js'
 export * from './projects.js'
 export * from './areas.js'
