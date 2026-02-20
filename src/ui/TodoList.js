@@ -6,6 +6,7 @@ import { getCategoryById } from '../services/categories.js'
 import { getPriorityById } from '../services/priorities.js'
 import { getContextById } from '../services/contexts.js'
 import { getDailyQuote } from '../services/quotes.js'
+import { getIcon } from '../utils/icons.js'
 
 /**
  * Get human-readable label for a GTD status
@@ -210,14 +211,7 @@ export function renderTodos(container, options = {}) {
 
         // Recurring icon for todos linked to a template
         const recurringIcon = todo.template_id
-            ? `<span class="recurring-icon" title="Recurring">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="17 1 21 5 17 9"/>
-                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                    <polyline points="7 23 3 19 7 15"/>
-                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-                </svg>
-               </span>`
+            ? `<span class="recurring-icon" title="Recurring">${getIcon('repeat', { size: 14 })}</span>`
             : ''
 
         if (category) {
@@ -232,7 +226,7 @@ export function renderTodos(container, options = {}) {
                 data-id="${todo.id}"
                 aria-label="Select todo"
             >
-            <span class="drag-handle" draggable="true">\u22ee\u22ee</span>
+            <span class="drag-handle" draggable="true">${getIcon('drag-handle', { size: 14 })}</span>
             <input
                 type="checkbox"
                 class="todo-checkbox"
