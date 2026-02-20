@@ -1,23 +1,15 @@
 import { store } from '../core/store.js'
 import { escapeHtml } from '../utils/security.js'
 import { getGtdCount, updateTodoGtdStatus } from '../services/todos.js'
+import { getIcon } from '../utils/icons.js'
 
 /**
  * Get icon for a GTD status
  * @param {string} status - GTD status
- * @returns {string} Emoji icon
+ * @returns {string} SVG icon markup
  */
 export function getGtdIcon(status) {
-    const icons = {
-        'inbox': '\ud83d\udce5',
-        'next_action': '\u00bb',
-        'scheduled': '\ud83d\udcc6',
-        'waiting_for': '\u23f3',
-        'someday_maybe': '\ud83d\udcc5',
-        'done': '\u2713',
-        'all': '\u2630'
-    }
-    return icons[status] || '\u2022'
+    return getIcon(status, { size: 18 })
 }
 
 /**

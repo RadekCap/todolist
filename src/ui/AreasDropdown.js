@@ -2,6 +2,7 @@ import { store } from '../core/store.js'
 import { escapeHtml, validateColor } from '../utils/security.js'
 import { selectArea, reorderAreas, renameArea, deleteArea, updateArea, loadAreas } from '../services/areas.js'
 import { loadProjects } from '../services/projects.js'
+import { getIcon } from '../utils/icons.js'
 
 /**
  * Render the areas dropdown menu
@@ -29,7 +30,7 @@ export function renderAreasDropdown(listContainer, dropdown, divider) {
         // Show color dot if area has a color
         const colorDot = area.color
             ? `<span class="area-color-dot" style="background-color: ${validateColor(area.color)}"></span>`
-            : `<span class="areas-item-icon">\ud83d\udcc2</span>`
+            : `<span class="areas-item-icon">${getIcon('folder', { size: 16 })}</span>`
         button.innerHTML = `
             ${colorDot}
             <span class="areas-item-label">${escapeHtml(area.name)}</span>
@@ -116,12 +117,12 @@ export function renderManageAreasList(container) {
         li.draggable = true
         const areaColor = area.color || '#667eea'
         li.innerHTML = `
-            <span class="manage-areas-drag-handle">\u22ee\u22ee</span>
+            <span class="manage-areas-drag-handle">${getIcon('drag-handle', { size: 16 })}</span>
             <input type="color" class="manage-areas-color" value="${validateColor(areaColor)}" title="Change color">
             <span class="manage-areas-name">${escapeHtml(area.name)}</span>
             <div class="manage-areas-actions">
-                <button class="manage-areas-edit" data-id="${area.id}" title="Rename">\u270e</button>
-                <button class="manage-areas-delete" data-id="${area.id}" title="Delete">\u00d7</button>
+                <button class="manage-areas-edit" data-id="${area.id}" title="Rename">${getIcon('edit', { size: 14 })}</button>
+                <button class="manage-areas-delete" data-id="${area.id}" title="Delete">${getIcon('x', { size: 14 })}</button>
             </div>
         `
 

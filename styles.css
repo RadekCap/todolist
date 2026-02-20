@@ -541,7 +541,11 @@ body.sidebar-resizing * {
     justify-content: center;
     transition: transform 0.2s ease;
     color: #666;
-    font-size: 12px;
+}
+
+.sidebar-section-toggle svg {
+    width: 12px;
+    height: 12px;
 }
 
 .sidebar-section.collapsed .sidebar-section-toggle {
@@ -610,8 +614,15 @@ body.sidebar-resizing * {
     color: inherit;
     cursor: pointer;
     padding: 2px 5px;
-    font-size: 16px;
     transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-delete svg {
+    width: 12px;
+    height: 12px;
 }
 
 .project-item:hover .project-delete {
@@ -955,13 +966,20 @@ body.sidebar-resizing * {
 .drag-handle {
     cursor: grab;
     color: #888;
-    font-size: 18px;
     padding: 2px 6px;
     user-select: none;
     opacity: 0.6;
     transition: opacity 0.2s, color 0.2s, transform 0.2s, background-color 0.2s;
     border-radius: 4px;
     flex-shrink: 0; /* Prevent Safari iOS from shrinking */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.drag-handle svg {
+    width: 14px;
+    height: 14px;
 }
 
 .drag-handle:hover {
@@ -1314,9 +1332,16 @@ body.sidebar-resizing * {
 }
 
 .toolbar-menu-arrow {
-    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #666;
     transition: transform 0.15s ease;
+}
+
+.toolbar-menu-arrow svg {
+    width: 10px;
+    height: 10px;
 }
 
 .toolbar-user-menu.open .toolbar-menu-arrow {
@@ -1450,8 +1475,16 @@ body.sidebar-resizing * {
 
 .areas-item-icon {
     width: 20px;
-    text-align: center;
-    font-size: 14px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.areas-item-icon svg {
+    width: 16px;
+    height: 16px;
 }
 
 .area-color-dot {
@@ -1579,7 +1612,14 @@ body.sidebar-resizing * {
     color: var(--ios-label-tertiary, #999);
     margin-right: 8px;
     cursor: grab;
-    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.manage-areas-drag-handle svg {
+    width: 16px;
+    height: 16px;
 }
 
 .manage-areas-color {
@@ -1639,9 +1679,17 @@ body.sidebar-resizing * {
     border: none;
     cursor: pointer;
     padding: 4px 8px;
-    font-size: 14px;
     border-radius: 4px;
     transition: background-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.manage-areas-edit svg,
+.manage-areas-delete svg {
+    width: 14px;
+    height: 14px;
 }
 
 .manage-areas-edit {
@@ -1749,8 +1797,15 @@ body.sidebar-resizing * {
 .manage-projects-drag-handle {
     color: var(--ios-label-tertiary, #999);
     cursor: grab;
-    font-size: 16px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.manage-projects-drag-handle svg {
+    width: 16px;
+    height: 16px;
 }
 
 .manage-projects-color,
@@ -1856,9 +1911,17 @@ body.sidebar-resizing * {
     border: none;
     cursor: pointer;
     padding: 4px 8px;
-    font-size: 14px;
     border-radius: 4px;
     transition: background 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.manage-projects-edit svg,
+.manage-projects-delete svg {
+    width: 14px;
+    height: 14px;
 }
 
 .manage-projects-edit {
@@ -3092,11 +3155,19 @@ body.sidebar-resizing * {
 }
 
 .gtd-icon {
-    width: 20px;
+    width: 22px;
+    height: 18px;
     margin-right: 10px;
-    text-align: center;
-    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.gtd-icon svg {
+    width: 18px;
+    height: 18px;
 }
 
 .gtd-item.active .gtd-icon {
@@ -4983,8 +5054,12 @@ body.sidebar-resizing * {
 }
 
 [data-density="compact"] .drag-handle {
-    font-size: 14px;
     padding: 1px 4px;
+}
+
+[data-density="compact"] .drag-handle svg {
+    width: 12px;
+    height: 12px;
 }
 
 [data-density="compact"] .todo-category-badge,

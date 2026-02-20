@@ -2,6 +2,7 @@ import { store } from '../core/store.js'
 import { escapeHtml, validateColor } from '../utils/security.js'
 import { getFilteredProjects, selectProject, deleteProject, updateProject, reorderProjects } from '../services/projects.js'
 import { getProjectTodoCount, updateTodoProject } from '../services/todos.js'
+import { getIcon } from '../utils/icons.js'
 
 /**
  * Render the project list in the sidebar
@@ -55,7 +56,7 @@ export function renderProjects(container) {
                 ${escapeHtml(project.name)}
             </span>
             <span class="project-count">${countDisplay}</span>
-            <button class="project-delete" data-id="${project.id}">\u00d7</button>
+            <button class="project-delete" data-id="${project.id}">${getIcon('x', { size: 12 })}</button>
         `
 
         li.addEventListener('click', (e) => {
@@ -137,7 +138,7 @@ export function renderManageProjectsList(container) {
         })
 
         li.innerHTML = `
-            <span class="manage-projects-drag-handle">\u22ee\u22ee</span>
+            <span class="manage-projects-drag-handle">${getIcon('drag-handle', { size: 16 })}</span>
             <input type="color" class="manage-projects-color" value="${validateColor(projectColor)}" title="Change color">
             <div class="manage-projects-details">
                 <span class="manage-projects-name">${escapeHtml(project.name)}</span>
@@ -145,8 +146,8 @@ export function renderManageProjectsList(container) {
             </div>
             <select class="manage-projects-area" title="Assign to area">${areaOptions}</select>
             <div class="manage-projects-actions">
-                <button class="manage-projects-edit" data-id="${project.id}" title="Edit">\u270e</button>
-                <button class="manage-projects-delete" data-id="${project.id}" title="Delete">\u00d7</button>
+                <button class="manage-projects-edit" data-id="${project.id}" title="Edit">${getIcon('edit', { size: 14 })}</button>
+                <button class="manage-projects-delete" data-id="${project.id}" title="Delete">${getIcon('x', { size: 14 })}</button>
             </div>
         `
 
