@@ -37,7 +37,7 @@ import { GtdGuideModal } from './src/ui/modals/GtdGuideModal.js'
 import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPrioritySelect } from './src/ui/SelectionBar.js'
 
 // Application version
-const APP_VERSION = '2.2.14'
+const APP_VERSION = '2.2.15'
 
 class TodoApp {
     constructor() {

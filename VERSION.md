@@ -175,5 +175,5 @@ When preparing a feature or breaking change release:
 
 ---
 
-**Current Version:** 2.2.14
+**Current Version:** 2.2.15
 **Last Updated:** 2026-02-28
