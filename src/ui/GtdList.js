@@ -2,6 +2,8 @@ import { store } from '../core/store.js'
 import { escapeHtml } from '../utils/security.js'
 import { getGtdCount, updateTodoGtdStatus } from '../services/todos.js'
 import { getIcon } from '../utils/icons.js'
+import { events, Events } from '../core/events.js'
+import { GTD_STATUS_PHASE_MAP } from './modals/GtdGuideModal.js'
 
 /**
  * Get icon for a GTD status
@@ -101,6 +103,20 @@ export function renderGtdList(container) {
             <span class="gtd-shortcut">${shortcut}</span>
             <span class="gtd-count">${countDisplay}</span>
         `
+
+        // Add contextual GTD help button
+        const helpBtn = document.createElement('button')
+        helpBtn.className = 'gtd-help-btn'
+        helpBtn.setAttribute('aria-label', `GTD guide for ${status.label}`)
+        helpBtn.setAttribute('title', `Learn about ${status.label} in GTD`)
+        helpBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
+        helpBtn.addEventListener('click', (e) => {
+            e.stopPropagation()
+            const phase = GTD_STATUS_PHASE_MAP[status.id] || 'capture'
+            events.emit(Events.OPEN_GTD_GUIDE, phase)
+        })
+        const countSpan = li.querySelector('.gtd-count')
+        li.insertBefore(helpBtn, countSpan)
 
         li.addEventListener('click', () => selectGtdStatus(status.id))
 

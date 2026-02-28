@@ -215,6 +215,7 @@
                             <div class="toolbar-dropdown" id="toolbarDropdown" role="menu">
                                 <button id="settingsBtn" class="toolbar-dropdown-item" role="menuitem">Settings</button>
                                 <button id="keyboardShortcutsBtn" class="toolbar-dropdown-item" role="menuitem">Keyboard Shortcuts</button>
+                                <button id="gtdGuideBtn" class="toolbar-dropdown-item" role="menuitem">GTD Guide</button>
                                 <button id="refreshBtn" class="toolbar-dropdown-item" role="menuitem">Refresh</button>
                                 <button id="lockBtn" class="toolbar-dropdown-item" role="menuitem">Lock</button>
                                 <div class="toolbar-dropdown-divider"></div>
@@ -875,11 +876,28 @@
                         <li><kbd>/</kbd> <span>Focus Search</span></li>
                         <li><kbd>Esc</kbd> <span>Close Modal / Clear Search</span></li>
                         <li><kbd>k</kbd> <span>Show This Help</span></li>
+                        <li><kbd>g</kbd> <span>GTD Guide</span></li>
                     </ul>
                 </div>
             </div>
             <div class="modal-actions">
                 <button type="button" id="closeKeyboardShortcutsModalBtn" class="modal-btn modal-btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GTD Guide Modal -->
+    <div id="gtdGuideModal" class="modal-overlay">
+        <div class="modal gtd-guide-modal" role="dialog" aria-modal="true" aria-labelledby="gtdGuideModalTitle">
+            <div class="modal-header">
+                <h2 id="gtdGuideModalTitle">GTD Guide</h2>
+                <button id="closeGtdGuideModal" class="modal-close" aria-label="Close modal">&times;</button>
+            </div>
+            <div id="gtdGuideContent" class="gtd-guide-content">
+                <!-- Content generated dynamically by GtdGuideModal.js -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" id="closeGtdGuideModalBtn" class="modal-btn modal-btn-secondary">Close</button>
             </div>
         </div>
     </div>
