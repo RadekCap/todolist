@@ -33,6 +33,7 @@ import { renderAreasDropdown, updateAreasLabel, updateAreaHeader, renderManageAr
 import { TodoModal } from './src/ui/modals/TodoModal.js'
 import { ImportModal } from './src/ui/modals/ImportModal.js'
 import { ExportModal } from './src/ui/modals/ExportModal.js'
+import { GtdGuideModal } from './src/ui/modals/GtdGuideModal.js'
 import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPrioritySelect } from './src/ui/SelectionBar.js'
 
 // Application version
@@ -53,6 +54,7 @@ class TodoApp {
         this.toolbarUserBtn = document.getElementById('toolbarUserBtn')
         this.settingsBtn = document.getElementById('settingsBtn')
         this.keyboardShortcutsBtn = document.getElementById('keyboardShortcutsBtn')
+        this.gtdGuideBtn = document.getElementById('gtdGuideBtn')
         this.refreshBtn = document.getElementById('refreshBtn')
         this.lockBtn = document.getElementById('lockBtn')
         this.logoutBtn = document.getElementById('logoutBtn')
@@ -121,6 +123,14 @@ class TodoApp {
         this.keyboardShortcutsModal = document.getElementById('keyboardShortcutsModal')
         this.closeKeyboardShortcutsModalBtn = document.getElementById('closeKeyboardShortcutsModal')
         this.closeKeyboardShortcutsModalBtn2 = document.getElementById('closeKeyboardShortcutsModalBtn')
+
+        // GTD Guide modal
+        this.gtdGuideModal = new GtdGuideModal({
+            modal: document.getElementById('gtdGuideModal'),
+            closeBtn: document.getElementById('closeGtdGuideModal'),
+            cancelBtn: document.getElementById('closeGtdGuideModalBtn'),
+            contentContainer: document.getElementById('gtdGuideContent')
+        })
 
         // Selection bar elements
         this.selectionBar = document.getElementById('selectionBar')
@@ -328,6 +338,15 @@ class TodoApp {
             this.closeToolbarMenu()
             this.openKeyboardShortcutsModal()
         })
+        // GTD Guide from menu
+        this.gtdGuideBtn.addEventListener('click', () => {
+            this.closeToolbarMenu()
+            this.gtdGuideModal.open()
+        })
+        // GTD Guide from sidebar help icons
+        events.on(Events.OPEN_GTD_GUIDE, (phase) => {
+            this.gtdGuideModal.open(phase)
+        })
         this.closeSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
         this.cancelSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
         this.settingsModal.addEventListener('click', (e) => {
@@ -480,6 +499,7 @@ class TodoApp {
                         this.manageAreasModal.classList.contains('active') ||
                         this.manageProjectsModal.classList.contains('active') ||
                         this.keyboardShortcutsModal.classList.contains('active') ||
+                        this.gtdGuideModal.modal.classList.contains('active') ||
                         this.exportModal.modal.classList.contains('active') ||
                         this.importModal.modal.classList.contains('active')
 
@@ -519,6 +539,12 @@ class TodoApp {
         if ((e.key === 'k' || e.key === '?') && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
             e.preventDefault()
             this.openKeyboardShortcutsModal()
+        }
+
+        // 'g' to show GTD guide
+        if (e.key === 'g' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
+            e.preventDefault()
+            this.gtdGuideModal.open()
         }
 
         // Escape to unfocus text inputs or clear selection

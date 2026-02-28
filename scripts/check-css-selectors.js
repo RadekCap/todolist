@@ -229,6 +229,10 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.selection-bar-right/,
     /\.selection-bar-btn/,
     /\.selection-bar-select/,
+    // GTD Guide modal (content rendered by JavaScript)
+    /\.gtd-guide-/,
+    /\.gtd-fc-/,
+    /\.gtd-help-btn/,
 ];
 
 /**

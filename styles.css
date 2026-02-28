@@ -2063,6 +2063,501 @@ body.sidebar-resizing * {
     color: #666;
 }
 
+/* GTD Guide Modal */
+.gtd-guide-modal {
+    max-width: 860px;
+}
+
+.gtd-guide-content {
+    padding: 0 24px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* GTD Guide Tabs */
+.gtd-guide-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid #e5e5ea;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 1;
+    padding-top: 4px;
+}
+
+.gtd-guide-tab {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    text-align: center;
+    transition: color 0.2s, border-color 0.2s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.gtd-guide-tab:hover {
+    color: #333;
+}
+
+.gtd-guide-tab.active {
+    color: #007aff;
+    border-bottom-color: #007aff;
+}
+
+/* GTD Guide Panels */
+.gtd-guide-panel {
+    display: none;
+    padding: 0 4px 16px;
+}
+
+.gtd-guide-panel.visible {
+    display: block;
+    animation: gtdFadeIn 0.3s ease;
+}
+
+@keyframes gtdFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* GTD Guide Principle Boxes */
+.gtd-guide-principle {
+    background: #f8f9fa;
+    border-left: 4px solid var(--principle-accent, #007aff);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    color: #444;
+    line-height: 1.6;
+}
+
+/* GTD Guide Cards */
+.gtd-guide-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.gtd-guide-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 16px;
+    border-left: 3px solid var(--card-accent, #007aff);
+}
+
+.gtd-guide-card h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: #333;
+}
+
+.gtd-guide-card p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* GTD Guide Flowchart (Clarify phase) */
+.gtd-guide-flowchart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 0;
+}
+
+.gtd-fc-box {
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 13px;
+    max-width: 320px;
+}
+
+.gtd-fc-start {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #fff;
+    border-radius: 999px;
+    padding: 10px 28px;
+    font-weight: 600;
+}
+
+.gtd-fc-question {
+    background: #e8f4fd;
+    border: 1px solid #b3d9f2;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+.gtd-fc-decision {
+    background: #fff3e0;
+    border: 2px solid #ffcc80;
+    color: #e65100;
+    font-weight: 600;
+    border-radius: 10px;
+}
+
+.gtd-fc-arrow-down {
+    width: 2px;
+    height: 20px;
+    background: #999;
+    position: relative;
+}
+
+.gtd-fc-arrow-down::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid #999;
+}
+
+.gtd-fc-branches {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-top: 12px;
+    width: 100%;
+}
+
+.gtd-fc-branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.gtd-fc-branch-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.gtd-fc-yes { color: #16a34a; }
+.gtd-fc-no { color: #dc2626; }
+
+.gtd-fc-branch-items {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.gtd-fc-branch-items .gtd-fc-box {
+    max-width: none;
+    width: 100%;
+}
+
+.gtd-fc-subbranch {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.gtd-fc-result {
+    font-weight: 600;
+    padding: 8px 14px;
+    font-size: 12px;
+}
+
+.gtd-fc-result span {
+    display: block;
+    font-weight: 400;
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.gtd-fc-trash { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+.gtd-fc-reference { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+.gtd-fc-someday { background: #f5f3ff; border: 1px solid #ddd6fe; color: #5b21b6; }
+.gtd-fc-project { background: #eef2ff; border: 1px solid #c7d2fe; color: #3730a3; }
+.gtd-fc-single { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+
+.gtd-fc-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.gtd-fc-do { background: #f0fdf4; border: 1px solid #86efac; color: #166534; }
+.gtd-fc-delegate { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+.gtd-fc-defer { background: #eff6ff; border: 1px solid #93c5fd; color: #1e40af; }
+
+.gtd-fc-result strong {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+    margin-bottom: 2px;
+}
+
+/* GTD Guide List Cards (Organize phase) */
+.gtd-guide-list-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.gtd-guide-list-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 16px;
+    border-top: 3px solid var(--list-accent, #007aff);
+}
+
+.gtd-guide-list-card h4 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+}
+
+.gtd-guide-list-card ul {
+    margin: 0;
+    padding: 0 0 0 16px;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* GTD Guide Section Titles */
+.gtd-guide-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 24px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.gtd-guide-section-title:first-child {
+    margin-top: 0;
+}
+
+.gtd-guide-subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    color: #999;
+}
+
+/* GTD Guide Review Steps (Reflect phase) */
+.gtd-guide-review-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.gtd-guide-review-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.gtd-guide-step-number {
+    background: #007aff;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.gtd-guide-step-content h4 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.gtd-guide-step-content p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* GTD Guide Horizons of Focus (Reflect phase) */
+.gtd-guide-horizons {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 16px 0;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.gtd-guide-horizon {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--horizon-bg, rgba(59,130,246,0.08));
+    border: 1px solid var(--horizon-border, rgba(59,130,246,0.2));
+}
+
+.gtd-guide-horizon-level {
+    font-weight: 700;
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* GTD Guide Criteria (Engage phase) */
+.gtd-guide-criteria {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.gtd-guide-criterion {
+    text-align: center;
+    flex: 0 0 auto;
+    width: 120px;
+}
+
+.gtd-guide-criterion-ring {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 3px solid var(--ring-color, #007aff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ring-color, #007aff);
+    margin: 0 auto 10px;
+}
+
+.gtd-guide-criterion h4 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.gtd-guide-criterion p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* GTD Help Button in Sidebar */
+.gtd-help-btn {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    margin: 0 2px;
+    color: #999;
+    opacity: 0.5;
+    transition: opacity 0.2s, color 0.2s;
+    line-height: 0;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.gtd-item:hover .gtd-help-btn {
+    display: inline-flex;
+}
+
+.gtd-help-btn:hover {
+    opacity: 1;
+    color: #007aff;
+}
+
+/* Touch devices: always show help button */
+@media (hover: none) {
+    .gtd-help-btn {
+        display: inline-flex;
+    }
+}
+
+/* GTD Guide Responsive */
+@media (max-width: 600px) {
+    .gtd-guide-modal {
+        max-width: 100%;
+    }
+
+    .gtd-guide-content {
+        padding: 0 12px;
+    }
+
+    .gtd-guide-tabs {
+        overflow-x: auto;
+    }
+
+    .gtd-guide-tab {
+        font-size: 11px;
+        padding: 10px 4px;
+        white-space: nowrap;
+    }
+
+    .gtd-guide-cards,
+    .gtd-guide-list-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .gtd-fc-branches {
+        flex-direction: column;
+    }
+
+    .gtd-fc-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .gtd-guide-criteria {
+        gap: 12px;
+    }
+
+    .gtd-guide-criterion {
+        width: 90px;
+    }
+
+    .gtd-guide-criterion-ring {
+        width: 50px;
+        height: 50px;
+        font-size: 16px;
+    }
+}
+
 .modal-form {
     display: flex;
     flex-direction: column;
@@ -4818,6 +5313,150 @@ body.sidebar-resizing * {
     background: var(--ios-bg-tertiary);
     border-color: var(--ios-separator);
     color: var(--ios-label);
+}
+
+/* iOS GTD Guide Modal */
+[data-theme="glass"] .gtd-guide-tabs,
+[data-theme="dark"] .gtd-guide-tabs,
+[data-theme="clear"] .gtd-guide-tabs {
+    border-bottom-color: var(--ios-separator);
+    background: var(--ios-bg-elevated, var(--ios-bg-secondary));
+}
+
+[data-theme="glass"] .gtd-guide-tab,
+[data-theme="dark"] .gtd-guide-tab,
+[data-theme="clear"] .gtd-guide-tab {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .gtd-guide-tab:hover,
+[data-theme="dark"] .gtd-guide-tab:hover,
+[data-theme="clear"] .gtd-guide-tab:hover {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .gtd-guide-tab.active,
+[data-theme="dark"] .gtd-guide-tab.active,
+[data-theme="clear"] .gtd-guide-tab.active {
+    color: var(--ios-blue);
+    border-bottom-color: var(--ios-blue);
+}
+
+[data-theme="glass"] .gtd-guide-principle,
+[data-theme="dark"] .gtd-guide-principle,
+[data-theme="clear"] .gtd-guide-principle {
+    background: var(--ios-bg-tertiary);
+    color: var(--ios-label-secondary);
+    border-left-color: var(--ios-blue);
+}
+
+[data-theme="glass"] .gtd-guide-card,
+[data-theme="dark"] .gtd-guide-card,
+[data-theme="clear"] .gtd-guide-card {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="glass"] .gtd-guide-card h4,
+[data-theme="dark"] .gtd-guide-card h4,
+[data-theme="clear"] .gtd-guide-card h4 {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-guide-card p,
+[data-theme="dark"] .gtd-guide-card p,
+[data-theme="clear"] .gtd-guide-card p {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .gtd-guide-list-card,
+[data-theme="dark"] .gtd-guide-list-card,
+[data-theme="clear"] .gtd-guide-list-card {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="glass"] .gtd-guide-list-card h4,
+[data-theme="dark"] .gtd-guide-list-card h4,
+[data-theme="clear"] .gtd-guide-list-card h4 {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-guide-list-card ul,
+[data-theme="dark"] .gtd-guide-list-card ul,
+[data-theme="clear"] .gtd-guide-list-card ul {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .gtd-guide-section-title,
+[data-theme="dark"] .gtd-guide-section-title,
+[data-theme="clear"] .gtd-guide-section-title {
+    color: var(--ios-label);
+    border-bottom-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .gtd-guide-subtitle,
+[data-theme="dark"] .gtd-guide-subtitle,
+[data-theme="clear"] .gtd-guide-subtitle {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .gtd-guide-review-step,
+[data-theme="dark"] .gtd-guide-review-step,
+[data-theme="clear"] .gtd-guide-review-step {
+    background: var(--ios-bg-tertiary);
+}
+
+[data-theme="glass"] .gtd-guide-step-number,
+[data-theme="dark"] .gtd-guide-step-number,
+[data-theme="clear"] .gtd-guide-step-number {
+    background: var(--ios-blue);
+}
+
+[data-theme="glass"] .gtd-guide-step-content h4,
+[data-theme="dark"] .gtd-guide-step-content h4,
+[data-theme="clear"] .gtd-guide-step-content h4 {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-guide-step-content p,
+[data-theme="dark"] .gtd-guide-step-content p,
+[data-theme="clear"] .gtd-guide-step-content p {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .gtd-guide-horizon,
+[data-theme="dark"] .gtd-guide-horizon,
+[data-theme="clear"] .gtd-guide-horizon {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-guide-horizon-level,
+[data-theme="dark"] .gtd-guide-horizon-level,
+[data-theme="clear"] .gtd-guide-horizon-level {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .gtd-guide-criterion h4,
+[data-theme="dark"] .gtd-guide-criterion h4,
+[data-theme="clear"] .gtd-guide-criterion h4 {
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-guide-criterion p,
+[data-theme="dark"] .gtd-guide-criterion p,
+[data-theme="clear"] .gtd-guide-criterion p {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .gtd-help-btn,
+[data-theme="dark"] .gtd-help-btn,
+[data-theme="clear"] .gtd-help-btn {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .gtd-help-btn:hover,
+[data-theme="dark"] .gtd-help-btn:hover,
+[data-theme="clear"] .gtd-help-btn:hover {
+    color: var(--ios-blue);
 }
 
 /* iOS Empty State */

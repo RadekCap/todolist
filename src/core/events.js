@@ -111,6 +111,7 @@ export const Events = {
     VIEW_CHANGED: 'view:changed',
     THEME_CHANGED: 'theme:changed',
     DENSITY_CHANGED: 'density:changed',
+    OPEN_GTD_GUIDE: 'ui:openGtdGuide',
 
     // Render events
     RENDER_TODOS: 'render:todos',
