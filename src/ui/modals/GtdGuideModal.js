@@ -152,7 +152,7 @@ export class GtdGuideModal {
                         <div class="gtd-fc-branch">
                             <div class="gtd-fc-branch-label gtd-fc-yes">Yes</div>
                             <div class="gtd-fc-branch-items">
-                                <div class="gtd-fc-box gtd-fc-decision" style="font-size: 0.85em;">Multi-step outcome?</div>
+                                <div class="gtd-fc-box gtd-fc-decision gtd-fc-decision-small">Multi-step outcome?</div>
                                 <div class="gtd-fc-subbranch">
                                     <div class="gtd-fc-box gtd-fc-result gtd-fc-project">Yes &rarr; Project<span>Add to Projects list, then define next action</span></div>
                                     <div class="gtd-fc-box gtd-fc-result gtd-fc-single">No &rarr; Single action</div>
@@ -161,7 +161,7 @@ export class GtdGuideModal {
                         </div>
                     </div>
 
-                    <div class="gtd-fc-arrow-down" style="margin-top: 12px;"></div>
+                    <div class="gtd-fc-arrow-down gtd-fc-arrow-spaced"></div>
                     <div class="gtd-fc-box gtd-fc-decision">What's the next action?</div>
 
                     <div class="gtd-fc-actions">

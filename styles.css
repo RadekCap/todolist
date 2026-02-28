@@ -2207,6 +2207,14 @@ body.sidebar-resizing * {
     border-radius: 10px;
 }
 
+.gtd-fc-decision-small {
+    font-size: 0.85em;
+}
+
+.gtd-fc-arrow-spaced {
+    margin-top: 12px;
+}
+
 .gtd-fc-arrow-down {
     width: 2px;
     height: 20px;
