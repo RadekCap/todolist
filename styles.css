@@ -2301,6 +2301,10 @@ body.sidebar-resizing * {
 .gtd-fc-delegate { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
 .gtd-fc-defer { background: #eff6ff; border: 1px solid #93c5fd; color: #1e40af; }
 
+.gtd-fc-actions .gtd-fc-box {
+    max-width: none;
+}
+
 .gtd-fc-result strong {
     display: block;
     font-size: 10px;
@@ -5320,7 +5324,7 @@ body.sidebar-resizing * {
 [data-theme="dark"] .gtd-guide-tabs,
 [data-theme="clear"] .gtd-guide-tabs {
     border-bottom-color: var(--ios-separator);
-    background: var(--ios-bg-elevated, var(--ios-bg-secondary));
+    background: var(--ios-bg-secondary);
 }
 
 [data-theme="glass"] .gtd-guide-tab,
@@ -5457,6 +5461,117 @@ body.sidebar-resizing * {
 [data-theme="dark"] .gtd-help-btn:hover,
 [data-theme="clear"] .gtd-help-btn:hover {
     color: var(--ios-blue);
+}
+
+/* iOS GTD Guide Flowchart Theme Overrides */
+[data-theme="glass"] .gtd-fc-question,
+[data-theme="dark"] .gtd-fc-question,
+[data-theme="clear"] .gtd-fc-question {
+    background: color-mix(in srgb, var(--ios-blue) 15%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, var(--ios-blue) 30%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-decision,
+[data-theme="dark"] .gtd-fc-decision,
+[data-theme="clear"] .gtd-fc-decision {
+    background: color-mix(in srgb, #f59e0b 12%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, #f59e0b 40%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-arrow-down,
+[data-theme="dark"] .gtd-fc-arrow-down,
+[data-theme="clear"] .gtd-fc-arrow-down {
+    background: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .gtd-fc-arrow-down::after,
+[data-theme="dark"] .gtd-fc-arrow-down::after,
+[data-theme="clear"] .gtd-fc-arrow-down::after {
+    border-top-color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .gtd-fc-trash,
+[data-theme="dark"] .gtd-fc-trash,
+[data-theme="clear"] .gtd-fc-trash {
+    background: color-mix(in srgb, #ef4444 12%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, #ef4444 30%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-reference,
+[data-theme="dark"] .gtd-fc-reference,
+[data-theme="clear"] .gtd-fc-reference {
+    background: color-mix(in srgb, #3b82f6 12%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-someday,
+[data-theme="dark"] .gtd-fc-someday,
+[data-theme="clear"] .gtd-fc-someday {
+    background: color-mix(in srgb, #7c3aed 12%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, #7c3aed 30%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-project,
+[data-theme="dark"] .gtd-fc-project,
+[data-theme="clear"] .gtd-fc-project {
+    background: color-mix(in srgb, #6366f1 12%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, #6366f1 30%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-single,
+[data-theme="dark"] .gtd-fc-single,
+[data-theme="clear"] .gtd-fc-single {
+    background: color-mix(in srgb, #10b981 12%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-do,
+[data-theme="dark"] .gtd-fc-do,
+[data-theme="clear"] .gtd-fc-do {
+    background: color-mix(in srgb, #10b981 12%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, #10b981 30%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-delegate,
+[data-theme="dark"] .gtd-fc-delegate,
+[data-theme="clear"] .gtd-fc-delegate {
+    background: color-mix(in srgb, #f59e0b 12%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, #f59e0b 30%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-defer,
+[data-theme="dark"] .gtd-fc-defer,
+[data-theme="clear"] .gtd-fc-defer {
+    background: color-mix(in srgb, #3b82f6 12%, var(--ios-bg-tertiary));
+    border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-fc-result span,
+[data-theme="dark"] .gtd-fc-result span,
+[data-theme="clear"] .gtd-fc-result span {
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .gtd-fc-result strong,
+[data-theme="dark"] .gtd-fc-result strong,
+[data-theme="clear"] .gtd-fc-result strong {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .gtd-fc-branch-label,
+[data-theme="dark"] .gtd-fc-branch-label,
+[data-theme="clear"] .gtd-fc-branch-label {
+    opacity: 0.9;
 }
 
 /* iOS Empty State */

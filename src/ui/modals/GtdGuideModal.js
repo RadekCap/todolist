@@ -47,6 +47,11 @@ export class GtdGuideModal {
     }
 
     open(phase = 'capture') {
+        // Clean up any existing handler first
+        if (this.handleEscapeKey) {
+            document.removeEventListener('keydown', this.handleEscapeKey)
+        }
+
         this.modal.classList.add('active')
         this.switchPhase(phase)
 
@@ -81,7 +86,7 @@ export class GtdGuideModal {
 
     buildContent() {
         this.contentContainer.innerHTML = `
-            <div class="gtd-guide-tabs" id="gtdGuideTabs">
+            <div class="gtd-guide-tabs">
                 <button class="gtd-guide-tab active" data-phase="capture">Capture</button>
                 <button class="gtd-guide-tab" data-phase="clarify">Clarify</button>
                 <button class="gtd-guide-tab" data-phase="organize">Organize</button>
