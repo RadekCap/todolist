@@ -165,7 +165,7 @@ class TodoApp {
         })
 
         // Set callback for when modal closes
-        this.todoModal.onClose = () => this.render()
+        this.todoModal.onCloseCallback = () => this.render()
 
         // Initialize ImportModal
         this.importModal = new ImportModal({

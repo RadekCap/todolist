@@ -1,8 +1,13 @@
 /**
- * BaseModal - Base class for all modal controllers
+ * BaseModal - Base class for modal controllers that have their own class
+ * (TodoModal, ExportModal, ImportModal, GtdGuideModal).
  *
  * Centralizes shared open/close, Escape key, and backdrop click logic.
  * Subclasses override onOpen() and onClose() hooks for modal-specific behavior.
+ *
+ * For simple modals without a dedicated controller (settings, manage areas,
+ * manage projects, keyboard shortcuts), use ModalManager instead — it manages
+ * modals via config objects registered at setup time.
  */
 export class BaseModal {
     /**
@@ -41,6 +46,8 @@ export class BaseModal {
      * or override onOpen() for setup that runs after the modal is visible.
      */
     open() {
+        if (this.modal.classList.contains('active')) return
+
         // Clean up any stale handler from a previous open
         this._removeEscapeHandler()
 

@@ -62,17 +62,6 @@ export class TodoModal extends BaseModal {
         this.initTabListeners()
     }
 
-    /**
-     * Set callback for when modal closes (used by app.js to trigger re-render)
-     */
-    set onClose(callback) {
-        this.onCloseCallback = callback
-    }
-
-    get onClose() {
-        return this.onCloseCallback || (() => {})
-    }
-
     initEventListeners() {
         // Open button
         if (this.openBtn) {
@@ -213,12 +202,7 @@ export class TodoModal extends BaseModal {
         super.open()
     }
 
-    /**
-     * Close the modal — clears fields and resets state
-     */
-    close() {
-        super.close()
-
+    onClose() {
         store.set('editingTodoId', null)
 
         this.todoInput.value = ''
