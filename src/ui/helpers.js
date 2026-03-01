@@ -7,7 +7,7 @@
  * @param {string} [options.labelKey='name'] - Property name to use for option text
  * @param {string} [options.valueKey='id'] - Property name to use for option value
  */
-export function populateSelectOptions(selectEl, items, { emptyLabel = 'No selection', labelKey = 'name', valueKey = 'id' } = {}) {
+export function populateSelectOptions(selectEl, items = [], { emptyLabel = 'No selection', labelKey = 'name', valueKey = 'id' } = {}) {
     selectEl.innerHTML = ''
     const emptyOption = document.createElement('option')
     emptyOption.value = ''
