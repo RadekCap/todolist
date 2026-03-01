@@ -291,6 +291,8 @@ export async function updateTodoCategory(todoId, categoryId) {
         todo.category_id = categoryId
         store.set('todos', [...todos])
         events.emit(Events.TODO_UPDATED, todo)
+    } else {
+        console.warn(`updateTodoCategory: todo ${todoId} not found in local store`)
     }
 }
 
@@ -316,6 +318,8 @@ export async function updateTodoContext(todoId, contextId) {
         todo.context_id = contextId
         store.set('todos', [...todos])
         events.emit(Events.TODO_UPDATED, todo)
+    } else {
+        console.warn(`updateTodoContext: todo ${todoId} not found in local store`)
     }
 }
 
@@ -345,6 +349,8 @@ export async function updateTodoGtdStatus(todoId, gtdStatus) {
         todo.completed = isCompleted
         store.set('todos', [...todos])
         events.emit(Events.TODO_UPDATED, todo)
+    } else {
+        console.warn(`updateTodoGtdStatus: todo ${todoId} not found in local store`)
     }
 }
 
@@ -370,5 +376,7 @@ export async function updateTodoProject(todoId, projectId) {
         todo.project_id = projectId
         store.set('todos', [...todos])
         events.emit(Events.TODO_UPDATED, todo)
+    } else {
+        console.warn(`updateTodoProject: todo ${todoId} not found in local store`)
     }
 }
