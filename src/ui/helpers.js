@@ -8,7 +8,11 @@
  * @param {string} [options.valueKey='id'] - Property name to use for option value
  */
 export function populateSelectOptions(selectEl, items, { emptyLabel = 'No selection', labelKey = 'name', valueKey = 'id' } = {}) {
-    selectEl.innerHTML = `<option value="">${emptyLabel}</option>`
+    selectEl.innerHTML = ''
+    const emptyOption = document.createElement('option')
+    emptyOption.value = ''
+    emptyOption.textContent = emptyLabel
+    selectEl.appendChild(emptyOption)
 
     items.forEach(item => {
         const option = document.createElement('option')
