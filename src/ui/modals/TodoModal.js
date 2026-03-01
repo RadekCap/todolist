@@ -69,6 +69,10 @@ export class TodoModal extends BaseModal {
         this.onCloseCallback = callback
     }
 
+    get onClose() {
+        return this.onCloseCallback || (() => {})
+    }
+
     initEventListeners() {
         // Open button
         if (this.openBtn) {
