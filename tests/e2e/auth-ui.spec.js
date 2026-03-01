@@ -4,7 +4,7 @@ test.describe('Auth UI', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto('/')
         // Wait for the auth container to appear (app initializes and shows auth)
-        await page.waitForSelector('#authContainer', { timeout: 10000 })
+        await expect(page.locator('#authContainer')).toBeVisible({ timeout: 10000 })
     })
 
     test('auth container is visible when not logged in', async ({ page }) => {
