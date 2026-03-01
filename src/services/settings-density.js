@@ -9,7 +9,7 @@ const DEFAULT_DENSITY = 'comfortable'
  * Load density from localStorage for instant display
  * @returns {string} The current density
  */
-export function loadDensityFromStorage() {
+function loadDensityFromStorage() {
     let savedDensity = localStorage.getItem('densityMode') || DEFAULT_DENSITY
 
     if (!VALID_DENSITIES.includes(savedDensity)) {
@@ -24,7 +24,7 @@ export function loadDensityFromStorage() {
  * Apply density to the document
  * @param {string} density - Density name
  */
-export function applyDensity(density) {
+function applyDensity(density) {
     document.documentElement.setAttribute('data-density', density)
 }
 
@@ -68,7 +68,7 @@ export async function loadDensityFromDatabase() {
  * Save density to database
  * @param {string} density - Density name
  */
-export async function saveDensityToDatabase(density) {
+async function saveDensityToDatabase(density) {
     const currentUser = store.get('currentUser')
     if (!currentUser) return
 

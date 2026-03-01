@@ -7,7 +7,7 @@ import { store } from '../core/store.js'
  */
 export async function loadNotificationSettings() {
     const currentUser = store.get('currentUser')
-    if (!currentUser) return { enabled: false, time: '08:00:00', timezone: 'UTC' }
+    if (!currentUser) return { enabled: false, time: '08:00:00', timezone: Intl.DateTimeFormat().resolvedOptions().timeZone }
 
     const { data, error } = await supabase
         .from('user_settings')

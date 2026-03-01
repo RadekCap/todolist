@@ -9,7 +9,7 @@ const DEFAULT_THEME = 'glass'
  * Load theme from localStorage for instant display
  * @returns {string} The current theme
  */
-export function loadThemeFromStorage() {
+function loadThemeFromStorage() {
     let savedTheme = localStorage.getItem('colorTheme') || DEFAULT_THEME
 
     // Migrate old themes to glass
@@ -70,7 +70,7 @@ export async function loadThemeFromDatabase() {
  * Save theme to database
  * @param {string} theme - Theme name
  */
-export async function saveThemeToDatabase(theme) {
+async function saveThemeToDatabase(theme) {
     const currentUser = store.get('currentUser')
     if (!currentUser) return
 
