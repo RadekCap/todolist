@@ -5,10 +5,14 @@
   "description": "A single-page todo list application with user authentication and cloud sync",
   "scripts": {
     "check:css": "node scripts/check-css-selectors.js",
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
     "prepare": "node scripts/setup-hooks.js"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "css-tree": "^2.3.1",
-    "jsdom": "^24.0.0"
+    "jsdom": "^24.0.0",
+    "serve": "^14.2.5"
   }
 }
