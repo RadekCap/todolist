@@ -58,14 +58,14 @@ export class ModalManager {
      * Open a registered modal
      * @param {string} name - Modal identifier
      */
-    open(name) {
+    async open(name) {
         const modal = this._modals.get(name)
         if (!modal) {
             console.warn(`ModalManager: unknown modal "${name}"`)
             return
         }
 
-        if (modal.onOpen) modal.onOpen()
+        if (modal.onOpen) await modal.onOpen()
 
         modal.element.classList.add('active')
 
@@ -85,7 +85,12 @@ export class ModalManager {
      */
     close(name) {
         const modal = this._modals.get(name)
-        if (!modal) return
+        if (!modal) {
+            console.warn(`ModalManager: unknown modal "${name}"`)
+            return
+        }
+
+        if (!modal.element.classList.contains('active')) return
 
         modal.element.classList.remove('active')
 
