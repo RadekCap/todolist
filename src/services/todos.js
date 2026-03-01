@@ -207,7 +207,7 @@ export async function updateTodo(todoId, todoData) {
         store.set('todos', [...todos])
     }
 
-    events.emit(Events.TODOS_UPDATED)
+    events.emit(Events.TODO_UPDATED, todos[todoIndex])
     return todos[todoIndex]
 }
 
@@ -239,7 +239,7 @@ export async function toggleTodo(todoId) {
     todo.completed = newCompleted
     todo.gtd_status = newGtdStatus
     store.set('todos', [...todos])
-    events.emit(Events.TODOS_UPDATED)
+    events.emit(Events.TODO_UPDATED, todo)
 
     // If completing a recurring instance, generate the next occurrence
     if (newCompleted && todo.template_id) {
@@ -285,7 +285,13 @@ export async function updateTodoCategory(todoId, categoryId) {
         throw error
     }
 
-    await loadTodos()
+    const todos = store.get('todos')
+    const todo = todos.find(t => t.id === todoId)
+    if (todo) {
+        todo.category_id = categoryId
+        store.set('todos', [...todos])
+        events.emit(Events.TODO_UPDATED, todo)
+    }
 }
 
 /**
@@ -304,7 +310,13 @@ export async function updateTodoContext(todoId, contextId) {
         throw error
     }
 
-    await loadTodos()
+    const todos = store.get('todos')
+    const todo = todos.find(t => t.id === todoId)
+    if (todo) {
+        todo.context_id = contextId
+        store.set('todos', [...todos])
+        events.emit(Events.TODO_UPDATED, todo)
+    }
 }
 
 /**
@@ -326,7 +338,14 @@ export async function updateTodoGtdStatus(todoId, gtdStatus) {
         throw error
     }
 
-    await loadTodos()
+    const todos = store.get('todos')
+    const todo = todos.find(t => t.id === todoId)
+    if (todo) {
+        todo.gtd_status = gtdStatus
+        todo.completed = isCompleted
+        store.set('todos', [...todos])
+        events.emit(Events.TODO_UPDATED, todo)
+    }
 }
 
 /**
@@ -345,5 +364,11 @@ export async function updateTodoProject(todoId, projectId) {
         throw error
     }
 
-    await loadTodos()
+    const todos = store.get('todos')
+    const todo = todos.find(t => t.id === todoId)
+    if (todo) {
+        todo.project_id = projectId
+        store.set('todos', [...todos])
+        events.emit(Events.TODO_UPDATED, todo)
+    }
 }

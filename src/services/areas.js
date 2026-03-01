@@ -66,9 +66,11 @@ export async function addArea(name, color = null) {
         throw error
     }
 
-    await loadAreas()
-    events.emit(Events.AREA_ADDED, data[0])
-    return data[0]
+    const area = { ...data[0], name }
+    const updatedAreas = [...store.get('areas'), area]
+    store.set('areas', updatedAreas)
+    events.emit(Events.AREA_ADDED, area)
+    return area
 }
 
 /**
@@ -107,7 +109,7 @@ export async function updateArea(areaId, updates) {
         store.set('areas', [...areas])
     }
 
-    events.emit(Events.AREAS_LOADED, store.get('areas'))
+    events.emit(Events.AREA_UPDATED, area)
 }
 
 /**

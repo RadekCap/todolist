@@ -91,14 +91,17 @@ export const Events = {
     TODOS_LOADED: 'todos:loaded',
     TODOS_UPDATED: 'todos:updated',
     TODO_ADDED: 'todo:added',
+    TODO_UPDATED: 'todo:updated',
     TODO_DELETED: 'todo:deleted',
 
     PROJECTS_LOADED: 'projects:loaded',
     PROJECT_ADDED: 'project:added',
+    PROJECT_UPDATED: 'project:updated',
     PROJECT_DELETED: 'project:deleted',
 
     AREAS_LOADED: 'areas:loaded',
     AREA_ADDED: 'area:added',
+    AREA_UPDATED: 'area:updated',
     AREA_DELETED: 'area:deleted',
 
     CATEGORIES_LOADED: 'categories:loaded',
