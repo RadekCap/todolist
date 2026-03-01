@@ -1,5 +1,6 @@
 import { supabase } from '../core/supabase.js'
 import { store } from '../core/store.js'
+import { upsertUserSetting } from './settings-helpers.js'
 
 /**
  * Load notification settings from database
@@ -36,38 +37,9 @@ export async function loadNotificationSettings() {
  * @returns {Promise<{success: boolean, error?: string}>}
  */
 export async function saveNotificationSettings(settings) {
-    const currentUser = store.get('currentUser')
-    if (!currentUser) return { success: false, error: 'Not logged in' }
-
-    const updateData = {
+    return upsertUserSetting({
         email_notifications_enabled: settings.enabled,
         email_notification_time: settings.time,
-        timezone: settings.timezone,
-        updated_at: new Date().toISOString()
-    }
-
-    const { data, error: updateError } = await supabase
-        .from('user_settings')
-        .update(updateData)
-        .eq('user_id', currentUser.id)
-        .select()
-
-    if (updateError) {
-        console.error('Error updating notification settings:', updateError)
-    }
-
-    if (updateError || !data || data.length === 0) {
-        const { error: insertError } = await supabase
-            .from('user_settings')
-            .insert({
-                user_id: currentUser.id,
-                ...updateData
-            })
-        if (insertError) {
-            console.error('Error inserting notification settings:', insertError)
-            return { success: false, error: 'Failed to save notification settings' }
-        }
-    }
-
-    return { success: true }
+        timezone: settings.timezone
+    })
 }

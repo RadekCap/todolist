@@ -1,6 +1,7 @@
 import { supabase } from '../core/supabase.js'
 import { store } from '../core/store.js'
 import { events, Events } from '../core/events.js'
+import { upsertUserSetting } from './settings-helpers.js'
 
 const VALID_DENSITIES = ['comfortable', 'compact']
 const DEFAULT_DENSITY = 'comfortable'
@@ -69,33 +70,7 @@ export async function loadDensityFromDatabase() {
  * @param {string} density - Density name
  */
 async function saveDensityToDatabase(density) {
-    const currentUser = store.get('currentUser')
-    if (!currentUser) return
-
-    // Try to update existing setting
-    const { data, error: updateError } = await supabase
-        .from('user_settings')
-        .update({ density_mode: density, updated_at: new Date().toISOString() })
-        .eq('user_id', currentUser.id)
-        .select()
-
-    if (updateError) {
-        console.error('Error updating density in user_settings:', updateError)
-    }
-
-    // If no rows were updated, insert a new one
-    if (updateError || !data || data.length === 0) {
-        const { error: insertError } = await supabase
-            .from('user_settings')
-            .insert({
-                user_id: currentUser.id,
-                density_mode: density,
-                updated_at: new Date().toISOString()
-            })
-        if (insertError) {
-            console.error('Error inserting density into user_settings:', insertError)
-        }
-    }
+    await upsertUserSetting({ density_mode: density })
 }
 
 /**

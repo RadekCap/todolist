@@ -1,6 +1,7 @@
 import { supabase } from '../core/supabase.js'
 import { store } from '../core/store.js'
 import { events, Events } from '../core/events.js'
+import { upsertUserSetting } from './settings-helpers.js'
 
 const VALID_THEMES = ['glass', 'dark', 'clear']
 const DEFAULT_THEME = 'glass'
@@ -71,33 +72,7 @@ export async function loadThemeFromDatabase() {
  * @param {string} theme - Theme name
  */
 async function saveThemeToDatabase(theme) {
-    const currentUser = store.get('currentUser')
-    if (!currentUser) return
-
-    // Try to update existing setting
-    const { data, error: updateError } = await supabase
-        .from('user_settings')
-        .update({ color_theme: theme, updated_at: new Date().toISOString() })
-        .eq('user_id', currentUser.id)
-        .select()
-
-    if (updateError) {
-        console.error('Error updating user_settings:', updateError)
-    }
-
-    // If no rows were updated, insert a new one
-    if (updateError || !data || data.length === 0) {
-        const { error: insertError } = await supabase
-            .from('user_settings')
-            .insert({
-                user_id: currentUser.id,
-                color_theme: theme,
-                updated_at: new Date().toISOString()
-            })
-        if (insertError) {
-            console.error('Error inserting into user_settings:', insertError)
-        }
-    }
+    await upsertUserSetting({ color_theme: theme })
 }
 
 /**
