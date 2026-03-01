@@ -35,6 +35,7 @@ import { ImportModal } from './src/ui/modals/ImportModal.js'
 import { ExportModal } from './src/ui/modals/ExportModal.js'
 import { GtdGuideModal } from './src/ui/modals/GtdGuideModal.js'
 import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPrioritySelect } from './src/ui/SelectionBar.js'
+import { ModalManager } from './src/ui/ModalManager.js'
 
 // Application version
 const APP_VERSION = '2.2.19'
@@ -192,6 +193,50 @@ class TodoApp {
             cancelBtn: document.getElementById('cancelExportModal')
         })
 
+        // Initialize ModalManager for simple modals
+        this.modalManager = new ModalManager()
+
+        this.modalManager.register('settings', {
+            element: this.settingsModal,
+            closeButtons: [this.closeSettingsModalBtn, this.cancelSettingsModalBtn],
+            focusOnOpen: this.usernameInput,
+            onOpen: () => this.loadSettingsModalData(),
+            onClose: () => {
+                this.usernameInput.value = ''
+                this.emailNotificationsEnabled.checked = false
+                this.notificationSettingsDetails.style.display = 'none'
+                if (this.settingsBtn) this.settingsBtn.focus()
+            }
+        })
+
+        this.modalManager.register('manageAreas', {
+            element: this.manageAreasModal,
+            closeButtons: [this.closeManageAreasModalBtn, this.closeManageAreasModalBtn2],
+            focusOnOpen: this.newAreaInput,
+            onOpen: () => renderManageAreasList(this.manageAreasList),
+            onClose: () => { this.newAreaInput.value = '' }
+        })
+
+        this.modalManager.register('manageProjects', {
+            element: this.manageProjectsModal,
+            closeButtons: [this.closeManageProjectsModalBtn, this.closeManageProjectsModalBtn2],
+            focusOnOpen: this.newProjectModalInput,
+            onOpen: () => renderManageProjectsList(this.manageProjectsList),
+            onClose: () => { this.newProjectModalInput.value = '' }
+        })
+
+        this.modalManager.register('keyboardShortcuts', {
+            element: this.keyboardShortcutsModal,
+            closeButtons: [this.closeKeyboardShortcutsModalBtn, this.closeKeyboardShortcutsModalBtn2]
+        })
+
+        // Track externally-managed modals for isAnyOpen()
+        this.modalManager.track(this.todoModal.modal)
+        this.modalManager.track(this.unlockModal)
+        this.modalManager.track(this.gtdGuideModal.modal)
+        this.modalManager.track(this.exportModal.modal)
+        this.modalManager.track(this.importModal.modal)
+
         // AbortController for document-level listeners (cleaned up on sign-out)
         this.globalAbortController = new AbortController()
 
@@ -331,12 +376,12 @@ class TodoApp {
         // Settings modal
         this.settingsBtn.addEventListener('click', () => {
             this.closeToolbarMenu()
-            this.openSettingsModal()
+            this.modalManager.open('settings')
         })
         // Keyboard shortcuts from menu
         this.keyboardShortcutsBtn.addEventListener('click', () => {
             this.closeToolbarMenu()
-            this.openKeyboardShortcutsModal()
+            this.modalManager.open('keyboardShortcuts')
         })
         // GTD Guide from menu
         this.gtdGuideBtn.addEventListener('click', () => {
@@ -347,11 +392,7 @@ class TodoApp {
         events.on(Events.OPEN_GTD_GUIDE, (phase) => {
             this.gtdGuideModal.open(phase)
         })
-        this.closeSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
-        this.cancelSettingsModalBtn.addEventListener('click', () => this.closeSettingsModal())
-        this.settingsModal.addEventListener('click', (e) => {
-            if (e.target === this.settingsModal) this.closeSettingsModal()
-        })
+        // Settings modal close buttons and backdrop are handled by ModalManager
 
         // Save settings
         this.settingsForm.addEventListener('submit', (e) => {
@@ -433,22 +474,16 @@ class TodoApp {
         // Add new area from dropdown
         this.addAreaBtn.addEventListener('click', () => {
             this.closeAreasMenu()
-            this.openManageAreasModal()
-            setTimeout(() => this.newAreaInput.focus(), 100)
+            this.modalManager.open('manageAreas')
         })
 
         // Open manage areas modal
         this.manageAreasBtn.addEventListener('click', () => {
             this.closeAreasMenu()
-            this.openManageAreasModal()
+            this.modalManager.open('manageAreas')
         })
 
-        // Manage areas modal controls
-        this.closeManageAreasModalBtn.addEventListener('click', () => this.closeManageAreasModal())
-        this.closeManageAreasModalBtn2.addEventListener('click', () => this.closeManageAreasModal())
-        this.manageAreasModal.addEventListener('click', (e) => {
-            if (e.target === this.manageAreasModal) this.closeManageAreasModal()
-        })
+        // Manage areas modal close buttons and backdrop are handled by ModalManager
 
         // Add new area
         this.addNewAreaBtn.addEventListener('click', () => this.handleAddArea())
@@ -457,14 +492,9 @@ class TodoApp {
         })
 
         // Open manage projects modal
-        this.manageProjectsBtn.addEventListener('click', () => this.openManageProjectsModal())
+        this.manageProjectsBtn.addEventListener('click', () => this.modalManager.open('manageProjects'))
 
-        // Manage projects modal controls
-        this.closeManageProjectsModalBtn.addEventListener('click', () => this.closeManageProjectsModal())
-        this.closeManageProjectsModalBtn2.addEventListener('click', () => this.closeManageProjectsModal())
-        this.manageProjectsModal.addEventListener('click', (e) => {
-            if (e.target === this.manageProjectsModal) this.closeManageProjectsModal()
-        })
+        // Manage projects modal close buttons and backdrop are handled by ModalManager
 
         // Add new project in modal
         this.addNewProjectBtn.addEventListener('click', () => this.handleAddProjectInModal())
@@ -472,12 +502,7 @@ class TodoApp {
             if (e.key === 'Enter') this.handleAddProjectInModal()
         })
 
-        // Keyboard shortcuts modal
-        this.closeKeyboardShortcutsModalBtn.addEventListener('click', () => this.closeKeyboardShortcutsModal())
-        this.closeKeyboardShortcutsModalBtn2.addEventListener('click', () => this.closeKeyboardShortcutsModal())
-        this.keyboardShortcutsModal.addEventListener('click', (e) => {
-            if (e.target === this.keyboardShortcutsModal) this.closeKeyboardShortcutsModal()
-        })
+        // Keyboard shortcuts modal close buttons and backdrop are handled by ModalManager
 
         // Initialize sidebar resize
         this.initSidebarResize()
@@ -493,15 +518,7 @@ class TodoApp {
                        activeElement.tagName === 'SELECT' ||
                        activeElement.isContentEditable
 
-        const modalOpen = this.todoModal.modal.classList.contains('active') ||
-                        this.unlockModal.classList.contains('active') ||
-                        this.settingsModal.classList.contains('active') ||
-                        this.manageAreasModal.classList.contains('active') ||
-                        this.manageProjectsModal.classList.contains('active') ||
-                        this.keyboardShortcutsModal.classList.contains('active') ||
-                        this.gtdGuideModal.modal.classList.contains('active') ||
-                        this.exportModal.modal.classList.contains('active') ||
-                        this.importModal.modal.classList.contains('active')
+        const modalOpen = this.modalManager.isAnyOpen()
 
         // 'n' to create new item
         if (e.code === 'KeyN' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
@@ -538,7 +555,7 @@ class TodoApp {
         // 'k' or '?' to show keyboard shortcuts help
         if ((e.key === 'k' || e.key === '?') && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
             e.preventDefault()
-            this.openKeyboardShortcutsModal()
+            this.modalManager.open('keyboardShortcuts')
         }
 
         // 'g' to show GTD guide
@@ -850,49 +867,6 @@ class TodoApp {
         }
     }
 
-    openManageAreasModal() {
-        this.manageAreasModal.classList.add('active')
-        renderManageAreasList(this.manageAreasList)
-
-        this.handleManageAreasEscapeKey = (e) => {
-            if (e.key === 'Escape') this.closeManageAreasModal()
-        }
-        document.addEventListener('keydown', this.handleManageAreasEscapeKey)
-
-        setTimeout(() => this.newAreaInput.focus(), 100)
-    }
-
-    closeManageAreasModal() {
-        this.manageAreasModal.classList.remove('active')
-
-        if (this.handleManageAreasEscapeKey) {
-            document.removeEventListener('keydown', this.handleManageAreasEscapeKey)
-        }
-
-        this.newAreaInput.value = ''
-    }
-
-    openManageProjectsModal() {
-        this.manageProjectsModal.classList.add('active')
-        renderManageProjectsList(this.manageProjectsList)
-
-        this.handleManageProjectsEscapeKey = (e) => {
-            if (e.key === 'Escape') this.closeManageProjectsModal()
-        }
-        document.addEventListener('keydown', this.handleManageProjectsEscapeKey)
-
-        setTimeout(() => this.newProjectModalInput.focus(), 100)
-    }
-
-    closeManageProjectsModal() {
-        this.manageProjectsModal.classList.remove('active')
-
-        if (this.handleManageProjectsEscapeKey) {
-            document.removeEventListener('keydown', this.handleManageProjectsEscapeKey)
-        }
-
-        this.newProjectModalInput.value = ''
-    }
 
     async handleAddProjectInModal() {
         const name = this.newProjectModalInput.value.trim()
@@ -913,26 +887,7 @@ class TodoApp {
         }
     }
 
-    openKeyboardShortcutsModal() {
-        this.keyboardShortcutsModal.classList.add('active')
-
-        this.handleKeyboardShortcutsEscapeKey = (e) => {
-            if (e.key === 'Escape') this.closeKeyboardShortcutsModal()
-        }
-        document.addEventListener('keydown', this.handleKeyboardShortcutsEscapeKey)
-    }
-
-    closeKeyboardShortcutsModal() {
-        this.keyboardShortcutsModal.classList.remove('active')
-
-        if (this.handleKeyboardShortcutsEscapeKey) {
-            document.removeEventListener('keydown', this.handleKeyboardShortcutsEscapeKey)
-        }
-    }
-
-    async openSettingsModal() {
-        this.settingsModal.classList.add('active')
-
+    async loadSettingsModalData() {
         const currentUser = store.get('currentUser')
         const currentUsername = this.toolbarUsername.textContent
         if (currentUsername !== currentUser.email) {
@@ -941,35 +896,11 @@ class TodoApp {
             this.usernameInput.value = ''
         }
 
-        // Load notification settings
         const notificationSettings = await loadNotificationSettings()
         this.emailNotificationsEnabled.checked = notificationSettings.enabled
         this.notificationSettingsDetails.style.display = notificationSettings.enabled ? 'block' : 'none'
         this.notificationTime.value = notificationSettings.time
         this.timezoneSelect.value = notificationSettings.timezone
-
-        this.handleSettingsEscapeKey = (e) => {
-            if (e.key === 'Escape') this.closeSettingsModal()
-        }
-        document.addEventListener('keydown', this.handleSettingsEscapeKey)
-
-        setTimeout(() => this.usernameInput.focus(), 100)
-    }
-
-    closeSettingsModal() {
-        this.settingsModal.classList.remove('active')
-
-        if (this.handleSettingsEscapeKey) {
-            document.removeEventListener('keydown', this.handleSettingsEscapeKey)
-        }
-
-        this.usernameInput.value = ''
-        this.emailNotificationsEnabled.checked = false
-        this.notificationSettingsDetails.style.display = 'none'
-
-        if (this.settingsBtn && typeof this.settingsBtn.focus === 'function') {
-            this.settingsBtn.focus()
-        }
     }
 
     populateTimezoneSelect() {
@@ -1012,7 +943,7 @@ class TodoApp {
         const currentUser = store.get('currentUser')
         this.toolbarUsername.textContent = username || currentUser.email
 
-        this.closeSettingsModal()
+        this.modalManager.close('settings')
     }
 
     async migrateExistingData() {
