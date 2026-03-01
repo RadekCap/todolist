@@ -1,14 +1,20 @@
 import { store } from '../../core/store.js'
 import { batchAddTodos } from '../../services/todos.js'
 import { populateSelectOptions } from '../helpers.js'
+import { BaseModal } from './BaseModal.js'
 
 /**
  * ImportModal controller
  * Manages the bulk import modal for adding multiple todos at once
  */
-export class ImportModal {
+export class ImportModal extends BaseModal {
     constructor(elements) {
-        this.modal = elements.modal
+        super(elements.modal, {
+            closeButtons: [elements.closeBtn, elements.cancelBtn],
+            focusOnOpen: elements.textarea,
+            focusDelay: 50
+        })
+
         this.form = elements.form
         this.textarea = elements.textarea
         this.projectSelect = elements.projectSelect
@@ -18,26 +24,15 @@ export class ImportModal {
         this.gtdStatusSelect = elements.gtdStatusSelect
         this.dueDateInput = elements.dueDateInput
         this.importBtn = elements.importBtn
-        this.closeBtn = elements.closeBtn
-        this.cancelBtn = elements.cancelBtn
-        this.openBtn = elements.openBtn
 
-        this.handleEscapeKey = null
+        if (elements.openBtn) {
+            elements.openBtn.addEventListener('click', () => this.open())
+        }
 
         this.initEventListeners()
     }
 
     initEventListeners() {
-        // Modal controls
-        if (this.openBtn) {
-            this.openBtn.addEventListener('click', () => this.open())
-        }
-        this.closeBtn.addEventListener('click', () => this.close())
-        this.cancelBtn.addEventListener('click', () => this.close())
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) this.close()
-        })
-
         // Form submission
         this.form.addEventListener('submit', (e) => {
             e.preventDefault()
@@ -53,11 +48,7 @@ export class ImportModal {
         })
     }
 
-    /**
-     * Open the import modal
-     */
-    open() {
-        this.modal.classList.add('active')
+    onOpen() {
         this.textarea.value = ''
         this.dueDateInput.value = ''
         this.gtdStatusSelect.value = 'inbox'
@@ -83,26 +74,6 @@ export class ImportModal {
         this.updateCategorySelect()
         this.updateContextSelect()
         this.updatePrioritySelect()
-
-        // Add escape key listener
-        this.handleEscapeKey = (e) => {
-            if (e.key === 'Escape') this.close()
-        }
-        document.addEventListener('keydown', this.handleEscapeKey)
-
-        // Focus textarea
-        setTimeout(() => this.textarea.focus(), 50)
-    }
-
-    /**
-     * Close the import modal
-     */
-    close() {
-        this.modal.classList.remove('active')
-        if (this.handleEscapeKey) {
-            document.removeEventListener('keydown', this.handleEscapeKey)
-            this.handleEscapeKey = null
-        }
     }
 
     /**

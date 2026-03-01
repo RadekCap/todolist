@@ -2,14 +2,19 @@ import { store } from '../../core/store.js'
 import { addTodo, updateTodo, createRecurringTodo, convertToRecurring, updateTemplateRecurrence } from '../../services/todos.js'
 import { populateSelectOptions } from '../helpers.js'
 import { RecurrencePanel } from './RecurrencePanel.js'
+import { BaseModal } from './BaseModal.js'
 
 /**
  * TodoModal controller
  * Manages the add/edit todo modal
  */
-export class TodoModal {
+export class TodoModal extends BaseModal {
     constructor(elements) {
-        this.modal = elements.modal
+        super(elements.modal, {
+            closeButtons: [elements.closeBtn, elements.cancelBtn],
+            focusOnOpen: elements.todoInput
+        })
+
         this.form = elements.form
         this.todoInput = elements.todoInput
         this.categorySelect = elements.categorySelect
@@ -22,16 +27,13 @@ export class TodoModal {
         this.priorityToggle = elements.priorityToggle
         this.addBtn = elements.addBtn
         this.title = elements.title
-        this.closeBtn = elements.closeBtn
-        this.cancelBtn = elements.cancelBtn
         this.openBtn = elements.openBtn
 
         // Tab elements
         this.tabs = document.querySelectorAll('.modal-tab')
         this.tabPanels = document.querySelectorAll('.modal-tab-panel')
 
-        this.handleEscapeKey = null
-        this.onClose = null
+        this.onCloseCallback = null
 
         // Initialize recurrence panel as a separate controller
         this.recurrencePanel = new RecurrencePanel({
@@ -60,16 +62,18 @@ export class TodoModal {
         this.initTabListeners()
     }
 
+    /**
+     * Set callback for when modal closes (used by app.js to trigger re-render)
+     */
+    set onClose(callback) {
+        this.onCloseCallback = callback
+    }
+
     initEventListeners() {
-        // Modal controls
+        // Open button
         if (this.openBtn) {
             this.openBtn.addEventListener('click', () => this.open())
         }
-        this.closeBtn.addEventListener('click', () => this.close())
-        this.cancelBtn.addEventListener('click', () => this.close())
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) this.close()
-        })
 
         // Form submission
         this.form.addEventListener('submit', (e) => {
@@ -127,7 +131,6 @@ export class TodoModal {
         store.set('editingTodoId', null)
         this.title.textContent = 'Add New Todo'
         this.addBtn.textContent = 'Add Todo'
-        this.modal.classList.add('active')
         this.todoInput.value = ''
         this.dueDateInput.value = ''
         this.commentInput.value = ''
@@ -161,13 +164,7 @@ export class TodoModal {
         this.recurrencePanel.reset()
         this.switchTab('details')
 
-        // Handle Escape key
-        this.handleEscapeKey = (e) => {
-            if (e.key === 'Escape') this.close()
-        }
-        document.addEventListener('keydown', this.handleEscapeKey)
-
-        setTimeout(() => this.todoInput.focus(), 100)
+        super.open()
     }
 
     /**
@@ -182,7 +179,6 @@ export class TodoModal {
         store.set('editingTodoId', todoId)
         this.title.textContent = 'Edit Todo'
         this.addBtn.textContent = 'Save Changes'
-        this.modal.classList.add('active')
 
         // Pre-populate fields
         this.todoInput.value = todo.text
@@ -210,25 +206,16 @@ export class TodoModal {
             this.switchTab('details')
         }
 
-        // Handle Escape key
-        this.handleEscapeKey = (e) => {
-            if (e.key === 'Escape') this.close()
-        }
-        document.addEventListener('keydown', this.handleEscapeKey)
-
-        setTimeout(() => this.todoInput.focus(), 100)
+        super.open()
     }
 
     /**
-     * Close the modal
+     * Close the modal — clears fields and resets state
      */
     close() {
-        this.modal.classList.remove('active')
-        store.set('editingTodoId', null)
+        super.close()
 
-        if (this.handleEscapeKey) {
-            document.removeEventListener('keydown', this.handleEscapeKey)
-        }
+        store.set('editingTodoId', null)
 
         this.todoInput.value = ''
         this.categorySelect.value = ''
@@ -250,8 +237,8 @@ export class TodoModal {
             this.openBtn.focus()
         }
 
-        if (this.onClose) {
-            this.onClose()
+        if (this.onCloseCallback) {
+            this.onCloseCallback()
         }
     }
 

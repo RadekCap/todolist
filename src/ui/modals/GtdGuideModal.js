@@ -1,3 +1,5 @@
+import { BaseModal } from './BaseModal.js'
+
 /**
  * GTD status to GTD phase mapping
  * Maps app GTD statuses to the corresponding GTD methodology phase
@@ -16,27 +18,20 @@ export const GTD_STATUS_PHASE_MAP = {
  * GtdGuideModal controller
  * Displays an interactive GTD methodology reference guide with 5 phases
  */
-export class GtdGuideModal {
+export class GtdGuideModal extends BaseModal {
     constructor(elements) {
-        this.modal = elements.modal
-        this.closeBtn = elements.closeBtn
-        this.cancelBtn = elements.cancelBtn
-        this.contentContainer = elements.contentContainer
+        super(elements.modal, {
+            closeButtons: [elements.closeBtn, elements.cancelBtn]
+        })
 
-        this.handleEscapeKey = null
+        this.contentContainer = elements.contentContainer
         this.activePhase = 'capture'
 
         this.buildContent()
-        this.initEventListeners()
+        this.initGuideListeners()
     }
 
-    initEventListeners() {
-        this.closeBtn.addEventListener('click', () => this.close())
-        this.cancelBtn.addEventListener('click', () => this.close())
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) this.close()
-        })
-
+    initGuideListeners() {
         // Tab switching via event delegation
         this.tabsContainer.addEventListener('click', (e) => {
             const tab = e.target.closest('.gtd-guide-tab')
@@ -47,27 +42,8 @@ export class GtdGuideModal {
     }
 
     open(phase = 'capture') {
-        // Clean up any existing handler first
-        if (this.handleEscapeKey) {
-            document.removeEventListener('keydown', this.handleEscapeKey)
-        }
-
-        this.modal.classList.add('active')
+        super.open()
         this.switchPhase(phase)
-
-        this.handleEscapeKey = (e) => {
-            if (e.key === 'Escape') this.close()
-        }
-        document.addEventListener('keydown', this.handleEscapeKey)
-    }
-
-    close() {
-        this.modal.classList.remove('active')
-
-        if (this.handleEscapeKey) {
-            document.removeEventListener('keydown', this.handleEscapeKey)
-            this.handleEscapeKey = null
-        }
     }
 
     switchPhase(phase) {
