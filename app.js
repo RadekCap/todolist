@@ -38,7 +38,7 @@ import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPr
 import { ModalManager } from './src/ui/ModalManager.js'
 
 // Application version
-const APP_VERSION = '2.2.19'
+const APP_VERSION = '2.2.20'
 
 class TodoApp {
     constructor() {
