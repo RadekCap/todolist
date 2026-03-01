@@ -1,5 +1,6 @@
 import { store } from '../../core/store.js'
 import { addTodo, updateTodo, createRecurringTodo, convertToRecurring, updateTemplateRecurrence } from '../../services/todos.js'
+import { populateSelectOptions } from '../helpers.js'
 import { RecurrencePanel } from './RecurrencePanel.js'
 
 /**
@@ -361,63 +362,19 @@ export class TodoModal {
         }
     }
 
-    /**
-     * Update category select options
-     */
     updateCategorySelect() {
-        const categories = store.get('categories')
-        this.categorySelect.innerHTML = '<option value="">No Category</option>'
-
-        categories.forEach(category => {
-            const option = document.createElement('option')
-            option.value = category.id
-            option.textContent = category.name
-            this.categorySelect.appendChild(option)
-        })
+        populateSelectOptions(this.categorySelect, store.get('categories'), { emptyLabel: 'No Category' })
     }
 
-    /**
-     * Update priority select options
-     */
     updatePrioritySelect() {
-        const priorities = store.get('priorities')
-        this.prioritySelect.innerHTML = '<option value="">No Priority</option>'
-
-        priorities.forEach(priority => {
-            const option = document.createElement('option')
-            option.value = priority.id
-            option.textContent = priority.name
-            this.prioritySelect.appendChild(option)
-        })
+        populateSelectOptions(this.prioritySelect, store.get('priorities'), { emptyLabel: 'No Priority' })
     }
 
-    /**
-     * Update context select options
-     */
     updateContextSelect() {
-        const contexts = store.get('contexts')
-        this.contextSelect.innerHTML = '<option value="">No Context</option>'
-
-        contexts.forEach(context => {
-            const option = document.createElement('option')
-            option.value = context.id
-            option.textContent = context.name
-            this.contextSelect.appendChild(option)
-        })
+        populateSelectOptions(this.contextSelect, store.get('contexts'), { emptyLabel: 'No Context' })
     }
 
-    /**
-     * Update project select options
-     */
     updateProjectSelect() {
-        const projects = store.get('projects')
-        this.projectSelect.innerHTML = '<option value="">No Project</option>'
-
-        projects.forEach(project => {
-            const option = document.createElement('option')
-            option.value = project.id
-            option.textContent = project.name
-            this.projectSelect.appendChild(option)
-        })
+        populateSelectOptions(this.projectSelect, store.get('projects'), { emptyLabel: 'No Project' })
     }
 }

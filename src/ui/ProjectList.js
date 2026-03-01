@@ -3,6 +3,7 @@ import { escapeHtml, validateColor } from '../utils/security.js'
 import { getFilteredProjects, selectProject, deleteProject, updateProject, reorderProjects } from '../services/projects.js'
 import { getProjectTodoCount, updateTodoProject } from '../services/todos.js'
 import { getIcon } from '../utils/icons.js'
+import { populateSelectOptions } from './helpers.js'
 
 /**
  * Render the project list in the sidebar
@@ -100,15 +101,7 @@ export function renderProjects(container) {
  * @param {HTMLSelectElement} selectElement - Select element
  */
 export function updateProjectSelect(selectElement) {
-    const projects = store.get('projects')
-    selectElement.innerHTML = '<option value="">No Project</option>'
-
-    projects.forEach(project => {
-        const option = document.createElement('option')
-        option.value = project.id
-        option.textContent = project.name
-        selectElement.appendChild(option)
-    })
+    populateSelectOptions(selectElement, store.get('projects'), { emptyLabel: 'No Project' })
 }
 
 /**
