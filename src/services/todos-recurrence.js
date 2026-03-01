@@ -315,7 +315,7 @@ export async function deleteRecurringSeries(templateId) {
     const templates = (store.get('templates') || []).filter(t => String(t.id) !== String(templateId))
     store.set('templates', templates)
 
-    events.emit(Events.TODOS_LOADED, todos)
+    events.emit(Events.TODOS_UPDATED, todos)
 }
 
 /**
@@ -457,6 +457,6 @@ export async function convertToRecurring(todoId, todoData, recurrenceRule, endCo
     templates.push(template)
     store.set('templates', templates)
 
-    events.emit(Events.TODOS_UPDATED)
+    events.emit(Events.TODO_UPDATED, todos[todoIndex])
     return todos[todoIndex]
 }

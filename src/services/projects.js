@@ -71,9 +71,12 @@ export async function addProject(name) {
         throw error
     }
 
-    await loadProjects()
-    events.emit(Events.PROJECT_ADDED, data[0])
-    return data[0]
+    // Overlay decrypted name (DB returns encrypted value)
+    const project = { ...data[0], name }
+    const updatedProjects = [...store.get('projects'), project]
+    store.set('projects', updatedProjects)
+    events.emit(Events.PROJECT_ADDED, project)
+    return project
 }
 
 /**
@@ -186,7 +189,7 @@ export async function updateProject(projectId, updates) {
         store.set('projects', [...projects])
     }
 
-    events.emit(Events.PROJECTS_LOADED, store.get('projects'))
+    events.emit(Events.PROJECT_UPDATED, project)
 }
 
 /**

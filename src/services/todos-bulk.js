@@ -26,7 +26,7 @@ export async function bulkDeleteTodos(todoIds) {
     store.set('selectedTodoIds', new Set())
     store.set('lastSelectedTodoId', null)
 
-    events.emit(Events.TODOS_UPDATED)
+    events.emit(Events.TODOS_UPDATED, todos)
 }
 
 /**
@@ -62,7 +62,7 @@ export async function bulkUpdateTodosStatus(todoIds, gtdStatus) {
     store.set('selectedTodoIds', new Set())
     store.set('lastSelectedTodoId', null)
 
-    events.emit(Events.TODOS_UPDATED)
+    events.emit(Events.TODOS_UPDATED, todos)
 }
 
 /**
@@ -96,7 +96,7 @@ export async function bulkUpdateTodosProject(todoIds, projectId) {
     store.set('selectedTodoIds', new Set())
     store.set('lastSelectedTodoId', null)
 
-    events.emit(Events.TODOS_UPDATED)
+    events.emit(Events.TODOS_UPDATED, todos)
 }
 
 /**
@@ -130,5 +130,5 @@ export async function bulkUpdateTodosPriority(todoIds, priorityId) {
     store.set('selectedTodoIds', new Set())
     store.set('lastSelectedTodoId', null)
 
-    events.emit(Events.TODOS_UPDATED)
+    events.emit(Events.TODOS_UPDATED, todos)
 }
