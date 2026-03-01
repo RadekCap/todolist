@@ -66,6 +66,7 @@ export async function addArea(name, color = null) {
         throw error
     }
 
+    // Overlay decrypted name (DB returns encrypted value)
     const area = { ...data[0], name }
     const updatedAreas = [...store.get('areas'), area]
     store.set('areas', updatedAreas)

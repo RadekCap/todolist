@@ -71,6 +71,7 @@ export async function addProject(name) {
         throw error
     }
 
+    // Overlay decrypted name (DB returns encrypted value)
     const project = { ...data[0], name }
     const updatedProjects = [...store.get('projects'), project]
     store.set('projects', updatedProjects)

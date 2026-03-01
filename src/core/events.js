@@ -88,6 +88,8 @@ export const Events = {
     AUTH_LOCK: 'auth:lock',
 
     // Data events
+    // Single-item events carry the affected entity as payload
+    // Plural events (TODOS_UPDATED, TODOS_LOADED) carry the full array
     TODOS_LOADED: 'todos:loaded',
     TODOS_UPDATED: 'todos:updated',
     TODO_ADDED: 'todo:added',
