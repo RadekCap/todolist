@@ -9,7 +9,7 @@ test.describe('App Loading', () => {
     test('loading screen is shown initially', async ({ page }) => {
         await page.goto('/')
         const loadingScreen = page.locator('#loadingScreen')
-        await expect(loadingScreen).toBeAttached()
+        await expect(loadingScreen).toBeVisible()
     })
 
     test('main container exists', async ({ page }) => {

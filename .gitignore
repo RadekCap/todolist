@@ -1,8 +1,8 @@
 # Dependencies
 node_modules/
 
-# Lock files (optional - can include if you want reproducible builds)
-package-lock.json
+# Lock files
+# package-lock.json is tracked for reproducible CI builds (npm ci)
 
 # OS files
 .DS_Store
