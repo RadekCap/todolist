@@ -65,9 +65,13 @@ export class ModalManager {
             return
         }
 
-        if (modal.onOpen) await modal.onOpen()
-
         modal.element.classList.add('active')
+
+        try {
+            if (modal.onOpen) await modal.onOpen()
+        } catch (err) {
+            console.error(`ModalManager: onOpen failed for "${name}"`, err)
+        }
 
         modal.escapeHandler = (e) => {
             if (e.key === 'Escape') this.close(name)
