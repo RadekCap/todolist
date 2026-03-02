@@ -2,6 +2,7 @@ import { supabase } from '../core/supabase.js'
 import { store } from '../core/store.js'
 import { events, Events } from '../core/events.js'
 import { encrypt, decrypt } from './auth.js'
+import { pushNavigationState } from './navigation.js'
 
 /**
  * Load all projects for the current user
@@ -121,6 +122,7 @@ export function selectProject(projectId) {
         // Switch GTD filter to 'all' to show all items in this project
         store.set('selectedGtdStatus', 'all')
     }
+    pushNavigationState()
     events.emit(Events.VIEW_CHANGED)
 }
 
