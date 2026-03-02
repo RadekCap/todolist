@@ -145,13 +145,6 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.context-item/,
     /\.context-name/,
     /\.context-delete/,
-    // GTD list items (rendered by JavaScript)
-    /\.gtd-list/,
-    /\.gtd-item/,
-    /\.gtd-icon/,
-    /\.gtd-label/,
-    /\.gtd-count/,
-    /\.gtd-shortcut/,
     // GTD tab bar items (rendered by JavaScript)
     /\.gtd-tab/,
     /\.gtd-tab-icon/,
@@ -159,9 +152,6 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     // Scheduled view headers (rendered by JavaScript)
     /\.scheduled-section-header/,
     /\.section-header-text/,
-    // GTD separator and section label (rendered by JavaScript)
-    /\.gtd-inbox-separator/,
-    /\.gtd-section-label/,
     // Area management items (rendered by JavaScript)
     /\.manage-areas-item/,
     /\.manage-areas-drag-handle/,
@@ -237,7 +227,6 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     // GTD Guide modal (content rendered by JavaScript)
     /\.gtd-guide-/,
     /\.gtd-fc-/,
-    /\.gtd-help-btn/,
 ];
 
 /**
