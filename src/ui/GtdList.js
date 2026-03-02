@@ -37,8 +37,9 @@ export function getGtdShortcut(status) {
  */
 export function selectGtdStatus(status) {
     store.set('selectedGtdStatus', status)
-    // Exit projects view when selecting a GTD status
+    // Exit projects/project view when selecting a GTD status
     store.set('showProjectsView', false)
+    store.set('selectedProjectId', null)
     pushNavigationState()
 }
 

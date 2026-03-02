@@ -26,10 +26,9 @@ function buildUrl(state) {
 
     if (state.showProjectsView) {
         params.set('view', 'projects')
-    } else if (state.projectId) {
-        params.set('project', state.projectId)
-    } else if (state.gtdStatus && state.gtdStatus !== 'inbox') {
-        params.set('gtd', state.gtdStatus)
+    } else {
+        if (state.projectId) params.set('project', state.projectId)
+        if (state.gtdStatus && state.gtdStatus !== 'inbox') params.set('gtd', state.gtdStatus)
     }
 
     const search = params.toString()
@@ -73,7 +72,7 @@ export function initNavigation() {
         } else if (state.projectId) {
             store.set('selectedProjectId', state.projectId)
             store.set('showProjectsView', false)
-            store.set('selectedGtdStatus', 'all')
+            store.set('selectedGtdStatus', state.gtdStatus || 'all')
         } else {
             store.set('selectedGtdStatus', state.gtdStatus || 'inbox')
             store.set('showProjectsView', false)
@@ -97,16 +96,17 @@ export function initNavigation() {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' })
             }
         }, 100)
-    } else if (urlParams.has('gtd')) {
-        const gtd = urlParams.get('gtd')
-        if (VALID_GTD_STATUSES.includes(gtd)) {
-            store.set('selectedGtdStatus', gtd)
-            store.set('showProjectsView', false)
-        }
-    } else if (urlParams.has('project')) {
-        store.set('selectedProjectId', urlParams.get('project'))
+    } else if (urlParams.has('project') || urlParams.has('gtd')) {
         store.set('showProjectsView', false)
-        store.set('selectedGtdStatus', 'all')
+        if (urlParams.has('project')) {
+            store.set('selectedProjectId', urlParams.get('project'))
+        }
+        const gtd = urlParams.get('gtd')
+        if (gtd && VALID_GTD_STATUSES.includes(gtd)) {
+            store.set('selectedGtdStatus', gtd)
+        } else if (urlParams.has('project')) {
+            store.set('selectedGtdStatus', 'all')
+        }
     } else if (view === 'projects') {
         store.set('selectedProjectId', null)
         store.set('showProjectsView', true)
