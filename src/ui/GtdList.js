@@ -120,26 +120,29 @@ export function renderGtdTabBar(container) {
         container.appendChild(btn)
     })
 
-    // Arrow key navigation for tablist pattern
-    container.addEventListener('keydown', (e) => {
-        const tabs = Array.from(container.querySelectorAll('[role="tab"]'))
-        const currentIndex = tabs.indexOf(document.activeElement)
-        if (currentIndex === -1) return
+    // Arrow key navigation for tablist pattern (attach once)
+    if (!container.dataset.keynavAttached) {
+        container.dataset.keynavAttached = 'true'
+        container.addEventListener('keydown', (e) => {
+            const tabs = Array.from(container.querySelectorAll('[role="tab"]'))
+            const currentIndex = tabs.indexOf(document.activeElement)
+            if (currentIndex === -1) return
 
-        let nextIndex
-        if (e.key === 'ArrowRight') {
-            nextIndex = (currentIndex + 1) % tabs.length
-        } else if (e.key === 'ArrowLeft') {
-            nextIndex = (currentIndex - 1 + tabs.length) % tabs.length
-        } else if (e.key === 'Home') {
-            nextIndex = 0
-        } else if (e.key === 'End') {
-            nextIndex = tabs.length - 1
-        } else {
-            return
-        }
+            let nextIndex
+            if (e.key === 'ArrowRight') {
+                nextIndex = (currentIndex + 1) % tabs.length
+            } else if (e.key === 'ArrowLeft') {
+                nextIndex = (currentIndex - 1 + tabs.length) % tabs.length
+            } else if (e.key === 'Home') {
+                nextIndex = 0
+            } else if (e.key === 'End') {
+                nextIndex = tabs.length - 1
+            } else {
+                return
+            }
 
-        e.preventDefault()
-        tabs[nextIndex].focus()
-    })
+            e.preventDefault()
+            tabs[nextIndex].focus()
+        })
+    }
 }
