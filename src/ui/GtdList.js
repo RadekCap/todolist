@@ -2,6 +2,16 @@ import { store } from '../core/store.js'
 import { getGtdCount, updateTodoGtdStatus } from '../services/todos.js'
 import { getIcon } from '../utils/icons.js'
 
+const GTD_STATUSES = [
+    { id: 'inbox', label: 'Inbox' },
+    { id: 'next_action', label: 'Next' },
+    { id: 'scheduled', label: 'Scheduled', isVirtual: true },
+    { id: 'waiting_for', label: 'Waiting' },
+    { id: 'someday_maybe', label: 'Someday' },
+    { id: 'done', label: 'Done' },
+    { id: 'all', label: 'All' }
+]
+
 /**
  * Get keyboard shortcut for a GTD status
  * @param {string} status - GTD status
@@ -58,19 +68,9 @@ export function selectGtdStatusByShortcut(digit) {
 export function renderGtdTabBar(container) {
     const state = store.state
 
-    const statuses = [
-        { id: 'inbox', label: 'Inbox' },
-        { id: 'next_action', label: 'Next' },
-        { id: 'scheduled', label: 'Scheduled', isVirtual: true },
-        { id: 'waiting_for', label: 'Waiting' },
-        { id: 'someday_maybe', label: 'Someday' },
-        { id: 'done', label: 'Done' },
-        { id: 'all', label: 'All' }
-    ]
-
     container.innerHTML = ''
 
-    statuses.forEach(status => {
+    GTD_STATUSES.forEach(status => {
         const btn = document.createElement('button')
         const isActive = state.selectedGtdStatus === status.id
         const count = getGtdCount(status.id)
@@ -145,4 +145,21 @@ export function renderGtdTabBar(container) {
             tabs[nextIndex].focus()
         })
     }
+}
+
+/**
+ * Update the GTD status header in the content area
+ * @param {HTMLElement} headerElement - The #gtdStatusHeader element
+ */
+export function updateGtdStatusHeader(headerElement) {
+    const status = store.state.selectedGtdStatus
+    const statusInfo = GTD_STATUSES.find(s => s.id === status)
+    if (!statusInfo) return
+
+    const iconSpan = headerElement.querySelector('.gtd-status-header-icon')
+    const nameSpan = headerElement.querySelector('.gtd-status-header-name')
+
+    iconSpan.innerHTML = getIcon(status, { size: 20 })
+    nameSpan.textContent = statusInfo.label
+    headerElement.className = `gtd-status-header ${status}`
 }
