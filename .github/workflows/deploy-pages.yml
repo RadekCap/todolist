@@ -1,6 +1,7 @@
 name: Deploy to GitHub Pages
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["Auto Version Bump"]
     types: [completed]
@@ -15,13 +16,17 @@ concurrency:
 jobs:
   deploy:
     # Deploy when:
-    # - Version bump succeeded, OR
+    # - Manual trigger (workflow_dispatch), OR
+    # - Version bump workflow succeeded, OR
+    # - Version bump PR merged to main, OR
     # - Direct push to main (not a PR merge that triggers version bump)
     if: |
+      (github.event_name == 'workflow_dispatch') ||
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
       (github.event_name == 'push' &&
-       !contains(github.event.head_commit.message, 'Merge pull request') &&
-       !contains(github.event.head_commit.message, '(#'))
+       (startsWith(github.event.head_commit.message, 'chore: Bump version') ||
+        (!contains(github.event.head_commit.message, 'Merge pull request') &&
+         !contains(github.event.head_commit.message, '(#'))))
     runs-on: ubuntu-latest
     permissions:
       pages: write
