@@ -267,9 +267,10 @@ body.fullscreen-mode .container {
     max-width: none;
     border-radius: 0;
     box-shadow: none;
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .container {
