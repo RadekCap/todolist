@@ -28,7 +28,7 @@ import { loadPriorities } from './src/services/priorities.js'
 // UI Components
 import { renderTodos } from './src/ui/TodoList.js'
 import { renderProjects, updateProjectSelect, renderManageProjectsList } from './src/ui/ProjectList.js'
-import { renderGtdTabBar, selectGtdStatus, selectGtdStatusByShortcut } from './src/ui/GtdList.js'
+import { renderGtdTabBar, updateGtdStatusHeader, selectGtdStatus, selectGtdStatusByShortcut } from './src/ui/GtdList.js'
 import { renderAreasDropdown, updateAreasLabel, updateAreaHeader, renderManageAreasList } from './src/ui/AreasDropdown.js'
 import { TodoModal } from './src/ui/modals/TodoModal.js'
 import { ImportModal } from './src/ui/modals/ImportModal.js'
@@ -77,6 +77,7 @@ class TodoApp {
         this.addProjectBtn = document.getElementById('addProjectBtn')
         this.projectsSection = document.getElementById('projectsSection')
         this.gtdTabBar = document.getElementById('gtdTabBar')
+        this.gtdStatusHeader = document.getElementById('gtdStatusHeader')
         this.exportBtn = document.getElementById('exportBtn')
         this.searchInput = document.getElementById('searchInput')
         this.versionNumberEl = document.getElementById('versionNumber')
@@ -1122,6 +1123,7 @@ class TodoApp {
 
     render() {
         renderGtdTabBar(this.gtdTabBar)
+        updateGtdStatusHeader(this.gtdStatusHeader)
         renderProjects(this.projectList)
         updateAreaHeader(this.areaHeader)
         renderTodos(this.todoList, {
@@ -1132,6 +1134,7 @@ class TodoApp {
 
     renderAll() {
         renderGtdTabBar(this.gtdTabBar)
+        updateGtdStatusHeader(this.gtdStatusHeader)
         renderProjects(this.projectList)
         renderAreasDropdown(this.areaListContainer, this.toolbarAreasDropdown, this.areaListDivider)
         updateAreasLabel(this.toolbarAreasLabel)

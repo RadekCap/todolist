@@ -149,6 +149,8 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.gtd-tab/,
     /\.gtd-tab-icon/,
     /\.gtd-tab-badge/,
+    // GTD status header (updated by JavaScript)
+    /\.gtd-status-header/,
     // Scheduled view headers (rendered by JavaScript)
     /\.scheduled-section-header/,
     /\.section-header-text/,

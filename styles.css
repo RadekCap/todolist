@@ -747,6 +747,38 @@ body.sidebar-resizing * {
 }
 
 /* Area Header - Shows current area with color indicator */
+/* GTD Status Header */
+.gtd-status-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: var(--ios-bg-secondary, rgba(0, 0, 0, 0.03));
+    border-radius: 10px;
+}
+
+.gtd-status-header-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.gtd-status-header-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ios-label, #333);
+}
+
+/* Per-status icon colors */
+.gtd-status-header.inbox .gtd-status-header-icon { color: #1976d2; }
+.gtd-status-header.next_action .gtd-status-header-icon { color: #388e3c; }
+.gtd-status-header.scheduled .gtd-status-header-icon { color: #e91e63; }
+.gtd-status-header.waiting_for .gtd-status-header-icon { color: #f57c00; }
+.gtd-status-header.someday_maybe .gtd-status-header-icon { color: #7b1fa2; }
+.gtd-status-header.done .gtd-status-header-icon { color: #2e7d32; }
+.gtd-status-header.all .gtd-status-header-icon { color: #607d8b; }
+
 .area-header {
     display: flex;
     align-items: center;
@@ -4424,6 +4456,18 @@ body.sidebar-resizing * {
 }
 
 /* Area Header Theme Styles */
+[data-theme="glass"] .gtd-status-header,
+[data-theme="dark"] .gtd-status-header,
+[data-theme="clear"] .gtd-status-header {
+    background: var(--ios-bg-secondary);
+}
+
+[data-theme="glass"] .gtd-status-header-name,
+[data-theme="dark"] .gtd-status-header-name,
+[data-theme="clear"] .gtd-status-header-name {
+    color: var(--ios-label);
+}
+
 [data-theme="glass"] .area-header,
 [data-theme="dark"] .area-header,
 [data-theme="clear"] .area-header {
