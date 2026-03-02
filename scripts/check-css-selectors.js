@@ -146,11 +146,16 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.context-name/,
     /\.context-delete/,
     // GTD list items (rendered by JavaScript)
+    /\.gtd-list/,
     /\.gtd-item/,
     /\.gtd-icon/,
     /\.gtd-label/,
     /\.gtd-count/,
     /\.gtd-shortcut/,
+    // GTD tab bar items (rendered by JavaScript)
+    /\.gtd-tab/,
+    /\.gtd-tab-icon/,
+    /\.gtd-tab-badge/,
     // Scheduled view headers (rendered by JavaScript)
     /\.scheduled-section-header/,
     /\.section-header-text/,

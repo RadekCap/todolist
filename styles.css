@@ -431,6 +431,15 @@ body.fullscreen-mode .todo-list {
     min-width: 15%;
     max-width: 30%;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
 }
 
 /* Sidebar app branding */
@@ -3375,6 +3384,14 @@ body.sidebar-resizing * {
         display: none;
     }
 
+    .gtd-tab-bar {
+        padding: 6px 8px;
+    }
+
+    .gtd-tab {
+        padding: 4px 6px;
+    }
+
     .input-row {
         flex-direction: column;
     }
@@ -3720,6 +3737,106 @@ body.sidebar-resizing * {
 
 .gtd-item.active .gtd-icon {
     color: white;
+}
+
+/* GTD Bottom Tab Bar */
+.gtd-tab-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-shrink: 0;
+    padding: 8px 4px;
+    border-top: 1px solid #e5e5e5;
+    background: #fafafa;
+    gap: 2px;
+}
+
+.gtd-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #888;
+    border: none;
+    background: none;
+    min-width: 32px;
+    font-family: inherit;
+}
+
+.gtd-tab:hover {
+    background: #f0f0f0;
+    color: #555;
+}
+
+.gtd-tab:focus-visible {
+    outline: 2px solid #007AFF;
+    outline-offset: 2px;
+}
+
+.gtd-tab.active {
+    background: linear-gradient(135deg, var(--primary-start) 0%, var(--primary-end) 100%);
+    color: white;
+}
+
+.gtd-tab-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gtd-tab-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: #ff3b30;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 16px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.gtd-tab-badge:empty {
+    display: none;
+}
+
+.gtd-tab.inbox .gtd-tab-badge {
+    background: #1976d2;
+}
+
+.gtd-tab.inbox .gtd-tab-icon { color: #1976d2; }
+.gtd-tab.next_action .gtd-tab-icon { color: #388e3c; }
+.gtd-tab.scheduled .gtd-tab-icon { color: #e91e63; }
+.gtd-tab.waiting_for .gtd-tab-icon { color: #f57c00; }
+.gtd-tab.someday_maybe .gtd-tab-icon { color: #7b1fa2; }
+.gtd-tab.done .gtd-tab-icon { color: #2e7d32; }
+.gtd-tab.all .gtd-tab-icon { color: #666; }
+
+.gtd-tab.active .gtd-tab-icon {
+    color: white;
+}
+
+.gtd-tab.drag-over {
+    background: #007AFF !important;
+    color: white !important;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.gtd-tab.drag-over .gtd-tab-icon {
+    color: white !important;
 }
 
 /* GTD Status Badge Colors */
@@ -5734,6 +5851,60 @@ body.sidebar-resizing * {
     color: white !important;
     transform: scale(1.02);
     box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+/* Glass/Dark/Clear GTD Tab Bar */
+[data-theme="glass"] .gtd-tab-bar,
+[data-theme="dark"] .gtd-tab-bar,
+[data-theme="clear"] .gtd-tab-bar {
+    background: var(--ios-bg-secondary);
+    border-top-color: var(--ios-separator);
+}
+
+[data-theme="glass"] .gtd-tab,
+[data-theme="dark"] .gtd-tab,
+[data-theme="clear"] .gtd-tab {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .gtd-tab:hover,
+[data-theme="dark"] .gtd-tab:hover,
+[data-theme="clear"] .gtd-tab:hover {
+    background: var(--ios-gray6);
+    color: var(--ios-label);
+}
+
+[data-theme="glass"] .gtd-tab.active,
+[data-theme="dark"] .gtd-tab.active,
+[data-theme="clear"] .gtd-tab.active {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--ios-blue);
+}
+
+[data-theme="glass"] .gtd-tab.active .gtd-tab-icon,
+[data-theme="dark"] .gtd-tab.active .gtd-tab-icon,
+[data-theme="clear"] .gtd-tab.active .gtd-tab-icon {
+    color: var(--ios-blue);
+}
+
+[data-theme="glass"] .gtd-tab.drag-over,
+[data-theme="dark"] .gtd-tab.drag-over,
+[data-theme="clear"] .gtd-tab.drag-over {
+    background: var(--ios-blue) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+[data-theme="glass"] .gtd-tab.drag-over .gtd-tab-icon,
+[data-theme="dark"] .gtd-tab.drag-over .gtd-tab-icon,
+[data-theme="clear"] .gtd-tab.drag-over .gtd-tab-icon {
+    color: white !important;
+}
+
+[data-theme="glass"] .gtd-tab-badge,
+[data-theme="dark"] .gtd-tab-badge,
+[data-theme="clear"] .gtd-tab-badge {
+    background: var(--ios-red);
 }
 
 /* iOS GTD Badges */

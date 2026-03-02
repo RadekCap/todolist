@@ -170,3 +170,73 @@ export function renderGtdList(container) {
     // Render area-specific statuses
     areaStatuses.forEach(status => renderGtdItem(status))
 }
+
+/**
+ * Render the GTD status tab bar (icon-only, horizontal)
+ * @param {HTMLElement} container - The nav.gtd-tab-bar element
+ */
+export function renderGtdTabBar(container) {
+    const state = store.state
+
+    const statuses = [
+        { id: 'inbox', label: 'Inbox' },
+        { id: 'next_action', label: 'Next' },
+        { id: 'scheduled', label: 'Scheduled', isVirtual: true },
+        { id: 'waiting_for', label: 'Waiting' },
+        { id: 'someday_maybe', label: 'Someday' },
+        { id: 'done', label: 'Done' },
+        { id: 'all', label: 'All' }
+    ]
+
+    container.innerHTML = ''
+
+    statuses.forEach(status => {
+        const btn = document.createElement('button')
+        const isActive = state.selectedGtdStatus === status.id
+        const count = getGtdCount(status.id)
+        const shortcut = getGtdShortcut(status.id)
+
+        btn.className = `gtd-tab ${status.id}${isActive ? ' active' : ''}`
+        btn.setAttribute('role', 'tab')
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false')
+        btn.setAttribute('aria-label', `${status.label} (${shortcut})`)
+        btn.setAttribute('title', `${status.label} (${shortcut})`)
+        btn.setAttribute('tabindex', isActive ? '0' : '-1')
+
+        const iconSpan = document.createElement('span')
+        iconSpan.className = 'gtd-tab-icon'
+        iconSpan.innerHTML = getIcon(status.id, { size: 20 })
+        btn.appendChild(iconSpan)
+
+        if (count > 0) {
+            const badge = document.createElement('span')
+            badge.className = 'gtd-tab-badge'
+            badge.textContent = count > 99 ? '99+' : count
+            btn.appendChild(badge)
+        }
+
+        btn.addEventListener('click', () => selectGtdStatus(status.id))
+
+        // Drop target for assigning GTD status (except 'all' and 'scheduled')
+        if (status.id !== 'all' && !status.isVirtual) {
+            btn.addEventListener('dragover', (e) => {
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+                btn.classList.add('drag-over')
+            })
+            btn.addEventListener('dragleave', () => {
+                btn.classList.remove('drag-over')
+            })
+            btn.addEventListener('drop', (e) => {
+                e.preventDefault()
+                btn.classList.remove('drag-over')
+                const todoId = e.dataTransfer.getData('text/plain')
+                if (todoId) {
+                    updateTodoGtdStatus(todoId, status.id)
+                }
+            })
+        }
+
+        container.appendChild(btn)
+    })
+}
