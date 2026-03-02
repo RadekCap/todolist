@@ -26,9 +26,9 @@ test.describe('Accessibility', () => {
     })
 
     test('sidebar sections have ARIA attributes', async ({ page }) => {
-        const gtdHeader = page.locator('#gtdSection .sidebar-section-header')
-        await expect(gtdHeader).toHaveAttribute('role', 'button')
-        await expect(gtdHeader).toHaveAttribute('aria-expanded')
+        const gtdTabBar = page.locator('#gtdTabBar')
+        await expect(gtdTabBar).toHaveAttribute('role', 'tablist')
+        await expect(gtdTabBar).toHaveAttribute('aria-label', 'GTD Status')
 
         const projectsHeader = page.locator('#projectsSection .sidebar-section-header')
         await expect(projectsHeader).toHaveAttribute('role', 'button')

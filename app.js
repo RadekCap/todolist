@@ -28,7 +28,7 @@ import { loadPriorities } from './src/services/priorities.js'
 // UI Components
 import { renderTodos } from './src/ui/TodoList.js'
 import { renderProjects, updateProjectSelect, renderManageProjectsList } from './src/ui/ProjectList.js'
-import { renderGtdList, selectGtdStatus, selectGtdStatusByShortcut } from './src/ui/GtdList.js'
+import { renderGtdTabBar, selectGtdStatus, selectGtdStatusByShortcut } from './src/ui/GtdList.js'
 import { renderAreasDropdown, updateAreasLabel, updateAreaHeader, renderManageAreasList } from './src/ui/AreasDropdown.js'
 import { TodoModal } from './src/ui/modals/TodoModal.js'
 import { ImportModal } from './src/ui/modals/ImportModal.js'
@@ -76,8 +76,7 @@ class TodoApp {
         this.newProjectInput = document.getElementById('newProjectInput')
         this.addProjectBtn = document.getElementById('addProjectBtn')
         this.projectsSection = document.getElementById('projectsSection')
-        this.gtdSection = document.getElementById('gtdSection')
-        this.gtdList = document.getElementById('gtdList')
+        this.gtdTabBar = document.getElementById('gtdTabBar')
         this.exportBtn = document.getElementById('exportBtn')
         this.searchInput = document.getElementById('searchInput')
         this.versionNumberEl = document.getElementById('versionNumber')
@@ -418,9 +417,6 @@ class TodoApp {
         })
 
         // Collapsible sidebar sections
-        this.gtdSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
-            this.toggleSidebarSection(this.gtdSection)
-        })
         this.projectsSection.querySelector('.sidebar-section-header').addEventListener('click', () => {
             this.toggleSidebarSection(this.projectsSection)
         })
@@ -1125,7 +1121,7 @@ class TodoApp {
     }
 
     render() {
-        renderGtdList(this.gtdList)
+        renderGtdTabBar(this.gtdTabBar)
         renderProjects(this.projectList)
         updateAreaHeader(this.areaHeader)
         renderTodos(this.todoList, {
@@ -1135,7 +1131,7 @@ class TodoApp {
     }
 
     renderAll() {
-        renderGtdList(this.gtdList)
+        renderGtdTabBar(this.gtdTabBar)
         renderProjects(this.projectList)
         renderAreasDropdown(this.areaListContainer, this.toolbarAreasDropdown, this.areaListDivider)
         updateAreasLabel(this.toolbarAreasLabel)

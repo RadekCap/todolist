@@ -78,46 +78,36 @@
                         </div>
                     </div>
 
-                    <!-- GTD Section (expanded by default) -->
-                    <div class="sidebar-section" id="gtdSection">
-                        <div class="sidebar-section-header" role="button" aria-expanded="true" aria-controls="gtdContent">
-                            <h2>Status</h2>
-                            <span class="sidebar-section-toggle" aria-hidden="true">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"/>
-                                </svg>
-                            </span>
-                        </div>
-                        <div class="sidebar-section-content" id="gtdContent">
-                            <ul id="gtdList" class="gtd-list"></ul>
+                    <div class="sidebar-scroll-area">
+                        <!-- Projects Section (expanded by default) -->
+                        <div class="sidebar-section" id="projectsSection">
+                            <div class="sidebar-section-header" role="button" aria-expanded="true" aria-controls="projectsContent">
+                                <h2>Projects</h2>
+                                <span class="sidebar-section-toggle" aria-hidden="true">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="6 9 12 15 18 9"/>
+                                    </svg>
+                                </span>
+                            </div>
+                            <div class="sidebar-section-content" id="projectsContent">
+                                <ul id="projectList" class="project-list"></ul>
+                                <div class="add-project-form">
+                                    <input
+                                        type="text"
+                                        id="newProjectInput"
+                                        class="add-project-input"
+                                        placeholder="New project..."
+                                        autocomplete="off"
+                                    >
+                                    <button id="addProjectBtn" class="add-project-btn">Add Project</button>
+                                </div>
+                                <button id="manageProjectsBtn" class="manage-projects-btn">Manage Projects</button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Projects Section (expanded by default) -->
-                    <div class="sidebar-section" id="projectsSection">
-                        <div class="sidebar-section-header" role="button" aria-expanded="true" aria-controls="projectsContent">
-                            <h2>Projects</h2>
-                            <span class="sidebar-section-toggle" aria-hidden="true">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="6 9 12 15 18 9"/>
-                                </svg>
-                            </span>
-                        </div>
-                        <div class="sidebar-section-content" id="projectsContent">
-                            <ul id="projectList" class="project-list"></ul>
-                            <div class="add-project-form">
-                                <input
-                                    type="text"
-                                    id="newProjectInput"
-                                    class="add-project-input"
-                                    placeholder="New project..."
-                                    autocomplete="off"
-                                >
-                                <button id="addProjectBtn" class="add-project-btn">Add Project</button>
-                            </div>
-                            <button id="manageProjectsBtn" class="manage-projects-btn">Manage Projects</button>
-                        </div>
-                    </div>
+                    <!-- GTD Status Tab Bar -->
+                    <nav class="gtd-tab-bar" id="gtdTabBar" role="tablist" aria-label="GTD Status"></nav>
 
                 </div>
 

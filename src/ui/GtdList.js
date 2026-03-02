@@ -1,18 +1,6 @@
 import { store } from '../core/store.js'
-import { escapeHtml } from '../utils/security.js'
 import { getGtdCount, updateTodoGtdStatus } from '../services/todos.js'
 import { getIcon } from '../utils/icons.js'
-import { events, Events } from '../core/events.js'
-import { GTD_STATUS_PHASE_MAP } from './modals/GtdGuideModal.js'
-
-/**
- * Get icon for a GTD status
- * @param {string} status - GTD status
- * @returns {string} SVG icon markup
- */
-export function getGtdIcon(status) {
-    return getIcon(status, { size: 18 })
-}
 
 /**
  * Get keyboard shortcut for a GTD status
@@ -64,19 +52,14 @@ export function selectGtdStatusByShortcut(digit) {
 }
 
 /**
- * Render the GTD status list
- * @param {HTMLElement} container - Container element
+ * Render the GTD status tab bar (icon-only, horizontal)
+ * @param {HTMLElement} container - The nav.gtd-tab-bar element
  */
-export function renderGtdList(container) {
+export function renderGtdTabBar(container) {
     const state = store.state
 
-    // Global statuses (always visible)
-    const globalStatuses = [
-        { id: 'inbox', label: 'Inbox' }
-    ]
-
-    // Area-specific statuses
-    const areaStatuses = [
+    const statuses = [
+        { id: 'inbox', label: 'Inbox' },
         { id: 'next_action', label: 'Next' },
         { id: 'scheduled', label: 'Scheduled', isVirtual: true },
         { id: 'waiting_for', label: 'Waiting' },
@@ -87,52 +70,46 @@ export function renderGtdList(container) {
 
     container.innerHTML = ''
 
-    // Helper function to render a GTD item
-    const renderGtdItem = (status) => {
-        const li = document.createElement('li')
+    statuses.forEach(status => {
+        const btn = document.createElement('button')
         const isActive = state.selectedGtdStatus === status.id
-        li.className = `gtd-item ${status.id} ${isActive ? 'active' : ''}`
-
         const count = getGtdCount(status.id)
-        const countDisplay = count > 0 ? count : ''
         const shortcut = getGtdShortcut(status.id)
 
-        li.innerHTML = `
-            <span class="gtd-icon">${getGtdIcon(status.id)}</span>
-            <span class="gtd-label">${escapeHtml(status.label)}</span>
-            <span class="gtd-shortcut">${shortcut}</span>
-            <span class="gtd-count">${countDisplay}</span>
-        `
+        btn.className = `gtd-tab ${status.id}${isActive ? ' active' : ''}`
+        btn.setAttribute('role', 'tab')
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false')
+        btn.setAttribute('aria-label', `${status.label} (${shortcut})`)
+        btn.setAttribute('title', `${status.label} (${shortcut})`)
+        btn.setAttribute('tabindex', isActive ? '0' : '-1')
 
-        // Add contextual GTD help button
-        const helpBtn = document.createElement('button')
-        helpBtn.className = 'gtd-help-btn'
-        helpBtn.setAttribute('aria-label', `GTD guide for ${status.label}`)
-        helpBtn.setAttribute('title', `Learn about ${status.label} in GTD`)
-        helpBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
-        helpBtn.addEventListener('click', (e) => {
-            e.stopPropagation()
-            const phase = GTD_STATUS_PHASE_MAP[status.id] || 'capture'
-            events.emit(Events.OPEN_GTD_GUIDE, phase)
-        })
-        const countSpan = li.querySelector('.gtd-count')
-        li.insertBefore(helpBtn, countSpan)
+        const iconSpan = document.createElement('span')
+        iconSpan.className = 'gtd-tab-icon'
+        iconSpan.innerHTML = getIcon(status.id, { size: 20 })
+        btn.appendChild(iconSpan)
 
-        li.addEventListener('click', () => selectGtdStatus(status.id))
+        if (count > 0) {
+            const badge = document.createElement('span')
+            badge.className = 'gtd-tab-badge'
+            badge.textContent = count > 99 ? '99+' : count
+            btn.appendChild(badge)
+        }
+
+        btn.addEventListener('click', () => selectGtdStatus(status.id))
 
         // Drop target for assigning GTD status (except 'all' and 'scheduled')
         if (status.id !== 'all' && !status.isVirtual) {
-            li.addEventListener('dragover', (e) => {
+            btn.addEventListener('dragover', (e) => {
                 e.preventDefault()
                 e.dataTransfer.dropEffect = 'move'
-                li.classList.add('drag-over')
+                btn.classList.add('drag-over')
             })
-            li.addEventListener('dragleave', () => {
-                li.classList.remove('drag-over')
+            btn.addEventListener('dragleave', () => {
+                btn.classList.remove('drag-over')
             })
-            li.addEventListener('drop', (e) => {
+            btn.addEventListener('drop', (e) => {
                 e.preventDefault()
-                li.classList.remove('drag-over')
+                btn.classList.remove('drag-over')
                 const todoId = e.dataTransfer.getData('text/plain')
                 if (todoId) {
                     updateTodoGtdStatus(todoId, status.id)
@@ -140,33 +117,32 @@ export function renderGtdList(container) {
             })
         }
 
-        container.appendChild(li)
+        container.appendChild(btn)
+    })
+
+    // Arrow key navigation for tablist pattern (attach once)
+    if (!container.dataset.keynavAttached) {
+        container.dataset.keynavAttached = 'true'
+        container.addEventListener('keydown', (e) => {
+            const tabs = Array.from(container.querySelectorAll('[role="tab"]'))
+            const currentIndex = tabs.indexOf(document.activeElement)
+            if (currentIndex === -1) return
+
+            let nextIndex
+            if (e.key === 'ArrowRight') {
+                nextIndex = (currentIndex + 1) % tabs.length
+            } else if (e.key === 'ArrowLeft') {
+                nextIndex = (currentIndex - 1 + tabs.length) % tabs.length
+            } else if (e.key === 'Home') {
+                nextIndex = 0
+            } else if (e.key === 'End') {
+                nextIndex = tabs.length - 1
+            } else {
+                return
+            }
+
+            e.preventDefault()
+            tabs[nextIndex].focus()
+        })
     }
-
-    // Render global Inbox
-    globalStatuses.forEach(status => renderGtdItem(status))
-
-    // Add separator between Inbox and area-specific items
-    const separator = document.createElement('li')
-    separator.className = 'gtd-inbox-separator'
-    container.appendChild(separator)
-
-    // Add area label if a specific area is selected
-    if (state.selectedAreaId !== 'all' && state.selectedAreaId !== 'unassigned') {
-        const area = state.areas.find(a => a.id === state.selectedAreaId)
-        if (area) {
-            const label = document.createElement('li')
-            label.className = 'gtd-section-label'
-            label.textContent = area.name
-            container.appendChild(label)
-        }
-    } else if (state.selectedAreaId === 'unassigned') {
-        const label = document.createElement('li')
-        label.className = 'gtd-section-label'
-        label.textContent = 'Unassigned'
-        container.appendChild(label)
-    }
-
-    // Render area-specific statuses
-    areaStatuses.forEach(status => renderGtdItem(status))
 }
