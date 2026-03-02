@@ -1,5 +1,6 @@
 import { store } from '../core/store.js'
 import { getGtdCount, updateTodoGtdStatus } from '../services/todos.js'
+import { pushNavigationState } from '../services/navigation.js'
 import { getIcon } from '../utils/icons.js'
 
 const GTD_STATUSES = [
@@ -38,6 +39,7 @@ export function selectGtdStatus(status) {
     store.set('selectedGtdStatus', status)
     // Exit projects view when selecting a GTD status
     store.set('showProjectsView', false)
+    pushNavigationState()
 }
 
 /**

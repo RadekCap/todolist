@@ -24,6 +24,7 @@ import { loadAreas, addArea, selectArea, selectAreaByShortcut, restoreSelectedAr
 import { loadCategories } from './src/services/categories.js'
 import { loadContexts } from './src/services/contexts.js'
 import { loadPriorities } from './src/services/priorities.js'
+import { initNavigation } from './src/services/navigation.js'
 
 // UI Components
 import { renderTodos } from './src/ui/TodoList.js'
@@ -677,8 +678,8 @@ class TodoApp {
         // Restore persisted UI state
         restoreSelectedArea()
 
-        // Handle URL parameters (e.g., ?view=tomorrow from email notifications)
-        this.handleUrlParameters()
+        // Initialize browser history navigation and handle URL parameters
+        initNavigation()
 
         // Load non-essential items without waiting
         loadThemeFromDatabase()
@@ -686,27 +687,6 @@ class TodoApp {
         this.loadUserSettingsDisplay()
 
         this.hideLoadingScreen()
-    }
-
-    handleUrlParameters() {
-        const urlParams = new URLSearchParams(window.location.search)
-        const view = urlParams.get('view')
-
-        if (view === 'today' || view === 'tomorrow') {
-            // Select scheduled view
-            selectGtdStatus('scheduled')
-
-            // Scroll to the appropriate section after render
-            setTimeout(() => {
-                const section = document.querySelector(`.scheduled-section-header.${view}`)
-                if (section) {
-                    section.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                }
-            }, 100)
-
-            // Clean up URL without reloading
-            window.history.replaceState({}, document.title, window.location.pathname)
-        }
     }
 
     async loadUserSettingsDisplay() {
