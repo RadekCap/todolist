@@ -2,6 +2,12 @@ name: E2E Tests
 on:
   pull_request:
     branches: [main, master]
+  merge_group:
+    branches: [main, master]
+
+concurrency:
+  group: e2e-tests-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:

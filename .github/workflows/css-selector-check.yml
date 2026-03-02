@@ -8,6 +8,12 @@ on:
       - 'index.html'
       - '.github/workflows/css-selector-check.yml'
       - 'scripts/check-css-selectors.js'
+  merge_group:
+    branches: [main]
+
+concurrency:
+  group: css-check-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check-selectors:
