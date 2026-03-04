@@ -178,10 +178,19 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.manage-projects-color/,
     // Area color indicators (rendered by JavaScript)
     /\.area-color-dot/,
-    // Project title header (rendered by JavaScript)
+    // Project tree hierarchy (rendered by JavaScript)
+    /\.project-expand/,
+    /\.project-expand-spacer/,
+    /\.project-context-menu/,
+    /\.context-menu-item/,
+    // Project title header and breadcrumb (rendered by JavaScript)
     /\.project-title-header/,
     /\.project-title-text/,
     /\.project-title-description/,
+    /\.project-title-breadcrumb/,
+    /\.project-breadcrumb-link/,
+    /\.project-breadcrumb-separator/,
+    /\.project-breadcrumb-current/,
     // Area shortcut hints (rendered by JavaScript for dynamic areas)
     /\.areas-item-shortcut/,
     // Empty/loading states (rendered by JavaScript)

@@ -1,4 +1,16 @@
 import { store } from '../core/store.js'
+import { getProjectPath } from './projects.js'
+
+/**
+ * Get the full hierarchy path name for a project (e.g., "Parent > Child > Grandchild")
+ * @param {string} projectId - Project ID
+ * @returns {string|null} Full path name or null if not found
+ */
+function getProjectPathName(projectId) {
+    const path = getProjectPath(projectId)
+    if (path.length === 0) return null
+    return path.map(p => p.name).join(' > ')
+}
 
 /**
  * Get human-readable view name for export header
@@ -41,9 +53,9 @@ export function getExportViewName() {
 
     // Project
     if (state.selectedProjectId) {
-        const project = state.projects.find(p => p.id === state.selectedProjectId)
-        if (project) {
-            parts.push(`Project: ${project.name}`)
+        const projectName = getProjectPathName(state.selectedProjectId)
+        if (projectName) {
+            parts.push(`Project: ${projectName}`)
         }
     }
 
@@ -119,9 +131,9 @@ export function exportTodosAsText(filteredTodos) {
             meta.push(`Category: ${category.name}`)
         }
 
-        const project = todo.project_id ? state.projects.find(p => p.id === todo.project_id) : null
-        if (project) {
-            meta.push(`Project: ${project.name}`)
+        const projectName = todo.project_id ? getProjectPathName(todo.project_id) : null
+        if (projectName) {
+            meta.push(`Project: ${projectName}`)
         }
 
         const context = todo.context_id ? state.contexts.find(c => c.id === todo.context_id) : null
@@ -177,7 +189,7 @@ export function exportTodosAsJSON(filteredTodos) {
         },
         todos: filteredTodos.map(todo => {
             const category = todo.category_id ? state.categories.find(c => c.id === todo.category_id) : null
-            const project = todo.project_id ? state.projects.find(p => p.id === todo.project_id) : null
+            const projectName = todo.project_id ? getProjectPathName(todo.project_id) : null
             const context = todo.context_id ? state.contexts.find(c => c.id === todo.context_id) : null
             const priority = todo.priority_id ? state.priorities.find(p => p.id === todo.priority_id) : null
 
@@ -188,7 +200,7 @@ export function exportTodosAsJSON(filteredTodos) {
                 gtdStatus: todo.gtd_status,
                 dueDate: todo.due_date || null,
                 category: category ? category.name : null,
-                project: project ? project.name : null,
+                project: projectName,
                 context: context ? context.name : null,
                 priority: priority ? priority.name : null,
                 comment: todo.comment || null,
@@ -230,7 +242,7 @@ export function exportTodosAsCSV(filteredTodos) {
     // CSV rows
     filteredTodos.forEach(todo => {
         const category = todo.category_id ? state.categories.find(c => c.id === todo.category_id) : null
-        const project = todo.project_id ? state.projects.find(p => p.id === todo.project_id) : null
+        const projectName = todo.project_id ? getProjectPathName(todo.project_id) : null
         const context = todo.context_id ? state.contexts.find(c => c.id === todo.context_id) : null
         const priority = todo.priority_id ? state.priorities.find(p => p.id === todo.priority_id) : null
 
@@ -241,7 +253,7 @@ export function exportTodosAsCSV(filteredTodos) {
             escapeCSV(todo.gtd_status),
             escapeCSV(todo.due_date),
             escapeCSV(category ? category.name : ''),
-            escapeCSV(project ? project.name : ''),
+            escapeCSV(projectName || ''),
             escapeCSV(context ? context.name : ''),
             escapeCSV(priority ? priority.name : ''),
             escapeCSV(todo.comment),
@@ -289,7 +301,7 @@ export function exportTodosAsXML(filteredTodos) {
 
     filteredTodos.forEach(todo => {
         const category = todo.category_id ? state.categories.find(c => c.id === todo.category_id) : null
-        const project = todo.project_id ? state.projects.find(p => p.id === todo.project_id) : null
+        const projectName = todo.project_id ? getProjectPathName(todo.project_id) : null
         const context = todo.context_id ? state.contexts.find(c => c.id === todo.context_id) : null
         const priority = todo.priority_id ? state.priorities.find(p => p.id === todo.priority_id) : null
 
@@ -304,8 +316,8 @@ export function exportTodosAsXML(filteredTodos) {
         if (category) {
             xmlLines.push(`      <category>${escapeXML(category.name)}</category>`)
         }
-        if (project) {
-            xmlLines.push(`      <project>${escapeXML(project.name)}</project>`)
+        if (projectName) {
+            xmlLines.push(`      <project>${escapeXML(projectName)}</project>`)
         }
         if (context) {
             xmlLines.push(`      <context>${escapeXML(context.name)}</context>`)

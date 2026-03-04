@@ -1,6 +1,7 @@
 import { store } from '../../core/store.js'
 import { batchAddTodos } from '../../services/todos.js'
 import { populateSelectOptions } from '../helpers.js'
+import { updateProjectSelect as updateProjectSelectHierarchical } from '../ProjectList.js'
 import { BaseModal } from './BaseModal.js'
 
 /**
@@ -129,7 +130,7 @@ export class ImportModal extends BaseModal {
     }
 
     updateProjectSelect() {
-        populateSelectOptions(this.projectSelect, store.get('projects'), { emptyLabel: 'No Project' })
+        updateProjectSelectHierarchical(this.projectSelect)
     }
 
     updateCategorySelect() {

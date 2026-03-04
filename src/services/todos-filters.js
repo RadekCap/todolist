@@ -104,13 +104,25 @@ export function getFilteredTodos() {
 }
 
 /**
- * Get todo count for a project (excluding done items)
+ * Get todo count for a project including all descendant projects (excluding done items)
  * @param {string} projectId - Project ID
  * @returns {number} Todo count
  */
 export function getProjectTodoCount(projectId) {
     const todos = store.get('todos')
-    return todos.filter(t => t.project_id === projectId && t.gtd_status !== 'done').length
+    const projects = store.get('projects')
+
+    // Collect this project + all descendant IDs
+    const ids = [projectId]
+    const collect = (pid) => {
+        projects.filter(p => p.parent_id === pid).forEach(child => {
+            ids.push(child.id)
+            collect(child.id)
+        })
+    }
+    collect(projectId)
+
+    return todos.filter(t => ids.includes(t.project_id) && t.gtd_status !== 'done').length
 }
 
 /**

@@ -2,6 +2,7 @@ import { store } from '../core/store.js'
 import { escapeHtml, validateColor } from '../utils/security.js'
 import { formatDateBadge, getDateGroup, getDateGroupLabel } from '../utils/dates.js'
 import { getFilteredTodos, toggleTodo, deleteTodo, updateTodoProject, updateTodoGtdStatus, getProjectTodoCount, toggleTodoSelection, selectTodoRange } from '../services/todos.js'
+import { getProjectPath, selectProject } from '../services/projects.js'
 import { getCategoryById } from '../services/categories.js'
 import { getPriorityById } from '../services/priorities.js'
 import { getContextById } from '../services/contexts.js'
@@ -38,10 +39,29 @@ export function renderProjectsView(container, onProjectClick) {
         return
     }
 
-    projects.forEach(project => {
+    renderProjectCards(container, projects, null, 0, onProjectClick)
+}
+
+/**
+ * Recursively render project cards in the "All Projects" view
+ * @param {HTMLElement} container - Container element
+ * @param {Array} projects - All projects
+ * @param {string|null} parentId - Parent ID filter
+ * @param {number} depth - Current depth
+ * @param {Function} onProjectClick - Click callback
+ */
+function renderProjectCards(container, projects, parentId, depth, onProjectClick) {
+    const children = projects
+        .filter(p => (p.parent_id || null) === parentId)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+
+    children.forEach(project => {
         const count = getProjectTodoCount(project.id)
         const li = document.createElement('li')
         li.className = 'project-card'
+        if (depth > 0) {
+            li.style.marginLeft = `${depth * 24}px`
+        }
         li.innerHTML = `
             <span class="project-card-color" style="background-color: ${validateColor(project.color)}"></span>
             <span class="project-card-name">${escapeHtml(project.name)}</span>
@@ -49,6 +69,9 @@ export function renderProjectsView(container, onProjectClick) {
         `
         li.addEventListener('click', () => onProjectClick(project.id))
         container.appendChild(li)
+
+        // Render children
+        renderProjectCards(container, projects, project.id, depth + 1, onProjectClick)
     })
 }
 
@@ -80,10 +103,36 @@ export function renderTodos(container, options = {}) {
             const descriptionHtml = project.description
                 ? `<span class="project-title-description">${escapeHtml(project.description)}</span>`
                 : ''
+
+            // Build breadcrumb for subprojects
+            const path = getProjectPath(project.id)
+            let titleHtml
+            if (path.length > 1) {
+                // Show breadcrumb: Parent > Child > Current
+                const breadcrumbParts = path.map((p, i) => {
+                    if (i < path.length - 1) {
+                        return `<span class="project-breadcrumb-link" data-project-id="${p.id}">${escapeHtml(p.name)}</span>`
+                    }
+                    return `<span class="project-breadcrumb-current">${escapeHtml(p.name)}</span>`
+                })
+                titleHtml = `<span class="project-title-breadcrumb">${breadcrumbParts.join('<span class="project-breadcrumb-separator"> / </span>')}</span>`
+            } else {
+                titleHtml = `<span class="project-title-text">${escapeHtml(project.name)}</span>`
+            }
+
             header.innerHTML = `
-                <span class="project-title-text">${escapeHtml(project.name)}</span>
+                ${titleHtml}
                 ${descriptionHtml}
             `
+
+            // Add click handlers for breadcrumb links
+            header.querySelectorAll('.project-breadcrumb-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.stopPropagation()
+                    selectProject(link.dataset.projectId)
+                })
+            })
+
             container.appendChild(header)
         }
     }
