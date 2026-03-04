@@ -241,23 +241,25 @@ const tools = [
   },
   {
     name: 'list_projects',
-    description: 'List all projects, optionally filtered by area',
+    description: 'List all projects, optionally filtered by area or parent project',
     inputSchema: {
       type: 'object',
       properties: {
-        area_id: { type: 'string', description: 'Filter by area ID (optional)' }
+        area_id: { type: 'string', description: 'Filter by area ID (optional)' },
+        parent_id: { type: 'string', description: 'Filter by parent project ID (optional, use "null" for root projects only)' }
       }
     }
   },
   {
     name: 'create_project',
-    description: 'Create a new project',
+    description: 'Create a new project or subproject (max 3 levels of nesting)',
     inputSchema: {
       type: 'object',
       properties: {
         name: { type: 'string', description: 'Project name' },
         color: { type: 'string', description: 'Hex color code (optional, e.g., #3498db)' },
-        area_id: { type: 'string', description: 'Area ID to assign project to (optional)' }
+        area_id: { type: 'string', description: 'Area ID to assign project to (optional)' },
+        parent_id: { type: 'string', description: 'Parent project ID to create as subproject (optional)' }
       },
       required: ['name']
     }
@@ -271,18 +273,19 @@ const tools = [
         id: { type: 'string', description: 'Project ID' },
         name: { type: 'string', description: 'New project name (optional)' },
         color: { type: 'string', description: 'New hex color code (optional)' },
-        area_id: { type: 'string', description: 'Area ID (optional, use null to remove)' }
+        area_id: { type: 'string', description: 'Area ID (optional, use null to remove)' },
+        parent_id: { type: 'string', description: 'Parent project ID (optional, use null to move to root)' }
       },
       required: ['id']
     }
   },
   {
     name: 'delete_project',
-    description: 'Delete a project',
+    description: 'Delete a project and all its subprojects',
     inputSchema: {
       type: 'object',
       properties: {
-        id: { type: 'string', description: 'Project ID to delete' }
+        id: { type: 'string', description: 'Project ID to delete (cascades to subprojects)' }
       },
       required: ['id']
     }
@@ -575,10 +578,18 @@ async function handleListProjects(args) {
     .from('projects')
     .select('*')
     .eq('user_id', currentUser.id)
-    .order('created_at', { ascending: false });
+    .order('sort_order', { ascending: true });
 
   if (args.area_id) {
     query = query.eq('area_id', args.area_id);
+  }
+
+  if (args.parent_id !== undefined) {
+    if (args.parent_id === 'null' || args.parent_id === null) {
+      query = query.is('parent_id', null);
+    } else {
+      query = query.eq('parent_id', args.parent_id);
+    }
   }
 
   const { data, error } = await query;
@@ -587,10 +598,11 @@ async function handleListProjects(args) {
     return { success: false, error: error.message };
   }
 
-  // Decrypt project names
+  // Decrypt project names and descriptions
   const projects = await Promise.all(data.map(async (project) => ({
     ...project,
-    name: await decrypt(project.name)
+    name: await decrypt(project.name),
+    description: project.description ? await decrypt(project.description) : null
   })));
 
   return { success: true, projects, count: projects.length };
@@ -608,6 +620,10 @@ async function handleCreateProject(args) {
     color: args.color || randomColor,
     area_id: args.area_id || null
   };
+
+  if (args.parent_id) {
+    projectData.parent_id = args.parent_id;
+  }
 
   const { data, error } = await supabase
     .from('projects')
@@ -639,6 +655,9 @@ async function handleUpdateProject(args) {
   }
   if (args.area_id !== undefined) {
     updateData.area_id = args.area_id;
+  }
+  if (args.parent_id !== undefined) {
+    updateData.parent_id = args.parent_id;
   }
 
   const { data, error } = await supabase
@@ -673,7 +692,7 @@ async function handleDeleteProject(args) {
     return { success: false, error: error.message };
   }
 
-  return { success: true, message: 'Project deleted successfully' };
+  return { success: true, message: 'Project and all subprojects deleted successfully' };
 }
 
 async function handleListAreas() {

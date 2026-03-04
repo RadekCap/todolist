@@ -189,12 +189,28 @@ export function updateSelectionBarProjectSelect(selectElement) {
     noProjectOption.textContent = 'No Project'
     selectElement.appendChild(noProjectOption)
 
-    // Add project options
-    projects.forEach(project => {
+    // Add project options hierarchically
+    addHierarchicalProjectOptions(selectElement, projects, null, 0)
+}
+
+/**
+ * Recursively add hierarchical project options to a select element
+ * @param {HTMLSelectElement} selectElement - Select element
+ * @param {Array} projects - All projects
+ * @param {string|null} parentId - Parent ID filter
+ * @param {number} depth - Indentation depth
+ */
+function addHierarchicalProjectOptions(selectElement, projects, parentId, depth) {
+    const children = projects
+        .filter(p => (p.parent_id || null) === parentId)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+
+    children.forEach(project => {
         const option = document.createElement('option')
         option.value = project.id
-        option.textContent = project.name
+        option.textContent = '\u00A0\u00A0'.repeat(depth) + project.name
         selectElement.appendChild(option)
+        addHierarchicalProjectOptions(selectElement, projects, project.id, depth + 1)
     })
 }
 

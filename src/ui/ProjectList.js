@@ -1,12 +1,14 @@
 import { store } from '../core/store.js'
 import { escapeHtml, validateColor } from '../utils/security.js'
-import { getFilteredProjects, selectProject, deleteProject, updateProject, reorderProjects } from '../services/projects.js'
+import { getFilteredProjects, selectProject, deleteProject, addProject, updateProject, reorderProjects, getDescendantIds } from '../services/projects.js'
 import { getProjectTodoCount, updateTodoProject } from '../services/todos.js'
 import { getIcon } from '../utils/icons.js'
-import { populateSelectOptions } from './helpers.js'
+
+// Track collapsed state for project tree nodes (not persisted)
+const collapsedProjects = new Set()
 
 /**
- * Render the project list in the sidebar
+ * Render the project list in the sidebar as a tree
  * @param {HTMLElement} container - Container element
  */
 export function renderProjects(container) {
@@ -45,13 +47,46 @@ export function renderProjects(container) {
     })
     container.appendChild(allItem)
 
-    // Add user projects (filtered by area)
-    filteredProjects.forEach(project => {
+    // Render project tree recursively
+    renderProjectTree(container, filteredProjects, null, 0)
+}
+
+/**
+ * Recursively render project tree nodes
+ * @param {HTMLElement} container - Container element
+ * @param {Array} projects - All projects (flat, filtered by area)
+ * @param {string|null} parentId - Parent project ID (null for roots)
+ * @param {number} depth - Current depth level
+ */
+function renderProjectTree(container, projects, parentId, depth) {
+    const state = store.state
+    const children = projects
+        .filter(p => (p.parent_id || null) === parentId)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+
+    children.forEach(project => {
         const li = document.createElement('li')
         li.className = `project-item ${state.selectedProjectId === project.id ? 'active' : ''}`
+        li.style.paddingLeft = `${12 + depth * 20}px`
+        li.dataset.projectId = project.id
+        li.dataset.depth = depth
+
         const count = getProjectTodoCount(project.id)
         const countDisplay = count > 0 ? count : ''
+
+        const hasChildren = projects.some(p => p.parent_id === project.id)
+        const isCollapsed = collapsedProjects.has(project.id)
+
+        let expandHtml
+        if (hasChildren) {
+            const chevronClass = isCollapsed ? 'collapsed' : ''
+            expandHtml = `<span class="project-expand ${chevronClass}">${getIcon('chevron-down', { size: 12 })}</span>`
+        } else {
+            expandHtml = '<span class="project-expand-spacer"></span>'
+        }
+
         li.innerHTML = `
+            ${expandHtml}
             <span class="project-name">
                 <span class="project-color" style="background-color: ${validateColor(project.color)}"></span>
                 ${escapeHtml(project.name)}
@@ -60,10 +95,31 @@ export function renderProjects(container) {
             <button class="project-delete" data-id="${project.id}">${getIcon('x', { size: 12 })}</button>
         `
 
+        // Expand/collapse toggle
+        if (hasChildren) {
+            const expandBtn = li.querySelector('.project-expand')
+            expandBtn.addEventListener('click', (e) => {
+                e.stopPropagation()
+                if (collapsedProjects.has(project.id)) {
+                    collapsedProjects.delete(project.id)
+                } else {
+                    collapsedProjects.add(project.id)
+                }
+                renderProjects(container)
+            })
+        }
+
+        // Click to select project
         li.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('project-delete')) {
+            if (!e.target.closest('.project-delete') && !e.target.closest('.project-expand')) {
                 selectProject(project.id)
             }
+        })
+
+        // Right-click context menu
+        li.addEventListener('contextmenu', (e) => {
+            e.preventDefault()
+            showProjectContextMenu(e, project, depth, container)
         })
 
         // Drop target for assigning project
@@ -84,24 +140,147 @@ export function renderProjects(container) {
             }
         })
 
+        // Delete button
         const deleteBtn = li.querySelector('.project-delete')
         deleteBtn.addEventListener('click', async (e) => {
             e.stopPropagation()
-            if (confirm('Delete this project? Todos in this project will become projectless.')) {
+            const descendantCount = getDescendantIds(project.id).length
+            const msg = descendantCount > 0
+                ? `Delete "${project.name}" and its ${descendantCount} subproject(s)? Todos in these projects will become projectless.`
+                : `Delete "${project.name}"? Todos in this project will become projectless.`
+            if (confirm(msg)) {
                 await deleteProject(project.id)
             }
         })
 
         container.appendChild(li)
+
+        // Render children recursively (if not collapsed)
+        if (hasChildren && !isCollapsed) {
+            renderProjectTree(container, projects, project.id, depth + 1)
+        }
     })
 }
 
 /**
- * Update the project select dropdown
+ * Show context menu for a project
+ * @param {MouseEvent} event - Right-click event
+ * @param {Object} project - Project object
+ * @param {number} depth - Current depth level
+ * @param {HTMLElement} projectContainer - The project list container for re-rendering
+ */
+function showProjectContextMenu(event, project, depth, projectContainer) {
+    // Remove any existing context menu
+    document.querySelector('.project-context-menu')?.remove()
+
+    const menu = document.createElement('div')
+    menu.className = 'project-context-menu'
+    menu.setAttribute('role', 'menu')
+
+    // "Add subproject" option (only if depth < 2, max 3 levels)
+    if (depth < 2) {
+        const addSubItem = document.createElement('div')
+        addSubItem.className = 'context-menu-item'
+        addSubItem.setAttribute('role', 'menuitem')
+        addSubItem.innerHTML = `${getIcon('plus', { size: 14 })} Add subproject`
+        addSubItem.addEventListener('click', async () => {
+            menu.remove()
+            const name = prompt('Subproject name:')
+            if (name && name.trim()) {
+                try {
+                    await addProject(name.trim(), project.id)
+                    // Ensure parent is expanded
+                    collapsedProjects.delete(project.id)
+                } catch (err) {
+                    alert(err.message)
+                }
+            }
+        })
+        menu.appendChild(addSubItem)
+    }
+
+    // "Delete" option
+    const deleteItem = document.createElement('div')
+    deleteItem.className = 'context-menu-item context-menu-item-danger'
+    deleteItem.setAttribute('role', 'menuitem')
+    const descendantCount = getDescendantIds(project.id).length
+    deleteItem.innerHTML = `${getIcon('x', { size: 14 })} Delete project`
+    deleteItem.addEventListener('click', async () => {
+        menu.remove()
+        const msg = descendantCount > 0
+            ? `Delete "${project.name}" and its ${descendantCount} subproject(s)? Todos in these projects will become projectless.`
+            : `Delete "${project.name}"? Todos in this project will become projectless.`
+        if (confirm(msg)) {
+            await deleteProject(project.id)
+        }
+    })
+    menu.appendChild(deleteItem)
+
+    // Position menu at cursor, clamped to viewport
+    menu.style.left = `${event.clientX}px`
+    menu.style.top = `${event.clientY}px`
+    document.body.appendChild(menu)
+
+    // Adjust position if menu overflows viewport
+    requestAnimationFrame(() => {
+        const rect = menu.getBoundingClientRect()
+        if (rect.right > window.innerWidth) {
+            menu.style.left = `${window.innerWidth - rect.width - 8}px`
+        }
+        if (rect.bottom > window.innerHeight) {
+            menu.style.top = `${window.innerHeight - rect.height - 8}px`
+        }
+    })
+
+    // Close on click outside
+    const closeMenu = (e) => {
+        if (!menu.contains(e.target)) {
+            menu.remove()
+            document.removeEventListener('click', closeMenu)
+            document.removeEventListener('contextmenu', closeMenu)
+        }
+    }
+    setTimeout(() => {
+        document.addEventListener('click', closeMenu)
+        document.addEventListener('contextmenu', closeMenu)
+    }, 0)
+}
+
+/**
+ * Update a project select dropdown with hierarchical options
  * @param {HTMLSelectElement} selectElement - Select element
  */
 export function updateProjectSelect(selectElement) {
-    populateSelectOptions(selectElement, store.get('projects'), { emptyLabel: 'No Project' })
+    const projects = store.get('projects')
+    selectElement.innerHTML = ''
+
+    const emptyOption = document.createElement('option')
+    emptyOption.value = ''
+    emptyOption.textContent = 'No Project'
+    selectElement.appendChild(emptyOption)
+
+    addHierarchicalOptions(selectElement, projects, null, 0)
+}
+
+/**
+ * Add hierarchical options to a select element
+ * @param {HTMLSelectElement} selectElement - Select element
+ * @param {Array} projects - All projects
+ * @param {string|null} parentId - Parent ID filter
+ * @param {number} depth - Indentation depth
+ */
+function addHierarchicalOptions(selectElement, projects, parentId, depth) {
+    const children = projects
+        .filter(p => (p.parent_id || null) === parentId)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+
+    children.forEach(project => {
+        const option = document.createElement('option')
+        option.value = project.id
+        option.textContent = '\u00A0\u00A0'.repeat(depth) + project.name
+        selectElement.appendChild(option)
+        addHierarchicalOptions(selectElement, projects, project.id, depth + 1)
+    })
 }
 
 /**
@@ -113,11 +292,30 @@ export function renderManageProjectsList(container) {
     const areas = store.get('areas')
     container.innerHTML = ''
 
-    projects.forEach(project => {
+    renderManageProjectsTree(container, projects, areas, null, 0)
+}
+
+/**
+ * Recursively render manage projects tree
+ * @param {HTMLElement} container - Container element
+ * @param {Array} projects - All projects
+ * @param {Array} areas - All areas
+ * @param {string|null} parentId - Parent project ID
+ * @param {number} depth - Current depth level
+ */
+function renderManageProjectsTree(container, projects, areas, parentId, depth) {
+    const children = projects
+        .filter(p => (p.parent_id || null) === parentId)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+
+    children.forEach(project => {
         const li = document.createElement('li')
         li.className = 'manage-projects-item'
         li.dataset.projectId = project.id
+        li.dataset.parentId = parentId || ''
+        li.dataset.depth = depth
         li.draggable = true
+        li.style.paddingLeft = `${12 + depth * 24}px`
         const projectColor = project.color || '#667eea'
         const descriptionHtml = project.description
             ? `<span class="manage-projects-description">${escapeHtml(project.description)}</span>`
@@ -144,9 +342,10 @@ export function renderManageProjectsList(container) {
             </div>
         `
 
-        // Drag events for reordering
+        // Drag events for reordering (scoped to siblings)
         li.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', project.id)
+            e.dataTransfer.setData('application/x-parent-id', parentId || '')
             li.classList.add('dragging')
         })
         li.addEventListener('dragend', () => {
@@ -159,7 +358,11 @@ export function renderManageProjectsList(container) {
             e.preventDefault()
             const dragging = container.querySelector('.dragging')
             if (dragging && dragging !== li) {
-                li.classList.add('drag-over')
+                // Only allow reordering among siblings
+                const dragParentId = dragging.dataset.parentId
+                if (dragParentId === li.dataset.parentId) {
+                    li.classList.add('drag-over')
+                }
             }
         })
         li.addEventListener('dragleave', () => {
@@ -170,6 +373,10 @@ export function renderManageProjectsList(container) {
             li.classList.remove('drag-over')
             const dragging = container.querySelector('.dragging')
             if (dragging && dragging !== li) {
+                // Only reorder among siblings
+                const dragParentId = dragging.dataset.parentId
+                if (dragParentId !== li.dataset.parentId) return
+
                 const rect = li.getBoundingClientRect()
                 const midY = rect.top + rect.height / 2
                 if (e.clientY < midY) {
@@ -177,7 +384,9 @@ export function renderManageProjectsList(container) {
                 } else {
                     li.after(dragging)
                 }
-                const orderedIds = [...container.querySelectorAll('.manage-projects-item')]
+                // Collect sibling IDs in new order
+                const siblingParentId = dragParentId || ''
+                const orderedIds = [...container.querySelectorAll(`.manage-projects-item[data-parent-id="${siblingParentId}"]`)]
                     .map(item => item.dataset.projectId)
                 await reorderProjects(orderedIds)
             }
@@ -223,13 +432,20 @@ export function renderManageProjectsList(container) {
         // Delete button
         li.querySelector('.manage-projects-delete').addEventListener('click', async (e) => {
             e.stopPropagation()
-            if (confirm(`Delete "${project.name}"? Todos in this project will become projectless.`)) {
+            const descendantCount = getDescendantIds(project.id).length
+            const msg = descendantCount > 0
+                ? `Delete "${project.name}" and its ${descendantCount} subproject(s)? Todos in these projects will become projectless.`
+                : `Delete "${project.name}"? Todos in this project will become projectless.`
+            if (confirm(msg)) {
                 await deleteProject(project.id)
                 renderManageProjectsList(container)
             }
         })
 
         container.appendChild(li)
+
+        // Render children recursively
+        renderManageProjectsTree(container, projects, areas, project.id, depth + 1)
     })
 }
 
