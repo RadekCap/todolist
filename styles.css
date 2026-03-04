@@ -701,8 +701,8 @@ body.sidebar-resizing * {
 .project-context-menu {
     position: fixed;
     z-index: 10000;
-    background: var(--bg-primary, #ffffff);
-    border: 1px solid var(--separator-color, #e0e0e0);
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 4px 0;
     min-width: 170px;
@@ -717,10 +717,11 @@ body.sidebar-resizing * {
     align-items: center;
     gap: 8px;
     transition: background 0.15s;
+    color: #333;
 }
 
 .context-menu-item:hover {
-    background: var(--bg-hover, #f5f5f5);
+    background: #f5f5f5;
 }
 
 .context-menu-item svg {
@@ -5025,17 +5026,31 @@ body.sidebar-resizing * {
 }
 
 [data-theme="glass"] .project-context-menu,
-[data-theme="dark"] .project-context-menu,
+[data-theme="dark"] .project-context-menu {
+    background: var(--ios-bg-tertiary);
+    border-color: var(--ios-separator-opaque);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
 [data-theme="clear"] .project-context-menu {
-    background: var(--bg-secondary);
-    border-color: var(--separator-color);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background: var(--ios-bg-secondary);
+    border-color: var(--ios-separator-opaque);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="glass"] .context-menu-item,
+[data-theme="dark"] .context-menu-item {
+    color: var(--ios-label);
+}
+
+[data-theme="clear"] .context-menu-item {
+    color: var(--ios-label);
 }
 
 [data-theme="glass"] .context-menu-item:hover,
 [data-theme="dark"] .context-menu-item:hover,
 [data-theme="clear"] .context-menu-item:hover {
-    background: var(--ios-gray6);
+    background: var(--ios-gray5);
 }
 
 [data-theme="glass"] .add-project-form,
