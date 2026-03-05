@@ -19,6 +19,7 @@ import {
     loadNotificationSettings, saveNotificationSettings
 } from './src/services/settings.js'
 import { loadTodos, addTodo, toggleTodo, deleteTodo, getGtdCount, clearTodoSelection } from './src/services/todos.js'
+import { performUndo, clearUndoStack } from './src/services/undo.js'
 import { loadProjects, addProject, deleteProject, selectProject } from './src/services/projects.js'
 import { loadAreas, addArea, selectArea, selectAreaByShortcut, restoreSelectedArea } from './src/services/areas.js'
 import { loadCategories } from './src/services/categories.js'
@@ -36,6 +37,7 @@ import { ImportModal } from './src/ui/modals/ImportModal.js'
 import { ExportModal } from './src/ui/modals/ExportModal.js'
 import { GtdGuideModal } from './src/ui/modals/GtdGuideModal.js'
 import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPrioritySelect } from './src/ui/SelectionBar.js'
+import { initToast } from './src/ui/Toast.js'
 import { ModalManager } from './src/ui/ModalManager.js'
 
 // Application version
@@ -244,6 +246,7 @@ class TodoApp {
         this.initAuth()
         this.initEventListeners()
         this.initSelectionBar()
+        initToast()
         this.setVersion()
         initTheme(this.themeSelect)
         initDensity(this.densitySelect)
@@ -518,6 +521,13 @@ class TodoApp {
 
         const modalOpen = this.modalManager.isAnyOpen()
 
+        // Ctrl+Z / Cmd+Z to undo
+        if (e.code === 'KeyZ' && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+            e.preventDefault()
+            performUndo()
+            return
+        }
+
         // 'n' to create new item
         if (e.code === 'KeyN' && !isTyping && !modalOpen && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing) {
             e.preventDefault()
@@ -728,6 +738,7 @@ class TodoApp {
         this.globalAbortController = new AbortController()
 
         store.reset()
+        clearUndoStack()
         this.authContainer.classList.add('active')
         this.appContainer.classList.remove('active')
         this.mainContainer.classList.add('auth-mode')

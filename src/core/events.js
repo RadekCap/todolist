@@ -118,6 +118,11 @@ export const Events = {
     DENSITY_CHANGED: 'density:changed',
     OPEN_GTD_GUIDE: 'ui:openGtdGuide',
 
+    // Undo events
+    UNDO_PUSHED: 'undo:pushed',
+    UNDO_PERFORMED: 'undo:performed',
+    UNDO_FAILED: 'undo:failed',
+
     // Render events
     RENDER_TODOS: 'render:todos',
     RENDER_PROJECTS: 'render:projects',

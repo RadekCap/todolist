@@ -193,6 +193,13 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.project-breadcrumb-current/,
     // Area shortcut hints (rendered by JavaScript for dynamic areas)
     /\.areas-item-shortcut/,
+    // Toast notifications (rendered by JavaScript)
+    /\.toast/,
+    /\.toast-visible/,
+    /\.toast-hiding/,
+    /\.toast-message/,
+    /\.toast-undo-btn/,
+    /\.toast-close-btn/,
     // Empty/loading states (rendered by JavaScript)
     /\.empty-state/,
     /\.loading-state/,

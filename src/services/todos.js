@@ -3,6 +3,7 @@ import { store } from '../core/store.js'
 import { events, Events } from '../core/events.js'
 import { encrypt, decrypt } from './auth.js'
 import { checkPendingRecurrences, generateNextRecurrence } from './todos-recurrence.js'
+import { pushUndo } from './undo.js'
 
 // Re-export all sub-modules so existing imports continue to work
 export * from './todos-filters.js'
@@ -241,6 +242,12 @@ export async function toggleTodo(todoId) {
     store.set('todos', [...todos])
     events.emit(Events.TODO_UPDATED, todo)
 
+    // Push undo action
+    const actionLabel = newCompleted ? 'Completed' : 'Uncompleted'
+    pushUndo(`${actionLabel} "${truncate(todo.text)}"`, async () => {
+        await toggleTodo(todoId)
+    })
+
     // If completing a recurring instance, generate the next occurrence
     if (newCompleted && todo.template_id) {
         await generateNextRecurrence(todo.template_id, todo.due_date)
@@ -254,6 +261,9 @@ export async function toggleTodo(todoId) {
  * @param {string} todoId - Todo ID
  */
 export async function deleteTodo(todoId) {
+    // Capture todo data before deletion for undo
+    const deletedTodo = store.get('todos').find(t => t.id === todoId)
+
     const { error } = await supabase
         .from('todos')
         .delete()
@@ -267,6 +277,14 @@ export async function deleteTodo(todoId) {
     const todos = store.get('todos').filter(t => t.id !== todoId)
     store.set('todos', todos)
     events.emit(Events.TODO_DELETED, todoId)
+
+    // Push undo action
+    if (deletedTodo) {
+        const todoText = deletedTodo.text
+        pushUndo(`Deleted "${truncate(todoText)}"`, async () => {
+            await restoreTodo(deletedTodo)
+        })
+    }
 }
 
 /**
@@ -329,6 +347,11 @@ export async function updateTodoContext(todoId, contextId) {
  * @param {string} gtdStatus - GTD status
  */
 export async function updateTodoGtdStatus(todoId, gtdStatus) {
+    // Capture previous state for undo
+    const todos = store.get('todos')
+    const todo = todos.find(t => t.id === todoId)
+    const previousGtdStatus = todo ? todo.gtd_status : null
+
     // Sync completed with gtd_status (unified status)
     const isCompleted = gtdStatus === 'done'
 
@@ -342,13 +365,17 @@ export async function updateTodoGtdStatus(todoId, gtdStatus) {
         throw error
     }
 
-    const todos = store.get('todos')
-    const todo = todos.find(t => t.id === todoId)
     if (todo) {
         todo.gtd_status = gtdStatus
         todo.completed = isCompleted
         store.set('todos', [...todos])
         events.emit(Events.TODO_UPDATED, todo)
+
+        if (previousGtdStatus && previousGtdStatus !== gtdStatus) {
+            pushUndo(`Moved "${truncate(todo.text)}" to ${gtdStatus}`, async () => {
+                await updateTodoGtdStatus(todoId, previousGtdStatus)
+            })
+        }
     } else {
         console.warn(`updateTodoGtdStatus: todo ${todoId} not found in local store`)
     }
@@ -359,6 +386,52 @@ export async function updateTodoGtdStatus(todoId, gtdStatus) {
  * @param {string} todoId - Todo ID
  * @param {string|null} projectId - Project ID or null
  */
+/**
+ * Truncate a string for display in undo messages
+ * @param {string} str - String to truncate
+ * @param {number} maxLen - Max length
+ * @returns {string}
+ */
+function truncate(str, maxLen = 30) {
+    if (!str) return ''
+    return str.length > maxLen ? str.slice(0, maxLen) + '...' : str
+}
+
+/**
+ * Restore a previously deleted todo by re-inserting it
+ * @param {Object} todo - The todo data to restore (with decrypted text)
+ */
+async function restoreTodo(todo) {
+    const encryptedText = await encrypt(todo.text)
+    const encryptedComment = todo.comment ? await encrypt(todo.comment) : null
+
+    const { data, error } = await supabase
+        .from('todos')
+        .insert({
+            user_id: todo.user_id,
+            text: encryptedText,
+            completed: todo.completed,
+            category_id: todo.category_id || null,
+            project_id: todo.project_id || null,
+            priority_id: todo.priority_id || null,
+            gtd_status: todo.gtd_status || 'inbox',
+            context_id: todo.context_id || null,
+            due_date: todo.due_date || null,
+            comment: encryptedComment
+        })
+        .select()
+
+    if (error) {
+        console.error('Error restoring todo:', error)
+        throw error
+    }
+
+    const restoredTodo = { ...data[0], text: todo.text, comment: todo.comment }
+    const todos = [...store.get('todos'), restoredTodo]
+    store.set('todos', todos)
+    events.emit(Events.TODO_ADDED, restoredTodo)
+}
+
 export async function updateTodoProject(todoId, projectId) {
     const { error } = await supabase
         .from('todos')
