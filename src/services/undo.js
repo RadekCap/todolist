@@ -7,13 +7,18 @@ const UNDO_STACK_MAX = 20
  * Each entry: { description: string, undo: async () => void, timestamp: number }
  */
 const undoStack = []
+let undoInProgress = false
 
 /**
- * Push an undoable action onto the stack
+ * Push an undoable action onto the stack.
+ * Suppressed while an undo is in progress to prevent reverse operations
+ * from polluting the stack.
  * @param {string} description - Human-readable description (e.g. "Deleted 'Buy milk'")
  * @param {Function} undoFn - Async function that reverses the action
  */
 export function pushUndo(description, undoFn) {
+    if (undoInProgress) return
+
     undoStack.push({
         description,
         undo: undoFn,
@@ -36,6 +41,7 @@ export async function performUndo() {
     if (undoStack.length === 0) return false
 
     const entry = undoStack.pop()
+    undoInProgress = true
     try {
         await entry.undo()
         events.emit(Events.UNDO_PERFORMED, { description: entry.description, stackSize: undoStack.length })
@@ -44,6 +50,8 @@ export async function performUndo() {
         console.error('Undo failed:', error)
         events.emit(Events.UNDO_FAILED, { description: entry.description, error })
         return false
+    } finally {
+        undoInProgress = false
     }
 }
 
