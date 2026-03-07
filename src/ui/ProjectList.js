@@ -294,6 +294,7 @@ function renderProjectTree(container, projects, parentId, depth) {
         })
 
         // Drop target for todo assignment, project reordering, and reparenting
+        // Three-zone drop: top 25% = reorder above, middle 50% = reparent, bottom 25% = reorder below
         li.addEventListener('dragover', (e) => {
             if (activeProjectDrag) {
                 if (activeProjectDrag.id === project.id) return
@@ -303,19 +304,15 @@ function renderProjectTree(container, projects, parentId, depth) {
 
                 e.preventDefault()
                 e.dataTransfer.dropEffect = 'move'
-                const isSibling = activeProjectDrag.parentId === (li.dataset.parentId || '')
+                const rect = li.getBoundingClientRect()
+                const relY = e.clientY - rect.top
+                const quarter = rect.height * 0.25
                 li.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
-                if (isSibling) {
-                    // Sibling reorder — show position indicator
-                    const rect = li.getBoundingClientRect()
-                    const midY = rect.top + rect.height / 2
-                    if (e.clientY < midY) {
-                        li.classList.add('drag-over-top')
-                    } else {
-                        li.classList.add('drag-over-bottom')
-                    }
+                if (relY < quarter) {
+                    li.classList.add('drag-over-top')
+                } else if (relY > rect.height - quarter) {
+                    li.classList.add('drag-over-bottom')
                 } else {
-                    // Reparent — highlight as new parent
                     li.classList.add('drag-over')
                 }
             } else {
@@ -334,14 +331,16 @@ function renderProjectTree(container, projects, parentId, depth) {
 
             if (activeProjectDrag) {
                 if (activeProjectDrag.id === project.id) return
-                const isSibling = activeProjectDrag.parentId === (li.dataset.parentId || '')
-                if (isSibling) {
-                    // Sibling reorder
+                const rect = li.getBoundingClientRect()
+                const relY = e.clientY - rect.top
+                const quarter = rect.height * 0.25
+                const isReorder = relY < quarter || relY > rect.height - quarter
+
+                if (isReorder && activeProjectDrag.parentId === (li.dataset.parentId || '')) {
+                    // Sibling reorder (edge zones, same parent only)
                     const dragging = container.querySelector('.project-item.dragging')
                     if (dragging && dragging !== li) {
-                        const rect = li.getBoundingClientRect()
-                        const midY = rect.top + rect.height / 2
-                        if (e.clientY < midY) {
+                        if (relY < quarter) {
                             li.before(dragging)
                         } else {
                             li.after(dragging)
