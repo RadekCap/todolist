@@ -140,6 +140,7 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.project-color/,
     /\.project-count/,
     /\.project-delete/,
+    /\.project-drag-handle/,
     /\.project-card/,
     // Context items (rendered by JavaScript)
     /\.context-item/,

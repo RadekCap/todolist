@@ -190,7 +190,9 @@ function renderProjectTree(container, projects, parentId, depth) {
         li.className = `project-item ${state.selectedProjectId === project.id ? 'active' : ''}`
         li.style.paddingLeft = `${12 + depth * 20}px`
         li.dataset.projectId = project.id
+        li.dataset.parentId = parentId || ''
         li.dataset.depth = depth
+        li.draggable = true
 
         const count = getProjectTodoCount(project.id)
         const countDisplay = count > 0 ? count : ''
@@ -206,14 +208,21 @@ function renderProjectTree(container, projects, parentId, depth) {
             expandHtml = '<span class="project-expand-spacer"></span>'
         }
 
+        // Build the project item content using safe helpers (escapeHtml, validateColor)
+        const dragHandleHtml = getIcon('drag-handle', { size: 12 })
+        const colorStyle = validateColor(project.color)
+        const safeName = escapeHtml(project.name)
+        const deleteIconHtml = getIcon('x', { size: 12 })
+
         li.innerHTML = `
+            <span class="project-drag-handle">${dragHandleHtml}</span>
             ${expandHtml}
             <span class="project-name">
-                <span class="project-color" style="background-color: ${validateColor(project.color)}"></span>
-                ${escapeHtml(project.name)}
+                <span class="project-color" style="background-color: ${colorStyle}"></span>
+                ${safeName}
             </span>
             <span class="project-count">${countDisplay}</span>
-            <button class="project-delete" data-id="${project.id}">${getIcon('x', { size: 12 })}</button>
+            <button class="project-delete" data-id="${project.id}">${deleteIconHtml}</button>
         `
 
         // Expand/collapse toggle
@@ -230,9 +239,27 @@ function renderProjectTree(container, projects, parentId, depth) {
             })
         }
 
+        // Project drag-and-drop for reordering
+        li.addEventListener('dragstart', (e) => {
+            if (!e.target.closest('.project-drag-handle')) {
+                e.preventDefault()
+                return
+            }
+            e.dataTransfer.setData('application/x-project-id', project.id)
+            e.dataTransfer.setData('application/x-project-parent-id', parentId || '')
+            e.dataTransfer.effectAllowed = 'move'
+            li.classList.add('dragging')
+        })
+        li.addEventListener('dragend', () => {
+            li.classList.remove('dragging')
+            container.querySelectorAll('.project-item').forEach(item => {
+                item.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
+            })
+        })
+
         // Click to select project
         li.addEventListener('click', (e) => {
-            if (!e.target.closest('.project-delete') && !e.target.closest('.project-expand')) {
+            if (!e.target.closest('.project-delete') && !e.target.closest('.project-expand') && !e.target.closest('.project-drag-handle')) {
                 selectProject(project.id)
             }
         })
@@ -243,21 +270,58 @@ function renderProjectTree(container, projects, parentId, depth) {
             showProjectContextMenu(e, project, depth, container)
         })
 
-        // Drop target for assigning project
+        // Drop target for both todo assignment and project reordering
         li.addEventListener('dragover', (e) => {
             e.preventDefault()
-            e.dataTransfer.dropEffect = 'move'
-            li.classList.add('drag-over')
+            const isProjectDrag = e.dataTransfer.types.includes('application/x-project-id')
+            if (isProjectDrag) {
+                const dragging = container.querySelector('.project-item.dragging')
+                if (dragging && dragging !== li && dragging.dataset.parentId === li.dataset.parentId) {
+                    e.dataTransfer.dropEffect = 'move'
+                    const rect = li.getBoundingClientRect()
+                    const midY = rect.top + rect.height / 2
+                    li.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
+                    if (e.clientY < midY) {
+                        li.classList.add('drag-over-top')
+                    } else {
+                        li.classList.add('drag-over-bottom')
+                    }
+                }
+            } else {
+                e.dataTransfer.dropEffect = 'move'
+                li.classList.add('drag-over')
+            }
         })
         li.addEventListener('dragleave', () => {
-            li.classList.remove('drag-over')
+            li.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
         })
-        li.addEventListener('drop', (e) => {
+        li.addEventListener('drop', async (e) => {
             e.preventDefault()
-            li.classList.remove('drag-over')
-            const todoId = e.dataTransfer.getData('text/plain')
-            if (todoId) {
-                updateTodoProject(todoId, project.id)
+            li.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
+
+            const projectDragId = e.dataTransfer.getData('application/x-project-id')
+            if (projectDragId) {
+                // Project reorder drop
+                const dragging = container.querySelector('.project-item.dragging')
+                if (dragging && dragging !== li && dragging.dataset.parentId === li.dataset.parentId) {
+                    const rect = li.getBoundingClientRect()
+                    const midY = rect.top + rect.height / 2
+                    if (e.clientY < midY) {
+                        li.before(dragging)
+                    } else {
+                        li.after(dragging)
+                    }
+                    const siblingParentId = dragging.dataset.parentId
+                    const orderedIds = [...container.querySelectorAll(`.project-item[data-parent-id="${siblingParentId}"]`)]
+                        .map(item => item.dataset.projectId)
+                    await reorderProjects(orderedIds)
+                }
+            } else {
+                // Todo assignment drop
+                const todoId = e.dataTransfer.getData('text/plain')
+                if (todoId) {
+                    updateTodoProject(todoId, project.id)
+                }
             }
         })
 

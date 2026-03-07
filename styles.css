@@ -697,6 +697,51 @@ body.sidebar-resizing * {
     color: rgba(255, 255, 255, 0.8);
 }
 
+/* Project sidebar drag handle */
+.project-drag-handle {
+    opacity: 0;
+    cursor: grab;
+    color: #999;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2px;
+    transition: opacity 0.2s;
+}
+
+.project-drag-handle svg {
+    width: 12px;
+    height: 12px;
+}
+
+.project-item:hover .project-drag-handle {
+    opacity: 0.5;
+}
+
+.project-drag-handle:hover {
+    opacity: 1 !important;
+}
+
+.project-drag-handle:active {
+    cursor: grabbing;
+}
+
+.project-item.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.project-item.drag-over-top {
+    border-top: 2px solid var(--accent-color, #007AFF);
+    margin-top: -2px;
+}
+
+.project-item.drag-over-bottom {
+    border-bottom: 2px solid var(--accent-color, #007AFF);
+    margin-bottom: -2px;
+}
+
 /* Project context menu */
 .project-context-menu {
     position: fixed;
@@ -3849,6 +3894,10 @@ body.sidebar-resizing * {
         display: none;
     }
 
+    .project-drag-handle {
+        display: none;
+    }
+
     .manage-projects-color {
         grid-column: 1;
         grid-row: 1;
@@ -5938,6 +5987,24 @@ body.sidebar-resizing * {
     color: white !important;
     transform: scale(1.02);
     box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+}
+
+[data-theme="glass"] .project-drag-handle,
+[data-theme="dark"] .project-drag-handle,
+[data-theme="clear"] .project-drag-handle {
+    color: var(--ios-label-tertiary);
+}
+
+[data-theme="glass"] .project-item.drag-over-top,
+[data-theme="dark"] .project-item.drag-over-top,
+[data-theme="clear"] .project-item.drag-over-top {
+    border-top-color: var(--ios-blue);
+}
+
+[data-theme="glass"] .project-item.drag-over-bottom,
+[data-theme="dark"] .project-item.drag-over-bottom,
+[data-theme="clear"] .project-item.drag-over-bottom {
+    border-bottom-color: var(--ios-blue);
 }
 
 /* Glass/Dark/Clear GTD Tab Bar */
