@@ -172,10 +172,33 @@ export async function addProject(name, parentId = null) {
  * @param {string} projectId - Project ID
  * @param {Object} [options] - Delete options
  * @param {boolean} [options.deleteTodos=false] - Also delete todos in these projects
+ * @param {string|null} [options.moveToProjectId=null] - Move non-closed todos to this project before deleting
  */
-export async function deleteProject(projectId, { deleteTodos = false } = {}) {
+export async function deleteProject(projectId, { deleteTodos = false, moveToProjectId = null } = {}) {
     const descendantIds = getDescendantIds(projectId)
     const removedIds = new Set([projectId, ...descendantIds])
+
+    // Move non-closed todos to another project if requested
+    if (moveToProjectId) {
+        const { error: moveError } = await supabase
+            .from('todos')
+            .update({ project_id: moveToProjectId })
+            .in('project_id', [...removedIds])
+            .neq('gtd_status', 'done')
+
+        if (moveError) {
+            console.error('Error moving project todos:', moveError)
+            throw moveError
+        }
+
+        const todos = store.get('todos').map(t => {
+            if (removedIds.has(t.project_id) && t.gtd_status !== 'done') {
+                return { ...t, project_id: moveToProjectId }
+            }
+            return t
+        })
+        store.set('todos', todos)
+    }
 
     // Delete todos in these projects if requested
     if (deleteTodos) {

@@ -14,17 +14,44 @@ function getAllProjectTodoCount(projectId) {
 }
 
 /**
- * Show a delete project dialog with options when project has todos.
- * Returns a promise that resolves to { confirmed, deleteTodos }.
+ * Count non-closed todos in a project and its descendants
  */
-function showDeleteProjectDialog(projectName, todoCount, descendantCount) {
+function getNonClosedProjectTodoCount(projectId) {
+    const todos = store.get('todos')
+    const ids = new Set([projectId, ...getDescendantIds(projectId)])
+    return todos.filter(t => ids.has(t.project_id) && t.gtd_status !== 'done').length
+}
+
+/**
+ * Build project select options excluding a project and its descendants
+ */
+function buildProjectOptions(excludeProjectId) {
+    const projects = store.get('projects')
+    const excludeIds = new Set([excludeProjectId, ...getDescendantIds(excludeProjectId)])
+    const available = projects.filter(p => !excludeIds.has(p.id))
+
+    if (available.length === 0) return ''
+
+    return available
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+        .map(p => `<option value="${p.id}">${escapeHtml(p.name)}</option>`)
+        .join('')
+}
+
+/**
+ * Show a delete project dialog with options when project has todos.
+ * Returns a promise that resolves to { confirmed, deleteTodos, moveToProjectId }.
+ */
+function showDeleteProjectDialog(projectName, todoCount, descendantCount, projectId) {
     return new Promise(resolve => {
+        const noResult = { confirmed: false, deleteTodos: false, moveToProjectId: null }
+
         // No todos — use simple confirm
         if (todoCount === 0) {
             const msg = descendantCount > 0
                 ? `Delete "${projectName}" and its ${descendantCount} subproject(s)?`
                 : `Delete "${projectName}"?`
-            resolve({ confirmed: confirm(msg), deleteTodos: false })
+            resolve({ confirmed: confirm(msg), deleteTodos: false, moveToProjectId: null })
             return
         }
 
@@ -34,6 +61,10 @@ function showDeleteProjectDialog(projectName, todoCount, descendantCount) {
         const projectLabel = descendantCount > 0
             ? `"${escapeHtml(projectName)}" and its ${descendantCount} subproject(s)`
             : `"${escapeHtml(projectName)}"`
+
+        const nonClosedCount = getNonClosedProjectTodoCount(projectId)
+        const projectOptions = buildProjectOptions(projectId)
+        const showMoveOption = nonClosedCount > 0 && projectOptions
 
         overlay.innerHTML = `
             <div class="delete-project-dialog" role="dialog" aria-modal="true" aria-label="Delete project">
@@ -45,6 +76,19 @@ function showDeleteProjectDialog(projectName, todoCount, descendantCount) {
                         Remove from project
                         <span class="delete-project-dialog-btn-desc">Tasks will become projectless</span>
                     </button>
+                    ${showMoveOption ? `
+                    <div class="delete-project-dialog-btn delete-project-dialog-btn-move">
+                        ${getIcon('folder', { size: 16 })}
+                        Move to another project
+                        <span class="delete-project-dialog-btn-desc">${nonClosedCount} non-closed task${nonClosedCount !== 1 ? 's' : ''} will be moved</span>
+                        <div class="delete-project-dialog-move-select">
+                            <select class="delete-project-dialog-select" aria-label="Target project">
+                                ${projectOptions}
+                            </select>
+                            <button class="delete-project-dialog-move-confirm" data-action="move-confirm">Move & Delete</button>
+                        </div>
+                    </div>
+                    ` : ''}
                     <button class="delete-project-dialog-btn delete-project-dialog-btn-delete" data-action="delete">
                         ${getIcon('trash', { size: 16 })}
                         Delete tasks
@@ -62,15 +106,19 @@ function showDeleteProjectDialog(projectName, todoCount, descendantCount) {
         }
 
         const onKey = (e) => {
-            if (e.key === 'Escape') cleanup({ confirmed: false, deleteTodos: false })
+            if (e.key === 'Escape') cleanup(noResult)
         }
         document.addEventListener('keydown', onKey)
 
         overlay.addEventListener('click', (e) => {
             const action = e.target.closest('[data-action]')?.dataset.action
-            if (action === 'keep') cleanup({ confirmed: true, deleteTodos: false })
-            else if (action === 'delete') cleanup({ confirmed: true, deleteTodos: true })
-            else if (action === 'cancel' || e.target === overlay) cleanup({ confirmed: false, deleteTodos: false })
+            if (action === 'keep') cleanup({ confirmed: true, deleteTodos: false, moveToProjectId: null })
+            else if (action === 'move-confirm') {
+                const select = overlay.querySelector('.delete-project-dialog-select')
+                cleanup({ confirmed: true, deleteTodos: false, moveToProjectId: select.value })
+            }
+            else if (action === 'delete') cleanup({ confirmed: true, deleteTodos: true, moveToProjectId: null })
+            else if (action === 'cancel' || e.target === overlay) cleanup(noResult)
         })
 
         document.body.appendChild(overlay)
@@ -219,9 +267,9 @@ function renderProjectTree(container, projects, parentId, depth) {
             e.stopPropagation()
             const descendantCount = getDescendantIds(project.id).length
             const todoCount = getAllProjectTodoCount(project.id)
-            const { confirmed, deleteTodos } = await showDeleteProjectDialog(project.name, todoCount, descendantCount)
+            const { confirmed, deleteTodos, moveToProjectId } = await showDeleteProjectDialog(project.name, todoCount, descendantCount, project.id)
             if (confirmed) {
-                await deleteProject(project.id, { deleteTodos })
+                await deleteProject(project.id, { deleteTodos, moveToProjectId })
             }
         })
 
@@ -280,9 +328,9 @@ function showProjectContextMenu(event, project, depth, projectContainer) {
     deleteItem.addEventListener('click', async () => {
         menu.remove()
         const todoCount = getAllProjectTodoCount(project.id)
-        const { confirmed, deleteTodos } = await showDeleteProjectDialog(project.name, todoCount, descendantCount)
+        const { confirmed, deleteTodos, moveToProjectId } = await showDeleteProjectDialog(project.name, todoCount, descendantCount, project.id)
         if (confirmed) {
-            await deleteProject(project.id, { deleteTodos })
+            await deleteProject(project.id, { deleteTodos, moveToProjectId })
         }
     })
     menu.appendChild(deleteItem)
@@ -505,9 +553,9 @@ function renderManageProjectsTree(container, projects, areas, parentId, depth) {
             e.stopPropagation()
             const descendantCount = getDescendantIds(project.id).length
             const todoCount = getAllProjectTodoCount(project.id)
-            const { confirmed, deleteTodos } = await showDeleteProjectDialog(project.name, todoCount, descendantCount)
+            const { confirmed, deleteTodos, moveToProjectId } = await showDeleteProjectDialog(project.name, todoCount, descendantCount, project.id)
             if (confirmed) {
-                await deleteProject(project.id, { deleteTodos })
+                await deleteProject(project.id, { deleteTodos, moveToProjectId })
                 renderManageProjectsList(container)
             }
         })
