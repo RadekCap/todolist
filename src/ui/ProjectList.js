@@ -128,6 +128,10 @@ function showDeleteProjectDialog(projectName, todoCount, descendantCount, projec
 // Track collapsed state for project tree nodes (not persisted)
 const collapsedProjects = new Set()
 
+// Track active project drag for cross-browser compatibility
+// (Safari doesn't expose custom MIME types in dragover)
+let activeProjectDrag = null
+
 /**
  * Render the project list in the sidebar as a tree
  * @param {HTMLElement} container - Container element
@@ -245,12 +249,13 @@ function renderProjectTree(container, projects, parentId, depth) {
                 e.preventDefault()
                 return
             }
-            e.dataTransfer.setData('application/x-project-id', project.id)
-            e.dataTransfer.setData('application/x-project-parent-id', parentId || '')
+            e.dataTransfer.setData('text/plain', project.id)
             e.dataTransfer.effectAllowed = 'move'
+            activeProjectDrag = { id: project.id, parentId: parentId || '' }
             li.classList.add('dragging')
         })
         li.addEventListener('dragend', () => {
+            activeProjectDrag = null
             li.classList.remove('dragging')
             container.querySelectorAll('.project-item').forEach(item => {
                 item.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
@@ -273,10 +278,8 @@ function renderProjectTree(container, projects, parentId, depth) {
         // Drop target for both todo assignment and project reordering
         li.addEventListener('dragover', (e) => {
             e.preventDefault()
-            const isProjectDrag = e.dataTransfer.types.includes('application/x-project-id')
-            if (isProjectDrag) {
-                const dragging = container.querySelector('.project-item.dragging')
-                if (dragging && dragging !== li && dragging.dataset.parentId === li.dataset.parentId) {
+            if (activeProjectDrag) {
+                if (activeProjectDrag.parentId === (li.dataset.parentId || '') && activeProjectDrag.id !== project.id) {
                     e.dataTransfer.dropEffect = 'move'
                     const rect = li.getBoundingClientRect()
                     const midY = rect.top + rect.height / 2
@@ -299,11 +302,10 @@ function renderProjectTree(container, projects, parentId, depth) {
             e.preventDefault()
             li.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
 
-            const projectDragId = e.dataTransfer.getData('application/x-project-id')
-            if (projectDragId) {
+            if (activeProjectDrag) {
                 // Project reorder drop
                 const dragging = container.querySelector('.project-item.dragging')
-                if (dragging && dragging !== li && dragging.dataset.parentId === li.dataset.parentId) {
+                if (dragging && dragging !== li && activeProjectDrag.parentId === (li.dataset.parentId || '')) {
                     const rect = li.getBoundingClientRect()
                     const midY = rect.top + rect.height / 2
                     if (e.clientY < midY) {
@@ -311,7 +313,7 @@ function renderProjectTree(container, projects, parentId, depth) {
                     } else {
                         li.after(dragging)
                     }
-                    const siblingParentId = dragging.dataset.parentId
+                    const siblingParentId = activeProjectDrag.parentId
                     const orderedIds = [...container.querySelectorAll(`.project-item[data-parent-id="${siblingParentId}"]`)]
                         .map(item => item.dataset.projectId)
                     await reorderProjects(orderedIds)
