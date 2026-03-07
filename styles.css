@@ -1034,6 +1034,24 @@ body.sidebar-resizing * {
     font-size: 15px;
     font-weight: 600;
     color: var(--ios-label, #333);
+    flex: 1;
+}
+
+.delete-all-done-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3b30;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.delete-all-done-btn:hover {
+    background: rgba(255, 59, 48, 0.2);
 }
 
 /* Per-status icon colors */
@@ -4767,6 +4785,19 @@ body.sidebar-resizing * {
 [data-theme="dark"] .gtd-status-header-name,
 [data-theme="clear"] .gtd-status-header-name {
     color: var(--ios-label);
+}
+
+[data-theme="glass"] .delete-all-done-btn,
+[data-theme="dark"] .delete-all-done-btn,
+[data-theme="clear"] .delete-all-done-btn {
+    background: rgba(255, 59, 48, 0.15);
+    color: var(--ios-red, #ff3b30);
+}
+
+[data-theme="glass"] .delete-all-done-btn:hover,
+[data-theme="dark"] .delete-all-done-btn:hover,
+[data-theme="clear"] .delete-all-done-btn:hover {
+    background: rgba(255, 59, 48, 0.25);
 }
 
 [data-theme="glass"] .area-header,
