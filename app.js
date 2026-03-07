@@ -18,7 +18,7 @@ import {
     loadUserSettings, saveUserSettings,
     loadNotificationSettings, saveNotificationSettings
 } from './src/services/settings.js'
-import { loadTodos, addTodo, toggleTodo, deleteTodo, getGtdCount, clearTodoSelection } from './src/services/todos.js'
+import { loadTodos, addTodo, toggleTodo, deleteTodo, getGtdCount, clearTodoSelection, bulkDeleteTodos } from './src/services/todos.js'
 import { performUndo, clearUndoStack } from './src/services/undo.js'
 import { loadProjects, addProject, deleteProject, selectProject } from './src/services/projects.js'
 import { loadAreas, addArea, selectArea, selectAreaByShortcut, restoreSelectedArea } from './src/services/areas.js'
@@ -81,6 +81,7 @@ class TodoApp {
         this.projectsSection = document.getElementById('projectsSection')
         this.gtdTabBar = document.getElementById('gtdTabBar')
         this.gtdStatusHeader = document.getElementById('gtdStatusHeader')
+        this.deleteAllDoneBtn = document.getElementById('deleteAllDoneBtn')
         this.exportBtn = document.getElementById('exportBtn')
         this.searchInput = document.getElementById('searchInput')
         this.versionNumberEl = document.getElementById('versionNumber')
@@ -438,6 +439,14 @@ class TodoApp {
 
         // Density selector
         this.densitySelect.addEventListener('change', () => changeDensity(this.densitySelect.value))
+
+        // Delete all done button
+        this.deleteAllDoneBtn.addEventListener('click', async () => {
+            const doneTodos = store.get('todos').filter(t => t.gtd_status === 'done')
+            if (doneTodos.length === 0) return
+            if (!confirm(`Delete all ${doneTodos.length} done task${doneTodos.length !== 1 ? 's' : ''}?`)) return
+            await bulkDeleteTodos(doneTodos.map(t => t.id))
+        })
 
         // Export button
         this.exportBtn.addEventListener('click', () => this.exportModal.open())

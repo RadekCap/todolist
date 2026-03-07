@@ -161,8 +161,16 @@ export function updateGtdStatusHeader(headerElement) {
 
     const iconSpan = headerElement.querySelector('.gtd-status-header-icon')
     const nameSpan = headerElement.querySelector('.gtd-status-header-name')
+    const deleteAllBtn = headerElement.querySelector('.delete-all-done-btn')
 
+    // Safe: getIcon returns trusted SVG markup, not user content
     iconSpan.innerHTML = getIcon(status, { size: 20 })
     nameSpan.textContent = statusInfo.label
     headerElement.className = `gtd-status-header ${status}`
+
+    // Show "Delete All" button only on Done view with items
+    if (deleteAllBtn) {
+        const doneCount = store.state.todos.filter(t => t.gtd_status === 'done').length
+        deleteAllBtn.style.display = status === 'done' && doneCount > 0 ? '' : 'none'
+    }
 }
