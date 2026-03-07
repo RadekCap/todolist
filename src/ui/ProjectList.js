@@ -153,7 +153,7 @@ export function renderProjects(container) {
     `
     allItem.addEventListener('click', () => selectProject(null))
 
-    // Drop target for removing project
+    // Drop target for removing todo project or moving project to root
     allItem.addEventListener('dragover', (e) => {
         e.preventDefault()
         e.dataTransfer.dropEffect = 'move'
@@ -162,12 +162,24 @@ export function renderProjects(container) {
     allItem.addEventListener('dragleave', () => {
         allItem.classList.remove('drag-over')
     })
-    allItem.addEventListener('drop', (e) => {
+    allItem.addEventListener('drop', async (e) => {
         e.preventDefault()
         allItem.classList.remove('drag-over')
-        const todoId = e.dataTransfer.getData('text/plain')
-        if (todoId) {
-            updateTodoProject(todoId, null)
+        if (activeProjectDrag) {
+            // Move project to root level
+            if (activeProjectDrag.parentId !== '') {
+                try {
+                    await updateProject(activeProjectDrag.id, { parent_id: null })
+                    renderProjects(container)
+                } catch (err) {
+                    alert(err.message)
+                }
+            }
+        } else {
+            const todoId = e.dataTransfer.getData('text/plain')
+            if (todoId) {
+                updateTodoProject(todoId, null)
+            }
         }
     })
     container.appendChild(allItem)
@@ -281,21 +293,30 @@ function renderProjectTree(container, projects, parentId, depth) {
             showProjectContextMenu(e, project, depth, container)
         })
 
-        // Drop target for both todo assignment and project reordering
+        // Drop target for todo assignment, project reordering, and reparenting
         li.addEventListener('dragover', (e) => {
             if (activeProjectDrag) {
-                // Only accept drops from siblings
-                if (activeProjectDrag.parentId === (li.dataset.parentId || '') && activeProjectDrag.id !== project.id) {
-                    e.preventDefault()
-                    e.dataTransfer.dropEffect = 'move'
+                if (activeProjectDrag.id === project.id) return
+                // Prevent dropping onto own descendants
+                const descendantIds = getDescendantIds(activeProjectDrag.id)
+                if (descendantIds.includes(project.id)) return
+
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+                const isSibling = activeProjectDrag.parentId === (li.dataset.parentId || '')
+                li.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
+                if (isSibling) {
+                    // Sibling reorder — show position indicator
                     const rect = li.getBoundingClientRect()
                     const midY = rect.top + rect.height / 2
-                    li.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
                     if (e.clientY < midY) {
                         li.classList.add('drag-over-top')
                     } else {
                         li.classList.add('drag-over-bottom')
                     }
+                } else {
+                    // Reparent — highlight as new parent
+                    li.classList.add('drag-over')
                 }
             } else {
                 // Todo assignment drop
@@ -312,20 +333,33 @@ function renderProjectTree(container, projects, parentId, depth) {
             li.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
 
             if (activeProjectDrag) {
-                // Project reorder drop
-                const dragging = container.querySelector('.project-item.dragging')
-                if (dragging && dragging !== li && activeProjectDrag.parentId === (li.dataset.parentId || '')) {
-                    const rect = li.getBoundingClientRect()
-                    const midY = rect.top + rect.height / 2
-                    if (e.clientY < midY) {
-                        li.before(dragging)
-                    } else {
-                        li.after(dragging)
+                if (activeProjectDrag.id === project.id) return
+                const isSibling = activeProjectDrag.parentId === (li.dataset.parentId || '')
+                if (isSibling) {
+                    // Sibling reorder
+                    const dragging = container.querySelector('.project-item.dragging')
+                    if (dragging && dragging !== li) {
+                        const rect = li.getBoundingClientRect()
+                        const midY = rect.top + rect.height / 2
+                        if (e.clientY < midY) {
+                            li.before(dragging)
+                        } else {
+                            li.after(dragging)
+                        }
+                        const siblingParentId = activeProjectDrag.parentId
+                        const orderedIds = [...container.querySelectorAll(`.project-item[data-parent-id="${siblingParentId}"]`)]
+                            .map(item => item.dataset.projectId)
+                        await reorderProjects(orderedIds)
                     }
-                    const siblingParentId = activeProjectDrag.parentId
-                    const orderedIds = [...container.querySelectorAll(`.project-item[data-parent-id="${siblingParentId}"]`)]
-                        .map(item => item.dataset.projectId)
-                    await reorderProjects(orderedIds)
+                } else {
+                    // Reparent — move dragged project under the target
+                    try {
+                        await updateProject(activeProjectDrag.id, { parent_id: project.id })
+                        collapsedProjects.delete(project.id)
+                        renderProjects(container)
+                    } catch (err) {
+                        alert(err.message)
+                    }
                 }
             } else {
                 // Todo assignment drop
