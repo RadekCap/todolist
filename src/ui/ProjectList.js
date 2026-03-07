@@ -4,6 +4,79 @@ import { getFilteredProjects, selectProject, deleteProject, addProject, updatePr
 import { getProjectTodoCount, updateTodoProject } from '../services/todos.js'
 import { getIcon } from '../utils/icons.js'
 
+/**
+ * Count ALL todos (including done) in a project and its descendants
+ */
+function getAllProjectTodoCount(projectId) {
+    const todos = store.get('todos')
+    const ids = new Set([projectId, ...getDescendantIds(projectId)])
+    return todos.filter(t => ids.has(t.project_id)).length
+}
+
+/**
+ * Show a delete project dialog with options when project has todos.
+ * Returns a promise that resolves to { confirmed, deleteTodos }.
+ */
+function showDeleteProjectDialog(projectName, todoCount, descendantCount) {
+    return new Promise(resolve => {
+        // No todos — use simple confirm
+        if (todoCount === 0) {
+            const msg = descendantCount > 0
+                ? `Delete "${projectName}" and its ${descendantCount} subproject(s)?`
+                : `Delete "${projectName}"?`
+            resolve({ confirmed: confirm(msg), deleteTodos: false })
+            return
+        }
+
+        const overlay = document.createElement('div')
+        overlay.className = 'delete-project-dialog-overlay'
+
+        const projectLabel = descendantCount > 0
+            ? `"${escapeHtml(projectName)}" and its ${descendantCount} subproject(s)`
+            : `"${escapeHtml(projectName)}"`
+
+        overlay.innerHTML = `
+            <div class="delete-project-dialog" role="dialog" aria-modal="true" aria-label="Delete project">
+                <div class="delete-project-dialog-title">Delete ${projectLabel}</div>
+                <p class="delete-project-dialog-text">This project has <strong>${todoCount}</strong> task${todoCount !== 1 ? 's' : ''}. What would you like to do with them?</p>
+                <div class="delete-project-dialog-actions">
+                    <button class="delete-project-dialog-btn delete-project-dialog-btn-keep" data-action="keep">
+                        ${getIcon('x', { size: 16 })}
+                        Remove from project
+                        <span class="delete-project-dialog-btn-desc">Tasks will become projectless</span>
+                    </button>
+                    <button class="delete-project-dialog-btn delete-project-dialog-btn-delete" data-action="delete">
+                        ${getIcon('trash', { size: 16 })}
+                        Delete tasks
+                        <span class="delete-project-dialog-btn-desc">Tasks will be permanently deleted</span>
+                    </button>
+                </div>
+                <button class="delete-project-dialog-cancel" data-action="cancel">Cancel</button>
+            </div>
+        `
+
+        const cleanup = (result) => {
+            overlay.remove()
+            document.removeEventListener('keydown', onKey)
+            resolve(result)
+        }
+
+        const onKey = (e) => {
+            if (e.key === 'Escape') cleanup({ confirmed: false, deleteTodos: false })
+        }
+        document.addEventListener('keydown', onKey)
+
+        overlay.addEventListener('click', (e) => {
+            const action = e.target.closest('[data-action]')?.dataset.action
+            if (action === 'keep') cleanup({ confirmed: true, deleteTodos: false })
+            else if (action === 'delete') cleanup({ confirmed: true, deleteTodos: true })
+            else if (action === 'cancel' || e.target === overlay) cleanup({ confirmed: false, deleteTodos: false })
+        })
+
+        document.body.appendChild(overlay)
+    })
+}
+
 // Track collapsed state for project tree nodes (not persisted)
 const collapsedProjects = new Set()
 
@@ -145,11 +218,10 @@ function renderProjectTree(container, projects, parentId, depth) {
         deleteBtn.addEventListener('click', async (e) => {
             e.stopPropagation()
             const descendantCount = getDescendantIds(project.id).length
-            const msg = descendantCount > 0
-                ? `Delete "${project.name}" and its ${descendantCount} subproject(s)? Todos in these projects will become projectless.`
-                : `Delete "${project.name}"? Todos in this project will become projectless.`
-            if (confirm(msg)) {
-                await deleteProject(project.id)
+            const todoCount = getAllProjectTodoCount(project.id)
+            const { confirmed, deleteTodos } = await showDeleteProjectDialog(project.name, todoCount, descendantCount)
+            if (confirmed) {
+                await deleteProject(project.id, { deleteTodos })
             }
         })
 
@@ -207,11 +279,10 @@ function showProjectContextMenu(event, project, depth, projectContainer) {
     deleteItem.innerHTML = `${getIcon('x', { size: 14 })} Delete project`
     deleteItem.addEventListener('click', async () => {
         menu.remove()
-        const msg = descendantCount > 0
-            ? `Delete "${project.name}" and its ${descendantCount} subproject(s)? Todos in these projects will become projectless.`
-            : `Delete "${project.name}"? Todos in this project will become projectless.`
-        if (confirm(msg)) {
-            await deleteProject(project.id)
+        const todoCount = getAllProjectTodoCount(project.id)
+        const { confirmed, deleteTodos } = await showDeleteProjectDialog(project.name, todoCount, descendantCount)
+        if (confirmed) {
+            await deleteProject(project.id, { deleteTodos })
         }
     })
     menu.appendChild(deleteItem)
@@ -433,11 +504,10 @@ function renderManageProjectsTree(container, projects, areas, parentId, depth) {
         li.querySelector('.manage-projects-delete').addEventListener('click', async (e) => {
             e.stopPropagation()
             const descendantCount = getDescendantIds(project.id).length
-            const msg = descendantCount > 0
-                ? `Delete "${project.name}" and its ${descendantCount} subproject(s)? Todos in these projects will become projectless.`
-                : `Delete "${project.name}"? Todos in this project will become projectless.`
-            if (confirm(msg)) {
-                await deleteProject(project.id)
+            const todoCount = getAllProjectTodoCount(project.id)
+            const { confirmed, deleteTodos } = await showDeleteProjectDialog(project.name, todoCount, descendantCount)
+            if (confirmed) {
+                await deleteProject(project.id, { deleteTodos })
                 renderManageProjectsList(container)
             }
         })

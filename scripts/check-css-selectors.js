@@ -193,6 +193,8 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.project-breadcrumb-current/,
     // Area shortcut hints (rendered by JavaScript for dynamic areas)
     /\.areas-item-shortcut/,
+    // Delete project dialog (rendered by JavaScript)
+    /\.delete-project-dialog/,
     // Toast notifications (rendered by JavaScript)
     /\.toast/,
     /\.toast-visible/,
