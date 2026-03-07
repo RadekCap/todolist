@@ -196,7 +196,6 @@ function renderProjectTree(container, projects, parentId, depth) {
         li.dataset.projectId = project.id
         li.dataset.parentId = parentId || ''
         li.dataset.depth = depth
-        li.draggable = true
 
         const count = getProjectTodoCount(project.id)
         const countDisplay = count > 0 ? count : ''
@@ -244,17 +243,22 @@ function renderProjectTree(container, projects, parentId, depth) {
         }
 
         // Project drag-and-drop for reordering
+        // Enable draggable only when mousedown on the drag handle (Safari compatible)
+        const dragHandle = li.querySelector('.project-drag-handle')
+        dragHandle.addEventListener('mousedown', () => {
+            li.draggable = true
+        })
+        dragHandle.addEventListener('mouseup', () => {
+            li.draggable = false
+        })
         li.addEventListener('dragstart', (e) => {
-            if (!e.target.closest('.project-drag-handle')) {
-                e.preventDefault()
-                return
-            }
             e.dataTransfer.setData('text/plain', project.id)
             e.dataTransfer.effectAllowed = 'move'
             activeProjectDrag = { id: project.id, parentId: parentId || '' }
             li.classList.add('dragging')
         })
         li.addEventListener('dragend', () => {
+            li.draggable = false
             activeProjectDrag = null
             li.classList.remove('dragging')
             container.querySelectorAll('.project-item').forEach(item => {
