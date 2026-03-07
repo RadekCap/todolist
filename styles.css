@@ -738,6 +738,104 @@ body.sidebar-resizing * {
     background: rgba(231, 76, 60, 0.1);
 }
 
+/* Delete project dialog */
+.delete-project-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(2px);
+}
+
+.delete-project-dialog {
+    background: var(--bg-primary, #fff);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.delete-project-dialog-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary, #333);
+}
+
+.delete-project-dialog-text {
+    font-size: 14px;
+    color: var(--text-secondary, #666);
+    margin: 0 0 16px;
+    line-height: 1.4;
+}
+
+.delete-project-dialog-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.delete-project-dialog-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    background: var(--bg-secondary, #f8f8f8);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary, #333);
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+    flex-wrap: wrap;
+}
+
+.delete-project-dialog-btn:hover {
+    background: var(--bg-hover, #f0f0f0);
+    border-color: var(--border-hover, #ccc);
+}
+
+.delete-project-dialog-btn-desc {
+    width: 100%;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-secondary, #888);
+    margin-left: 26px;
+}
+
+.delete-project-dialog-btn-delete {
+    color: #e74c3c;
+}
+
+.delete-project-dialog-btn-delete:hover {
+    background: rgba(231, 76, 60, 0.08);
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+.delete-project-dialog-cancel {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary, #888);
+    transition: background 0.15s;
+}
+
+.delete-project-dialog-cancel:hover {
+    background: var(--bg-hover, #f0f0f0);
+}
+
 .add-project-form {
     margin-top: 15px;
     padding-top: 15px;

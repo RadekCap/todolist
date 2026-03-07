@@ -170,9 +170,28 @@ export async function addProject(name, parentId = null) {
 /**
  * Delete a project and all its descendants
  * @param {string} projectId - Project ID
+ * @param {Object} [options] - Delete options
+ * @param {boolean} [options.deleteTodos=false] - Also delete todos in these projects
  */
-export async function deleteProject(projectId) {
+export async function deleteProject(projectId, { deleteTodos = false } = {}) {
     const descendantIds = getDescendantIds(projectId)
+    const removedIds = new Set([projectId, ...descendantIds])
+
+    // Delete todos in these projects if requested
+    if (deleteTodos) {
+        const { error: todosError } = await supabase
+            .from('todos')
+            .delete()
+            .in('project_id', [...removedIds])
+
+        if (todosError) {
+            console.error('Error deleting project todos:', todosError)
+            throw todosError
+        }
+
+        const todos = store.get('todos').filter(t => !removedIds.has(t.project_id))
+        store.set('todos', todos)
+    }
 
     const { error } = await supabase
         .from('projects')
@@ -185,7 +204,6 @@ export async function deleteProject(projectId) {
     }
 
     // Remove project and all descendants from local store
-    const removedIds = new Set([projectId, ...descendantIds])
     const projects = store.get('projects').filter(p => !removedIds.has(p.id))
     store.set('projects', projects)
 
