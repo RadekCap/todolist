@@ -259,11 +259,13 @@ function renderProjectTree(container, projects, parentId, depth) {
         })
         li.addEventListener('dragend', () => {
             li.draggable = false
-            activeProjectDrag = null
             li.classList.remove('dragging')
             container.querySelectorAll('.project-item').forEach(item => {
                 item.classList.remove('drag-over', 'drag-over-top', 'drag-over-bottom')
             })
+            // Clear activeProjectDrag after a tick so drop handler processes first
+            // (Safari can fire dragend before drop on the target)
+            setTimeout(() => { activeProjectDrag = null }, 0)
         })
 
         // Click to select project
@@ -281,9 +283,10 @@ function renderProjectTree(container, projects, parentId, depth) {
 
         // Drop target for both todo assignment and project reordering
         li.addEventListener('dragover', (e) => {
-            e.preventDefault()
             if (activeProjectDrag) {
+                // Only accept drops from siblings
                 if (activeProjectDrag.parentId === (li.dataset.parentId || '') && activeProjectDrag.id !== project.id) {
+                    e.preventDefault()
                     e.dataTransfer.dropEffect = 'move'
                     const rect = li.getBoundingClientRect()
                     const midY = rect.top + rect.height / 2
@@ -295,6 +298,8 @@ function renderProjectTree(container, projects, parentId, depth) {
                     }
                 }
             } else {
+                // Todo assignment drop
+                e.preventDefault()
                 e.dataTransfer.dropEffect = 'move'
                 li.classList.add('drag-over')
             }
