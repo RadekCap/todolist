@@ -129,12 +129,16 @@ test.describe('Areas', () => {
         const nameInput = authedPage.locator('.manage-areas-name-input')
         await expect(nameInput).toBeVisible({ timeout: 3000 })
 
-        // Clear and type new name, then press Enter
+        // Clear and type new name, then press Enter to trigger blur → saveEdit
         await nameInput.fill(newName)
         await nameInput.press('Enter')
 
-        // Wait for async rename + re-render to complete (input disappears)
+        // Wait for the async rename to complete (input disappears after re-render)
         await expect(nameInput).not.toBeAttached({ timeout: 10000 })
+
+        // Close and re-open modal to get a fresh render from the store
+        await closeManageAreasModal(authedPage)
+        await openManageAreasModal(authedPage)
 
         // Verify renamed in modal
         await expect(manageAreaItem(authedPage, newName)).toBeVisible({ timeout: 5000 })
