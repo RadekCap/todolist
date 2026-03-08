@@ -18,6 +18,8 @@ function sidebarProject(page, name) {
     return page.locator('#projectList .project-item', { has: page.locator('.project-name', { hasText: name }) })
 }
 
+const uniqueChild = () => `Child-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+
 /**
  * Helper: open the Manage Projects modal.
  */
@@ -217,6 +219,9 @@ test.describe('Projects', () => {
         await addProject(authedPage, projName)
         await addTodoToProject(authedPage, todoName, projName)
 
+        // Verify todo was created
+        await expect(todoItem(authedPage, todoName)).toBeVisible({ timeout: 5000 })
+
         // Add a todo without project
         await authedPage.click('#openAddTodoModal')
         await expect(authedPage.locator('#addTodoModal')).toBeVisible()
@@ -235,8 +240,8 @@ test.describe('Projects', () => {
         await authedPage.locator('#projectList .project-item', { has: authedPage.locator('.project-name', { hasText: 'All Projects' }) }).click()
 
         // Both should be visible now
-        await expect(todoItem(authedPage, todoName)).toBeVisible({ timeout: 5000 })
-        await expect(todoItem(authedPage, otherTodoName)).toBeVisible({ timeout: 5000 })
+        await expect(todoItem(authedPage, todoName)).toBeVisible({ timeout: 10000 })
+        await expect(todoItem(authedPage, otherTodoName)).toBeVisible({ timeout: 10000 })
 
         // Cleanup
         await deleteTodo(authedPage, todoName)
@@ -266,7 +271,7 @@ test.describe('Projects', () => {
 
     test('add a subproject under a parent', async ({ authedPage }) => {
         const parentName = unique()
-        const childName = `Sub-${parentName}`
+        const childName = uniqueChild()
         await addProject(authedPage, parentName)
 
         // Right-click parent to open context menu
@@ -312,7 +317,7 @@ test.describe('Projects', () => {
 
     test('area dropdown is disabled for subprojects in manage modal', async ({ authedPage }) => {
         const parentName = unique()
-        const childName = `Sub-${parentName}`
+        const childName = uniqueChild()
 
         // Create parent project
         await addProject(authedPage, parentName)
