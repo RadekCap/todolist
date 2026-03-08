@@ -6,8 +6,21 @@ const unique = () => `Area-${Date.now()}-${Math.random().toString(36).slice(2, 7
  * Helper: open the Areas dropdown in the toolbar.
  */
 async function openAreasDropdown(page) {
+    const dropdown = page.locator('#toolbarAreasDropdown')
+    if (await dropdown.isVisible()) return // Already open, don't toggle closed
     await page.click('#toolbarAreasBtn')
-    await expect(page.locator('#toolbarAreasDropdown')).toBeVisible({ timeout: 3000 })
+    await expect(dropdown).toBeVisible({ timeout: 3000 })
+}
+
+/**
+ * Helper: close the Areas dropdown if it's open.
+ */
+async function closeAreasDropdown(page) {
+    const dropdown = page.locator('#toolbarAreasDropdown')
+    if (await dropdown.isVisible()) {
+        await page.click('#toolbarAreasBtn')
+        await expect(dropdown).not.toBeVisible({ timeout: 3000 })
+    }
 }
 
 /**
@@ -96,6 +109,7 @@ test.describe('Areas', () => {
         // Area should appear in the toolbar dropdown
         await openAreasDropdown(authedPage)
         await expect(dropdownAreaItem(authedPage, name)).toBeVisible()
+        await closeAreasDropdown(authedPage)
 
         // Cleanup
         await deleteArea(authedPage, name)
@@ -119,6 +133,9 @@ test.describe('Areas', () => {
         await nameInput.fill(newName)
         await nameInput.press('Enter')
 
+        // Wait for async rename + re-render to complete (input disappears)
+        await expect(nameInput).not.toBeAttached({ timeout: 10000 })
+
         // Verify renamed in modal
         await expect(manageAreaItem(authedPage, newName)).toBeVisible({ timeout: 5000 })
 
@@ -127,6 +144,7 @@ test.describe('Areas', () => {
         // Verify renamed in toolbar dropdown
         await openAreasDropdown(authedPage)
         await expect(dropdownAreaItem(authedPage, newName)).toBeVisible()
+        await closeAreasDropdown(authedPage)
 
         // Cleanup
         await deleteArea(authedPage, newName)
@@ -139,6 +157,7 @@ test.describe('Areas', () => {
         // Verify it exists in dropdown
         await openAreasDropdown(authedPage)
         await expect(dropdownAreaItem(authedPage, name)).toBeVisible()
+        await closeAreasDropdown(authedPage)
 
         // Delete via manage modal
         await deleteArea(authedPage, name)
