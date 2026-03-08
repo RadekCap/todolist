@@ -129,9 +129,11 @@ test.describe('Areas', () => {
         const nameInput = authedPage.locator('.manage-areas-name-input')
         await expect(nameInput).toBeVisible({ timeout: 3000 })
 
-        // Clear and type new name, then press Enter to trigger blur → saveEdit
+        // Clear and type new name, then blur to trigger saveEdit
+        // Note: areas use 'keypress' for Enter (deprecated, unreliable in headless Chromium),
+        // so we trigger blur directly instead
         await nameInput.fill(newName)
-        await nameInput.press('Enter')
+        await nameInput.evaluate(el => el.blur())
 
         // Wait for the async rename to complete (input disappears after re-render)
         await expect(nameInput).not.toBeAttached({ timeout: 10000 })
