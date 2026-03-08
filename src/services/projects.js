@@ -3,6 +3,7 @@ import { store } from '../core/store.js'
 import { events, Events } from '../core/events.js'
 import { encrypt, decrypt } from './auth.js'
 import { pushNavigationState } from './navigation.js'
+import { pushUndo } from './undo.js'
 
 /**
  * Get the depth of a project (0 = root, 1 = child, 2 = grandchild)
@@ -178,8 +179,24 @@ export async function deleteProject(projectId, { deleteTodos = false, moveToProj
     const descendantIds = getDescendantIds(projectId)
     const removedIds = new Set([projectId, ...descendantIds])
 
+    // Capture state before deletion for undo
+    const deletedProjects = store.get('projects')
+        .filter(p => removedIds.has(p.id))
+        .map(p => ({ ...p }))
+    const projectName = deletedProjects.find(p => p.id === projectId)?.name || ''
+    const previousSelectedProjectId = store.get('selectedProjectId')
+
+    // Capture affected todos before mutation
+    let movedTodos = []
+    let deletedTodosCopy = []
+
     // Move non-closed todos to another project if requested
     if (moveToProjectId) {
+        // Capture original project_id for each todo being moved
+        movedTodos = store.get('todos')
+            .filter(t => removedIds.has(t.project_id) && t.gtd_status !== 'done')
+            .map(t => ({ id: t.id, project_id: t.project_id }))
+
         const { error: moveError } = await supabase
             .from('todos')
             .update({ project_id: moveToProjectId })
@@ -202,6 +219,11 @@ export async function deleteProject(projectId, { deleteTodos = false, moveToProj
 
     // Delete todos in these projects if requested
     if (deleteTodos) {
+        // Capture full todo objects for restoration
+        deletedTodosCopy = store.get('todos')
+            .filter(t => removedIds.has(t.project_id))
+            .map(t => ({ ...t }))
+
         const { error: todosError } = await supabase
             .from('todos')
             .delete()
@@ -236,6 +258,24 @@ export async function deleteProject(projectId, { deleteTodos = false, moveToProj
     }
 
     events.emit(Events.PROJECT_DELETED, projectId)
+
+    // Push undo action
+    const truncated = projectName.length > 30 ? projectName.slice(0, 30) + '...' : projectName
+    pushUndo(`Deleted project "${truncated}"`, async () => {
+        await restoreProjects(deletedProjects)
+
+        if (movedTodos.length > 0) {
+            await restoreTodoProjectAssignments(movedTodos)
+        }
+
+        if (deletedTodosCopy.length > 0) {
+            await restoreDeletedTodos(deletedTodosCopy)
+        }
+
+        if (previousSelectedProjectId && removedIds.has(previousSelectedProjectId)) {
+            store.set('selectedProjectId', previousSelectedProjectId)
+        }
+    })
 }
 
 /**
@@ -381,6 +421,116 @@ function getMaxSubtreeDepth(projectId) {
  */
 export async function renameProject(projectId, newName) {
     await updateProject(projectId, { name: newName })
+}
+
+/**
+ * Restore previously deleted projects by re-inserting them.
+ * Inserts parents before children to respect foreign key constraints.
+ * @param {Array<Object>} projects - Array of project objects with decrypted names
+ */
+async function restoreProjects(projects) {
+    // Sort by depth (parents first) so foreign keys on parent_id are satisfied
+    const projectIds = new Set(projects.map(p => p.id))
+    const getDepth = (p) => {
+        let depth = 0
+        let current = p
+        while (current.parent_id && projectIds.has(current.parent_id)) {
+            depth++
+            current = projects.find(pr => pr.id === current.parent_id)
+            if (!current) break
+        }
+        return depth
+    }
+    const sorted = [...projects].sort((a, b) => getDepth(a) - getDepth(b))
+
+    for (const project of sorted) {
+        const encryptedName = await encrypt(project.name)
+        const encryptedDesc = project.description ? await encrypt(project.description) : null
+
+        const { error } = await supabase
+            .from('projects')
+            .insert({
+                id: project.id,
+                user_id: project.user_id,
+                name: encryptedName,
+                description: encryptedDesc,
+                color: project.color,
+                area_id: project.area_id,
+                sort_order: project.sort_order,
+                parent_id: project.parent_id || null
+            })
+
+        if (error) {
+            console.error('Error restoring project:', error)
+            throw error
+        }
+    }
+
+    const updatedProjects = [...store.get('projects'), ...projects]
+    store.set('projects', updatedProjects)
+    events.emit(Events.PROJECTS_LOADED, updatedProjects)
+}
+
+/**
+ * Restore todo project assignments after an undo of "move todos" during project deletion.
+ * @param {Array<Object>} todoMappings - Array of { id, project_id } with original project IDs
+ */
+async function restoreTodoProjectAssignments(todoMappings) {
+    for (const { id, project_id } of todoMappings) {
+        const { error } = await supabase
+            .from('todos')
+            .update({ project_id })
+            .eq('id', id)
+
+        if (error) {
+            console.error('Error restoring todo project assignment:', error)
+            throw error
+        }
+    }
+
+    const todos = store.get('todos').map(t => {
+        const mapping = todoMappings.find(m => m.id === t.id)
+        return mapping ? { ...t, project_id: mapping.project_id } : t
+    })
+    store.set('todos', todos)
+    events.emit(Events.TODOS_LOADED, todos)
+}
+
+/**
+ * Restore previously deleted todos by re-inserting them (used when project deletion also deleted todos).
+ * @param {Array<Object>} todos - Array of todo objects with decrypted text
+ */
+async function restoreDeletedTodos(todos) {
+    for (const todo of todos) {
+        const encryptedText = await encrypt(todo.text)
+        const encryptedComment = todo.comment ? await encrypt(todo.comment) : null
+
+        const { data, error } = await supabase
+            .from('todos')
+            .insert({
+                user_id: todo.user_id,
+                text: encryptedText,
+                completed: todo.completed,
+                category_id: todo.category_id || null,
+                project_id: todo.project_id || null,
+                priority_id: todo.priority_id || null,
+                gtd_status: todo.gtd_status || 'inbox',
+                context_id: todo.context_id || null,
+                due_date: todo.due_date || null,
+                comment: encryptedComment
+            })
+            .select()
+
+        if (error) {
+            console.error('Error restoring deleted todo:', error)
+            throw error
+        }
+
+        const restoredTodo = { ...data[0], text: todo.text, comment: todo.comment }
+        const currentTodos = store.get('todos')
+        store.set('todos', [...currentTodos, restoredTodo])
+    }
+    events.emit(Events.TODOS_LOADED, store.get('todos'))
 }
 
 /**
