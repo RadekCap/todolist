@@ -236,10 +236,11 @@ test.describe('Projects', () => {
         await expect(todoItem(authedPage, todoName)).toBeVisible({ timeout: 5000 })
         await expect(todoItem(authedPage, otherTodoName)).not.toBeAttached({ timeout: 5000 })
 
-        // Switch back to All Projects
-        await authedPage.locator('#projectList .project-item', { has: authedPage.locator('.project-name', { hasText: 'All Projects' }) }).click()
+        // Click a GTD tab to exit project view and return to todo list
+        // ("All Projects" shows a projects overview, not the todo list)
+        await authedPage.click('.gtd-tab.inbox')
 
-        // Both should be visible now
+        // Both should be visible now (no project filter, Inbox GTD)
         await expect(todoItem(authedPage, todoName)).toBeVisible({ timeout: 10000 })
         await expect(todoItem(authedPage, otherTodoName)).toBeVisible({ timeout: 10000 })
 
