@@ -129,18 +129,27 @@ test.describe('Areas', () => {
         const nameInput = authedPage.locator('.manage-areas-name-input')
         await expect(nameInput).toBeVisible({ timeout: 3000 })
 
-        // Clear and type new name, then blur to trigger saveEdit
-        // Note: areas use 'keypress' for Enter (deprecated, unreliable in headless Chromium),
-        // so we trigger blur directly instead
+        // Verify fill works
         await nameInput.fill(newName)
+        await expect(nameInput).toHaveValue(newName)
+
+        // Trigger blur to invoke saveEdit
         await nameInput.evaluate(el => el.blur())
 
         // Wait for the async rename to complete (input disappears after re-render)
         await expect(nameInput).not.toBeAttached({ timeout: 10000 })
 
+        // Debug: log what manage-areas-name elements contain after re-render
+        const namesAfterRename = await authedPage.locator('.manage-areas-name').allTextContents()
+        console.log('Area names after rename re-render:', JSON.stringify(namesAfterRename))
+
         // Close and re-open modal to get a fresh render from the store
         await closeManageAreasModal(authedPage)
         await openManageAreasModal(authedPage)
+
+        // Debug: log what manage-areas-name elements contain after re-open
+        const namesAfterReopen = await authedPage.locator('.manage-areas-name').allTextContents()
+        console.log('Area names after modal re-open:', JSON.stringify(namesAfterReopen))
 
         // Verify renamed in modal
         await expect(manageAreaItem(authedPage, newName)).toBeVisible({ timeout: 5000 })
