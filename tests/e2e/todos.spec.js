@@ -41,6 +41,14 @@ function todoItem(page, text) {
 }
 
 /**
+ * Helper: click a GTD tab in the sidebar.
+ */
+async function switchGtdTab(page, status) {
+    await page.click(`.gtd-tab.${status}`)
+    await page.waitForTimeout(500)
+}
+
+/**
  * Helper: delete a todo by text and wait for removal.
  */
 async function deleteTodo(page, text) {
@@ -103,15 +111,25 @@ test.describe('Todo CRUD', () => {
         const item = todoItem(authedPage, name)
         await expect(item).toBeVisible({ timeout: 5000 })
 
-        // Check the completion checkbox
+        // Check the completion checkbox — this moves todo to "Done" GTD tab
         await item.locator('.todo-checkbox').check()
 
-        // Item should have 'completed' class
-        await expect(item).toHaveClass(/completed/, { timeout: 5000 })
+        // Todo should disappear from Inbox (moved to Done)
+        await expect(item).not.toBeAttached({ timeout: 5000 })
 
-        // Uncheck to restore (undo toggle)
-        await item.locator('.todo-checkbox').uncheck()
-        await expect(item).not.toHaveClass(/completed/, { timeout: 5000 })
+        // Switch to Done tab to verify the todo is there
+        await switchGtdTab(authedPage, 'done')
+        const doneItem = todoItem(authedPage, name)
+        await expect(doneItem).toBeVisible({ timeout: 5000 })
+        await expect(doneItem).toHaveClass(/completed/)
+
+        // Uncheck to restore — moves back to Inbox
+        await doneItem.locator('.todo-checkbox').uncheck()
+        await expect(doneItem).not.toBeAttached({ timeout: 5000 })
+
+        // Switch back to Inbox and verify it's there
+        await switchGtdTab(authedPage, 'inbox')
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
 
         // Cleanup
         await deleteTodo(authedPage, name)
@@ -162,10 +180,13 @@ test.describe('Todo CRUD', () => {
         const dueDate = '2099-12-31'
         await addTodo(authedPage, name, { dueDate })
 
+        // Setting a due date auto-changes GTD status to "scheduled"
+        await switchGtdTab(authedPage, 'scheduled')
+
         // Todo should show the due date badge
         const item = todoItem(authedPage, name)
         await expect(item).toBeVisible({ timeout: 5000 })
-        await expect(item.locator('.todo-date-badge')).toBeVisible()
+        await expect(item.locator('.todo-date')).toBeVisible()
 
         // Cleanup
         await deleteTodo(authedPage, name)
@@ -193,14 +214,18 @@ test.describe('Todo CRUD', () => {
         await todoItem(authedPage, name).locator('.todo-text').click()
         await expect(authedPage.locator('#addTodoModal')).toBeVisible()
 
-        // Set due date
+        // Set due date (this auto-changes GTD status to "scheduled")
         await authedPage.fill('#modalDueDateInput', '2099-06-15')
         await authedPage.click('#addTodoForm button[type="submit"]')
         await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
 
+        // Switch to Scheduled tab where the todo moved
+        await switchGtdTab(authedPage, 'scheduled')
+
         // Verify date badge appears
         const item = todoItem(authedPage, name)
-        await expect(item.locator('.todo-date-badge')).toBeVisible({ timeout: 5000 })
+        await expect(item).toBeVisible({ timeout: 5000 })
+        await expect(item.locator('.todo-date')).toBeVisible()
 
         // Cleanup
         await deleteTodo(authedPage, name)
