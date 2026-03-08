@@ -216,7 +216,8 @@ test.describe('Search and Filtering', () => {
     })
 
     test('empty search results show appropriate message', async ({ authedPage }) => {
-        await switchGtdTab(authedPage, 'inbox')
+        // Use "All" tab since Inbox shows a special zen state when empty
+        await switchGtdTab(authedPage, 'all')
 
         // Search for something that doesn't exist
         await search(authedPage, 'zzz-absolutely-no-match-zzz')
