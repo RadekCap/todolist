@@ -162,25 +162,21 @@ test.describe('GTD Workflow', () => {
         await deleteTodo(authedPage, name)
     })
 
-    test('undo a GTD status change', async ({ authedPage }) => {
+    test('undo completing a todo restores it from Done', async ({ authedPage }) => {
         const name = unique()
 
         await switchGtdTab(authedPage, 'inbox')
         await addTodo(authedPage, name)
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
 
-        // Change status via edit modal
-        await todoItem(authedPage, name).locator('.todo-text').click()
-        await expect(authedPage.locator('#addTodoModal')).toBeVisible()
-        await authedPage.selectOption('#modalGtdStatusSelect', 'someday_maybe')
-        await authedPage.click('#addTodoForm button[type="submit"]')
-        await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
-
-        // Todo should be gone from Inbox
+        // Complete the todo (moves to Done)
+        await todoItem(authedPage, name).locator('.todo-checkbox').check()
         await expect(todoItem(authedPage, name)).not.toBeAttached({ timeout: 5000 })
 
-        // Undo via Ctrl+Z
-        await authedPage.keyboard.press('Control+z')
+        // Undo via toast button
+        const undoBtn = authedPage.locator('.toast-undo-btn')
+        await expect(undoBtn).toBeVisible({ timeout: 5000 })
+        await undoBtn.click()
 
         // Todo should reappear in Inbox
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
