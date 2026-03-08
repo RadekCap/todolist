@@ -7,7 +7,6 @@ export default defineConfig({
     reporter: process.env.CI
         ? [['github'], ['html', { open: 'never' }]]
         : [['html', { open: 'on-failure' }]],
-    globalSetup: process.env.TEST_USER_EMAIL ? './tests/e2e/global-setup.js' : undefined,
     use: {
         baseURL: 'http://localhost:3000',
         headless: true,

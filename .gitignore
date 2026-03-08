@@ -20,4 +20,3 @@ npm-debug.log*
 # Playwright
 test-results/
 playwright-report/
-tests/e2e/.auth/

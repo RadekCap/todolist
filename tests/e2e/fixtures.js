@@ -1,4 +1,5 @@
 import { test as base, expect } from '@playwright/test'
+import { login } from './helpers/auth.js'
 
 /**
  * Extended test fixture that provides an authenticated page context.
@@ -11,18 +12,19 @@ import { test as base, expect } from '@playwright/test'
  */
 export const test = base.extend({
     /**
-     * Provides a page that is already authenticated via saved storage state.
-     * Navigates to '/' and waits for the app to be ready.
+     * Provides a page that is already authenticated.
+     * Logs in via the UI and waits for the app to be ready.
      */
-    authedPage: async ({ browser }, use) => {
-        const context = await browser.newContext({
-            storageState: 'tests/e2e/.auth/storage-state.json'
-        })
-        const page = await context.newPage()
-        await page.goto('/')
-        await expect(page.locator('#appContainer')).toHaveClass(/active/, { timeout: 15000 })
+    authedPage: async ({ page }, use) => {
+        const email = process.env.TEST_USER_EMAIL
+        const password = process.env.TEST_USER_PASSWORD
+
+        if (!email || !password) {
+            throw new Error('TEST_USER_EMAIL and TEST_USER_PASSWORD env vars are required for authenticated tests')
+        }
+
+        await login(page, email, password)
         await use(page)
-        await context.close()
     }
 })
 
