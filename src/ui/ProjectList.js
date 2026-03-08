@@ -562,7 +562,7 @@ function renderManageProjectsTree(container, projects, areas, parentId, depth) {
                 <span class="manage-projects-name">${escapeHtml(project.name)}</span>
                 ${descriptionHtml}
             </div>
-            <select class="manage-projects-area" title="Assign to area">${areaOptions}</select>
+            <select class="manage-projects-area" title="Assign to area"${depth > 0 ? ' disabled' : ''}>${areaOptions}</select>
             <div class="manage-projects-actions">
                 <button class="manage-projects-edit" data-id="${project.id}" title="Edit">${getIcon('edit', { size: 14 })}</button>
                 <button class="manage-projects-delete" data-id="${project.id}" title="Delete">${getIcon('x', { size: 14 })}</button>
