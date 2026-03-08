@@ -4,6 +4,9 @@ export default defineConfig({
     testDir: './tests/e2e',
     timeout: 30000,
     retries: process.env.CI ? 1 : 0,
+    reporter: process.env.CI
+        ? [['github'], ['html', { open: 'never' }]]
+        : [['html', { open: 'on-failure' }]],
     use: {
         baseURL: 'http://localhost:3000',
         headless: true,
