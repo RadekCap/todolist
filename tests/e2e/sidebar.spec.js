@@ -31,7 +31,7 @@ test.describe('Sidebar Resize', () => {
     test('sidebar width is constrained between 15% and 30%', async ({ authedPage }) => {
         const handle = authedPage.locator('#sidebarResizeHandle')
         const sidebar = authedPage.locator('.sidebar')
-        const container = authedPage.locator('.app-layout')
+        const container = authedPage.locator('.app-container')
 
         const handleBox = await handle.boundingBox()
         const containerWidth = await container.evaluate(el => el.getBoundingClientRect().width)

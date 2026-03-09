@@ -39,8 +39,8 @@ test.describe('Project Context Menu', () => {
         // Should have menu items
         await expect(contextMenu.locator('.context-menu-item').first()).toBeVisible()
 
-        // Close by pressing Escape
-        await authedPage.keyboard.press('Escape')
+        // Close by clicking a neutral area (the todo list)
+        await authedPage.locator('#todoList').click({ position: { x: 5, y: 5 } })
         await expect(contextMenu).not.toBeVisible({ timeout: 3000 })
 
         // Cleanup
@@ -62,7 +62,7 @@ test.describe('Project Context Menu', () => {
         await expect(contextMenu.locator('.context-menu-item', { hasText: 'subproject' })).toBeVisible()
 
         // Close menu
-        await authedPage.keyboard.press('Escape')
+        await authedPage.locator('#todoList').click({ position: { x: 5, y: 5 } })
 
         // Cleanup
         await deleteProject(authedPage, projName)
@@ -83,7 +83,7 @@ test.describe('Project Context Menu', () => {
         await expect(contextMenu.locator('.context-menu-item-danger')).toBeVisible()
 
         // Close menu
-        await authedPage.keyboard.press('Escape')
+        await authedPage.locator('#todoList').click({ position: { x: 5, y: 5 } })
 
         // Cleanup
         await deleteProject(authedPage, projName)
