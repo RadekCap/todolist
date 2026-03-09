@@ -113,7 +113,7 @@ test.describe('Advanced Recurring Tasks', () => {
         await expect(item).toBeVisible({ timeout: 5000 })
 
         // Verify recurrence icon is shown
-        await expect(item.locator('.recurrence-icon')).toBeVisible()
+        await expect(item.locator('.recurring-icon')).toBeVisible()
 
         // Open edit modal and verify recurrence settings
         await item.locator('.todo-text').click()
@@ -147,7 +147,7 @@ test.describe('Advanced Recurring Tasks', () => {
         await expect(item).toBeVisible({ timeout: 5000 })
 
         // Verify recurrence icon
-        await expect(item.locator('.recurrence-icon')).toBeVisible()
+        await expect(item.locator('.recurring-icon')).toBeVisible()
 
         // Open edit modal and verify
         await item.locator('.todo-text').click()
@@ -185,7 +185,7 @@ test.describe('Advanced Recurring Tasks', () => {
         await expect(item).toBeVisible({ timeout: 5000 })
 
         // Verify recurrence icon
-        await expect(item.locator('.recurrence-icon')).toBeVisible()
+        await expect(item.locator('.recurring-icon')).toBeVisible()
 
         // Cleanup
         await deleteTodo(authedPage, name)
@@ -240,7 +240,7 @@ test.describe('Advanced Recurring Tasks', () => {
         await expect(item).toBeVisible({ timeout: 5000 })
 
         // Should NOT have recurrence icon
-        await expect(item.locator('.recurrence-icon')).not.toBeVisible()
+        await expect(item.locator('.recurring-icon')).not.toBeVisible()
 
         // Edit todo and add recurrence
         await item.locator('.todo-text').click()
@@ -256,7 +256,7 @@ test.describe('Advanced Recurring Tasks', () => {
         await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
 
         // Now it should have a recurrence icon
-        await expect(item.locator('.recurrence-icon')).toBeVisible({ timeout: 5000 })
+        await expect(item.locator('.recurring-icon')).toBeVisible({ timeout: 5000 })
 
         // Cleanup
         await deleteTodo(authedPage, name)

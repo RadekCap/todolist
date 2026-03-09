@@ -111,18 +111,21 @@ test.describe('Session Lock and Unlock', () => {
         await expect(authedPage.locator('#appContainer')).toHaveClass(/active/, { timeout: 15000 })
     })
 
-    test('unlock with empty password shows validation error', async ({ authedPage }) => {
+    test('unlock with empty password does not submit', async ({ authedPage }) => {
         await lockApp(authedPage)
         await expect(authedPage.locator('#unlockModal')).toHaveClass(/active/, { timeout: 5000 })
 
-        // Try submitting with empty password
+        // Try submitting with empty password — HTML5 required validation prevents submission
         await authedPage.click('#unlockBtn')
+        await authedPage.waitForTimeout(500)
 
-        // Error should appear
-        await expect(authedPage.locator('#unlockError')).toBeVisible({ timeout: 5000 })
-
-        // App should still be locked
+        // App should still be locked (form did not submit)
         await expect(authedPage.locator('#appContainer')).not.toHaveClass(/active/)
+        await expect(authedPage.locator('#unlockModal')).toHaveClass(/active/)
+
+        // Password field should have validation state (required + empty = invalid)
+        const isValid = await authedPage.locator('#unlockPassword').evaluate(el => el.checkValidity())
+        expect(isValid).toBe(false)
 
         // Unlock to restore state
         const password = process.env.TEST_USER_PASSWORD

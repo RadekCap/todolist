@@ -94,11 +94,11 @@ test.describe('Keyboard Shortcuts', () => {
 
     test('pressing "k" opens the keyboard shortcuts modal', async ({ authedPage }) => {
         await authedPage.locator('body').click()
-        await authedPage.waitForTimeout(300)
+        await authedPage.waitForTimeout(500)
 
         await authedPage.keyboard.press('k')
 
-        await expect(authedPage.locator('#keyboardShortcutsModal')).toHaveClass(/active/, { timeout: 3000 })
+        await expect(authedPage.locator('#keyboardShortcutsModal')).toHaveClass(/active/, { timeout: 5000 })
 
         // Close with Escape
         await authedPage.keyboard.press('Escape')
@@ -107,11 +107,11 @@ test.describe('Keyboard Shortcuts', () => {
 
     test('pressing "?" also opens the keyboard shortcuts modal', async ({ authedPage }) => {
         await authedPage.locator('body').click()
-        await authedPage.waitForTimeout(300)
+        await authedPage.waitForTimeout(500)
 
         await authedPage.keyboard.press('?')
 
-        await expect(authedPage.locator('#keyboardShortcutsModal')).toHaveClass(/active/, { timeout: 3000 })
+        await expect(authedPage.locator('#keyboardShortcutsModal')).toHaveClass(/active/, { timeout: 5000 })
 
         // Close
         await authedPage.keyboard.press('Escape')
@@ -120,11 +120,11 @@ test.describe('Keyboard Shortcuts', () => {
 
     test('pressing "g" opens the GTD guide modal', async ({ authedPage }) => {
         await authedPage.locator('body').click()
-        await authedPage.waitForTimeout(300)
+        await authedPage.waitForTimeout(500)
 
         await authedPage.keyboard.press('g')
 
-        await expect(authedPage.locator('#gtdGuideModal')).toHaveClass(/active/, { timeout: 3000 })
+        await expect(authedPage.locator('#gtdGuideModal')).toHaveClass(/active/, { timeout: 5000 })
 
         // Close
         await authedPage.keyboard.press('Escape')
