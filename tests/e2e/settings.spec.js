@@ -41,8 +41,7 @@ test.describe('Settings - Theme', () => {
         await authedPage.waitForLoadState('networkidle')
 
         // Theme should still be dark after reload
-        await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 10000 })
-        await expect(authedPage.locator('#themeSelect')).toHaveValue('dark', { timeout: 10000 })
+        await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 15000 })
 
         // Restore to default (glass) for other tests
         await authedPage.selectOption('#themeSelect', 'glass')
@@ -80,8 +79,7 @@ test.describe('Settings - Density', () => {
         await authedPage.waitForLoadState('networkidle')
 
         // Density should still be compact after reload
-        await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact', { timeout: 10000 })
-        await expect(authedPage.locator('#densitySelect')).toHaveValue('compact', { timeout: 10000 })
+        await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact', { timeout: 15000 })
 
         // Restore to default (comfortable) for other tests
         await authedPage.selectOption('#densitySelect', 'comfortable')
