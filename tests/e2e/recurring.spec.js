@@ -41,21 +41,25 @@ async function addRecurringTodo(page, text, opts = {}) {
         await page.fill('#modalDueDateInput', opts.dueDate)
     }
 
-    // Set recurrence type
+    // Set recurrence type (repeat select is at the bottom of the sidebar, scroll into view)
     if (opts.recurrence) {
+        await page.locator('#modalRepeatSelect').scrollIntoViewIfNeeded()
         await page.selectOption('#modalRepeatSelect', opts.recurrence)
         await page.waitForTimeout(300)
     }
 
-    // Set end condition
+    // Set end condition (these elements are inside recurrence options, scroll into view)
     if (opts.endType) {
+        await page.locator('#recurrenceEndType').scrollIntoViewIfNeeded()
         await page.selectOption('#recurrenceEndType', opts.endType)
         await page.waitForTimeout(200)
     }
     if (opts.endDate) {
+        await page.locator('#recurrenceEndDate').scrollIntoViewIfNeeded()
         await page.fill('#recurrenceEndDate', opts.endDate)
     }
     if (opts.endCount) {
+        await page.locator('#recurrenceEndCount').scrollIntoViewIfNeeded()
         await page.fill('#recurrenceEndCount', String(opts.endCount))
     }
 
