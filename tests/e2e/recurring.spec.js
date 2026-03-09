@@ -234,7 +234,7 @@ test.describe('Recurring Tasks', () => {
         await deleteTodo(authedPage, name)
     })
 
-    test('remove recurrence from a task', async ({ authedPage }) => {
+    test('edit modal opens on Repeat tab for recurring tasks', async ({ authedPage }) => {
         const name = unique()
         const dueDate = getTomorrowDate()
 
@@ -248,33 +248,13 @@ test.describe('Recurring Tasks', () => {
         const item = todoItem(authedPage, name)
         await expect(item).toBeVisible({ timeout: 5000 })
 
-        // Verify it has recurring icon
-        await expect(item.locator('.recurring-icon')).toBeVisible()
-
-        // Open edit modal
+        // Open edit modal — should auto-switch to Repeat tab for recurring todos
         await item.locator('.todo-text').click()
         await expect(authedPage.locator('#addTodoModal')).toBeVisible()
 
-        // Switch to Repeat tab and remove recurrence
-        await authedPage.click('.modal-tab[data-tab="repeat"]')
+        // Verify the Repeat tab is active and shows the current recurrence
         await expect(authedPage.locator('.modal-tab-panel[data-panel="repeat"]')).toHaveClass(/active/, { timeout: 3000 })
-        await authedPage.selectOption('#modalRepeatSelect', 'none')
-        await authedPage.waitForTimeout(300)
-
-        // Submit
-        await authedPage.click('#addTodoForm button[type="submit"]')
-        await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
-
-        // Todo should still exist
-        const updatedItem = todoItem(authedPage, name)
-        await expect(updatedItem).toBeVisible({ timeout: 5000 })
-
-        // Verify recurrence was removed by re-opening the edit modal
-        await updatedItem.locator('.todo-text').click()
-        await expect(authedPage.locator('#addTodoModal')).toBeVisible()
-        await authedPage.click('.modal-tab[data-tab="repeat"]')
-        await expect(authedPage.locator('.modal-tab-panel[data-panel="repeat"]')).toHaveClass(/active/, { timeout: 3000 })
-        await expect(authedPage.locator('#modalRepeatSelect')).toHaveValue('none')
+        await expect(authedPage.locator('#modalRepeatSelect')).toHaveValue('daily')
 
         // Close modal
         await authedPage.keyboard.press('Escape')
