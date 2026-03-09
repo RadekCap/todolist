@@ -305,4 +305,35 @@ test.describe('Bulk Operations', () => {
         // Cleanup
         await cleanupTodos(authedPage, names)
     })
+
+    test('bulk complete selected todos', async ({ authedPage }) => {
+        const names = await createTodos(authedPage, 3)
+
+        // Select first two
+        await selectTodo(authedPage, names[0])
+        await selectTodo(authedPage, names[1])
+
+        // Click Complete button in selection bar
+        await authedPage.click('#completeSelectedBtn')
+
+        // First two should disappear from Inbox (moved to Done)
+        await expect(todoItem(authedPage, names[0])).not.toBeAttached({ timeout: 5000 })
+        await expect(todoItem(authedPage, names[1])).not.toBeAttached({ timeout: 5000 })
+
+        // Third should remain
+        await expect(todoItem(authedPage, names[2])).toBeVisible()
+
+        // Switch to Done tab and verify completed todos are there
+        await switchGtdTab(authedPage, 'done')
+        await expect(todoItem(authedPage, names[0])).toBeVisible({ timeout: 5000 })
+        await expect(todoItem(authedPage, names[1])).toBeVisible({ timeout: 5000 })
+
+        // Cleanup from Done
+        await deleteTodo(authedPage, names[0])
+        await deleteTodo(authedPage, names[1])
+
+        // Cleanup remaining from Inbox
+        await switchGtdTab(authedPage, 'inbox')
+        await deleteTodo(authedPage, names[2])
+    })
 })
