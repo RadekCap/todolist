@@ -265,10 +265,20 @@ test.describe('Recurring Tasks', () => {
         await authedPage.click('#addTodoForm button[type="submit"]')
         await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
 
-        // Todo should still exist but without recurring icon
+        // Todo should still exist
         const updatedItem = todoItem(authedPage, name)
         await expect(updatedItem).toBeVisible({ timeout: 5000 })
-        await expect(updatedItem.locator('.recurring-icon')).not.toBeVisible()
+
+        // Verify recurrence was removed by re-opening the edit modal
+        await updatedItem.locator('.todo-text').click()
+        await expect(authedPage.locator('#addTodoModal')).toBeVisible()
+        await authedPage.click('.modal-tab[data-tab="repeat"]')
+        await expect(authedPage.locator('.modal-tab-panel[data-panel="repeat"]')).toHaveClass(/active/, { timeout: 3000 })
+        await expect(authedPage.locator('#modalRepeatSelect')).toHaveValue('none')
+
+        // Close modal
+        await authedPage.keyboard.press('Escape')
+        await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
 
         // Cleanup
         await deleteTodo(authedPage, name)
