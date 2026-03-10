@@ -12,20 +12,29 @@ async function waitForSettingsLoaded(page) {
 
 /**
  * Helper: change theme and wait for the Supabase save to complete.
+ * We start listening for the response BEFORE triggering the change,
+ * because the save is a fire-and-forget async call inside the change
+ * event handler — networkidle can fire before the request even starts.
  */
 async function changeTheme(page, theme) {
+    const saved = page.waitForResponse(
+        resp => resp.url().includes('user_settings') && resp.request().method() !== 'GET'
+    )
     await page.selectOption('#themeSelect', theme)
     await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
-    await page.waitForLoadState('networkidle')
+    await saved
 }
 
 /**
  * Helper: change density and wait for the Supabase save to complete.
  */
 async function changeDensity(page, density) {
+    const saved = page.waitForResponse(
+        resp => resp.url().includes('user_settings') && resp.request().method() !== 'GET'
+    )
     await page.selectOption('#densitySelect', density)
     await expect(page.locator('html')).toHaveAttribute('data-density', density)
-    await page.waitForLoadState('networkidle')
+    await saved
 }
 
 test.describe('Settings - Theme', () => {
