@@ -93,18 +93,18 @@ test.describe('Project Color', () => {
 
         // Trigger change event (fill alone may not fire it)
         await colorInput.dispatchEvent('change')
-        await authedPage.waitForTimeout(500)
+        await authedPage.waitForTimeout(1000)
 
         await closeManageModal(authedPage)
 
-        // Sidebar project should have a color dot
+        // Sidebar project should have a color dot with the correct color
         const colorDot = sidebarProject(authedPage, name).locator('.project-color')
-        await expect(colorDot).toBeVisible()
+        await expect(colorDot).toBeAttached({ timeout: 5000 })
 
-        // Verify it has a background color set
+        // Verify it has the red background color set
         const bgColor = await colorDot.evaluate(el => getComputedStyle(el).backgroundColor)
-        expect(bgColor).not.toBe('')
-        expect(bgColor).not.toBe('rgba(0, 0, 0, 0)')
+        // rgb(255, 0, 0) = #ff0000
+        expect(bgColor).toBe('rgb(255, 0, 0)')
 
         await deleteProject(authedPage, name)
     })
@@ -210,7 +210,7 @@ test.describe('Project Description', () => {
         await deleteProject(authedPage, name)
     })
 
-    test('project description shows in All Projects view', async ({ authedPage }) => {
+    test('project description shows in project filtered view', async ({ authedPage }) => {
         const name = unique()
         const description = `ViewDesc-${Date.now()}`
         await addProject(authedPage, name)
@@ -228,15 +228,15 @@ test.describe('Project Description', () => {
         await authedPage.waitForTimeout(500)
         await closeManageModal(authedPage)
 
-        // Click on the project to see its todos with title
+        // Click on the project to see its filtered view with title header
         await sidebarProject(authedPage, name).click()
         await authedPage.waitForTimeout(500)
 
-        // The project title area should show the description
-        const titleDesc = authedPage.locator('.project-title-description')
-        // Description may or may not be shown in the filtered view depending on implementation
-        // Just verify the project view loaded correctly
-        await expect(authedPage.locator('.project-title', { hasText: name })).toBeVisible({ timeout: 5000 })
+        // The project title header should show the project name
+        await expect(authedPage.locator('.project-title-header')).toBeVisible({ timeout: 5000 })
+
+        // The description should appear in the title header
+        await expect(authedPage.locator('.project-title-description')).toContainText(description)
 
         // Go back to inbox
         await authedPage.click('.gtd-tab.inbox')
