@@ -154,22 +154,26 @@ test.describe('User Settings - Notifications', () => {
             await expect(details).not.toBeVisible()
 
             // Enable notifications — details should appear
-            await checkbox.check()
+            await checkbox.click()
+            await authedPage.waitForTimeout(300)
             await expect(details).toBeVisible()
 
             // Disable — details should hide
-            await checkbox.uncheck()
+            await checkbox.click()
+            await authedPage.waitForTimeout(300)
             await expect(details).not.toBeVisible()
         } else {
             // Details should be visible
             await expect(details).toBeVisible()
 
             // Disable — details should hide
-            await checkbox.uncheck()
+            await checkbox.click()
+            await authedPage.waitForTimeout(300)
             await expect(details).not.toBeVisible()
 
             // Re-enable — details should appear
-            await checkbox.check()
+            await checkbox.click()
+            await authedPage.waitForTimeout(300)
             await expect(details).toBeVisible()
         }
 
@@ -181,7 +185,8 @@ test.describe('User Settings - Notifications', () => {
 
         const checkbox = authedPage.locator('#emailNotificationsEnabled')
         if (!await checkbox.isChecked()) {
-            await checkbox.check()
+            await checkbox.click()
+            await authedPage.waitForTimeout(300)
         }
 
         // Time select should be visible and have options
@@ -199,7 +204,8 @@ test.describe('User Settings - Notifications', () => {
 
         const checkbox = authedPage.locator('#emailNotificationsEnabled')
         if (!await checkbox.isChecked()) {
-            await checkbox.check()
+            await checkbox.click()
+            await authedPage.waitForTimeout(300)
         }
 
         // Timezone select should be visible with options
