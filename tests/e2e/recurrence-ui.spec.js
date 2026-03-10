@@ -87,9 +87,14 @@ test.describe('Recurrence Interval', () => {
     })
 
     test('custom interval value can be set', async ({ authedPage }) => {
-        await openRepeatTab(authedPage)
+        // Open modal and fill details tab fields first (due date is on the details tab)
+        await authedPage.click('#openAddTodoModal')
+        await expect(authedPage.locator('#addTodoModal')).toBeVisible()
         await authedPage.fill('#modalTodoInput', 'interval-test')
         await authedPage.fill('#modalDueDateInput', getTomorrowDate())
+        // Now switch to repeat tab
+        await authedPage.click('.modal-tab[data-tab="repeat"]')
+        await expect(authedPage.locator('.modal-tab-panel[data-panel="repeat"]')).toHaveClass(/active/, { timeout: 3000 })
         await authedPage.selectOption('#modalRepeatSelect', 'daily')
         await authedPage.waitForTimeout(300)
 
@@ -180,13 +185,14 @@ test.describe('Weekly Weekday Checkboxes', () => {
         await authedPage.waitForTimeout(300)
 
         const mondayCheckbox = authedPage.locator('input[name="weekday"][value="1"]')
+        const mondayLabel = authedPage.locator('.weekday-checkbox:has(input[value="1"])')
 
-        // Toggle Monday on
-        await mondayCheckbox.check()
+        // Toggle Monday on (click the label since the input is visually hidden)
+        await mondayLabel.click()
         await expect(mondayCheckbox).toBeChecked()
 
         // Toggle Monday off
-        await mondayCheckbox.uncheck()
+        await mondayLabel.click()
         await expect(mondayCheckbox).not.toBeChecked()
 
         await authedPage.keyboard.press('Escape')
@@ -289,6 +295,10 @@ test.describe('Modal Escape Handling', () => {
         await authedPage.click('#settingsBtn')
         await expect(authedPage.locator('#settingsModal')).toHaveClass(/active/, { timeout: 5000 })
 
+        // Wait for the username input to receive focus — this happens via setTimeout(100ms)
+        // AFTER the Escape handler is registered in ModalManager.open, which itself waits
+        // for the async onOpen (loadSettingsModalData with network call) to complete first.
+        await expect(authedPage.locator('#usernameInput')).toBeFocused({ timeout: 10000 })
         await authedPage.keyboard.press('Escape')
         await expect(authedPage.locator('#settingsModal')).not.toHaveClass(/active/, { timeout: 5000 })
     })
