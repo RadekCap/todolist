@@ -1,40 +1,69 @@
 import { test, expect } from './fixtures.js'
 
+/**
+ * Helper: wait for the async loadThemeFromDatabase / loadDensityFromDatabase
+ * calls to finish. These fire without await after login (app.js line 704-705),
+ * so the theme/density can be overwritten after the test starts interacting.
+ * Waiting for networkidle ensures Supabase responses have arrived.
+ */
+async function waitForSettingsLoaded(page) {
+    await page.waitForLoadState('networkidle')
+}
+
+/**
+ * Helper: change theme and wait for the Supabase save to complete.
+ */
+async function changeTheme(page, theme) {
+    await page.selectOption('#themeSelect', theme)
+    await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
+    await page.waitForLoadState('networkidle')
+}
+
+/**
+ * Helper: change density and wait for the Supabase save to complete.
+ */
+async function changeDensity(page, density) {
+    await page.selectOption('#densitySelect', density)
+    await expect(page.locator('html')).toHaveAttribute('data-density', density)
+    await page.waitForLoadState('networkidle')
+}
+
 test.describe('Settings - Theme', () => {
     test('change theme to Dark and verify it applies', async ({ authedPage }) => {
-        // Change to Dark theme
-        await authedPage.selectOption('#themeSelect', 'dark')
+        await waitForSettingsLoaded(authedPage)
 
-        // Verify data-theme attribute is set on <html>
-        await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'dark')
-
-        // Verify the select shows the correct value
+        await changeTheme(authedPage, 'dark')
         await expect(authedPage.locator('#themeSelect')).toHaveValue('dark')
+
+        // Restore default
+        await changeTheme(authedPage, 'glass')
     })
 
     test('change theme to Clear and verify it applies', async ({ authedPage }) => {
-        await authedPage.selectOption('#themeSelect', 'clear')
-        await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'clear')
+        await waitForSettingsLoaded(authedPage)
+
+        await changeTheme(authedPage, 'clear')
         await expect(authedPage.locator('#themeSelect')).toHaveValue('clear')
+
+        // Restore default
+        await changeTheme(authedPage, 'glass')
     })
 
     test('change theme to Glass and verify it applies', async ({ authedPage }) => {
-        // First switch away from Glass (default)
-        await authedPage.selectOption('#themeSelect', 'dark')
-        await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'dark')
+        await waitForSettingsLoaded(authedPage)
+
+        // First switch away from Glass
+        await changeTheme(authedPage, 'dark')
 
         // Switch back to Glass
-        await authedPage.selectOption('#themeSelect', 'glass')
-        await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'glass')
+        await changeTheme(authedPage, 'glass')
     })
 
     test('theme persists after page reload', async ({ authedPage }) => {
-        // Change to Dark theme
-        await authedPage.selectOption('#themeSelect', 'dark')
-        await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'dark')
+        await waitForSettingsLoaded(authedPage)
 
-        // Wait for the setting to be saved to Supabase
-        await authedPage.waitForTimeout(1000)
+        // Change to Dark theme and wait for save
+        await changeTheme(authedPage, 'dark')
 
         // Reload the page
         await authedPage.reload()
@@ -43,36 +72,37 @@ test.describe('Settings - Theme', () => {
         // Theme should still be dark after reload
         await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 15000 })
 
-        // Restore to default (glass) for other tests
-        await authedPage.selectOption('#themeSelect', 'glass')
-        await authedPage.waitForTimeout(1000)
+        // Restore default
+        await changeTheme(authedPage, 'glass')
     })
 })
 
 test.describe('Settings - Density', () => {
     test('change density to Compact and verify it applies', async ({ authedPage }) => {
-        await authedPage.selectOption('#densitySelect', 'compact')
-        await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact')
+        await waitForSettingsLoaded(authedPage)
+
+        await changeDensity(authedPage, 'compact')
         await expect(authedPage.locator('#densitySelect')).toHaveValue('compact')
+
+        // Restore default
+        await changeDensity(authedPage, 'comfortable')
     })
 
     test('change density to Comfortable and verify it applies', async ({ authedPage }) => {
+        await waitForSettingsLoaded(authedPage)
+
         // First switch to compact
-        await authedPage.selectOption('#densitySelect', 'compact')
-        await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact')
+        await changeDensity(authedPage, 'compact')
 
         // Switch back to comfortable
-        await authedPage.selectOption('#densitySelect', 'comfortable')
-        await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'comfortable')
+        await changeDensity(authedPage, 'comfortable')
     })
 
     test('density persists after page reload', async ({ authedPage }) => {
-        // Change to Compact density
-        await authedPage.selectOption('#densitySelect', 'compact')
-        await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact')
+        await waitForSettingsLoaded(authedPage)
 
-        // Wait for the setting to be saved to Supabase
-        await authedPage.waitForTimeout(1000)
+        // Change to Compact density and wait for save
+        await changeDensity(authedPage, 'compact')
 
         // Reload the page
         await authedPage.reload()
@@ -81,20 +111,18 @@ test.describe('Settings - Density', () => {
         // Density should still be compact after reload
         await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact', { timeout: 15000 })
 
-        // Restore to default (comfortable) for other tests
-        await authedPage.selectOption('#densitySelect', 'comfortable')
-        await authedPage.waitForTimeout(1000)
+        // Restore default
+        await changeDensity(authedPage, 'comfortable')
     })
 })
 
 test.describe('Settings - Saved per user', () => {
     test('settings are stored in Supabase for the authenticated user', async ({ authedPage }) => {
-        // Change both theme and density
-        await authedPage.selectOption('#themeSelect', 'clear')
-        await authedPage.selectOption('#densitySelect', 'compact')
+        await waitForSettingsLoaded(authedPage)
 
-        // Wait for settings to save to Supabase
-        await authedPage.waitForTimeout(1000)
+        // Change both theme and density and wait for saves
+        await changeTheme(authedPage, 'clear')
+        await changeDensity(authedPage, 'compact')
 
         // Clear localStorage to prove settings come from the database
         await authedPage.evaluate(() => {
@@ -110,8 +138,7 @@ test.describe('Settings - Saved per user', () => {
         await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact', { timeout: 10000 })
 
         // Restore defaults
-        await authedPage.selectOption('#themeSelect', 'glass')
-        await authedPage.selectOption('#densitySelect', 'comfortable')
-        await authedPage.waitForTimeout(1000)
+        await changeTheme(authedPage, 'glass')
+        await changeDensity(authedPage, 'comfortable')
     })
 })
