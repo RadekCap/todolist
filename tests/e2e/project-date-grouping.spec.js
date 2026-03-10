@@ -74,8 +74,16 @@ async function selectProject(page, name) {
 async function deleteProject(page, name) {
     const item = page.locator('#projectList .project-item', { has: page.locator('.project-name', { hasText: name }) })
     if (await item.count() > 0) {
+        // Projects with todos show a custom DOM dialog instead of browser confirm
         page.once('dialog', dialog => dialog.accept())
         await item.locator('.project-delete').click()
+
+        // Handle custom delete dialog (shown when project has todos)
+        const customDialog = page.locator('.delete-project-dialog-overlay')
+        if (await customDialog.isVisible({ timeout: 1000 }).catch(() => false)) {
+            await customDialog.locator('[data-action="delete"]').click()
+        }
+
         await expect(item).not.toBeAttached({ timeout: 5000 })
     }
 }
