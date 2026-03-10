@@ -1,13 +1,21 @@
 import { test, expect } from './fixtures.js'
 
 /**
- * Helper: open the user menu and click Settings.
+ * Helper: open the user menu and click Settings, waiting for async data load.
  */
 async function openSettingsModal(page) {
+    // Start listening for the settings data load before opening
+    const settingsLoaded = page.waitForResponse(
+        resp => resp.url().includes('user_settings') && resp.request().method() === 'GET',
+        { timeout: 10000 }
+    )
     await page.click('#toolbarUserBtn')
     await expect(page.locator('#toolbarDropdown')).toBeVisible({ timeout: 3000 })
     await page.click('#settingsBtn')
     await expect(page.locator('#settingsModal')).toHaveClass(/active/, { timeout: 5000 })
+    // Wait for loadSettingsModalData() to finish fetching from Supabase
+    await settingsLoaded
+    await page.waitForTimeout(300) // allow DOM updates after response
 }
 
 /**
