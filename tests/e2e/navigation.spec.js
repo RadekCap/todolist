@@ -118,7 +118,7 @@ test.describe('URL Navigation - GTD Deep Linking', () => {
 test.describe('URL Navigation - View Deep Linking', () => {
     test('?view=projects shows the All Projects view', async ({ authedPage }) => {
         await navigateTo(authedPage, '/?view=projects')
-        await expect(authedPage.locator('.project-card')).toBeVisible({ timeout: 5000 })
+        await expect(authedPage.locator('.project-card').first()).toBeVisible({ timeout: 5000 })
     })
 
     test('?view=today selects Scheduled tab', async ({ authedPage }) => {
