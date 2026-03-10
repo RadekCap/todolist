@@ -77,6 +77,15 @@ export function getFilteredTodos() {
             if (!b.due_date) return -1
             return a.due_date.localeCompare(b.due_date)
         })
+    } else if (state.selectedProjectId !== null) {
+        // Project view: exclude done, sort by due date (items with dates first, then without)
+        filtered = filtered.filter(t => t.gtd_status !== 'done')
+        return filtered.slice().sort((a, b) => {
+            if (!a.due_date && !b.due_date) return 0
+            if (!a.due_date) return 1
+            if (!b.due_date) return -1
+            return a.due_date.localeCompare(b.due_date)
+        })
     } else if (state.selectedGtdStatus === 'done') {
         // Show only done items when Done tab is selected
         filtered = filtered.filter(t => t.gtd_status === 'done')

@@ -85,7 +85,8 @@ export function getDateGroupLabel(group) {
         'tomorrow': 'Tomorrow',
         'this-week': 'This Week',
         'next-week': 'Next Week',
-        'later': 'Later'
+        'later': 'Later',
+        'no-date': 'No Date'
     }
     return labels[group] || group
 }

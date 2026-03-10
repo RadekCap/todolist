@@ -1215,6 +1215,10 @@ body.sidebar-resizing * {
     background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
 }
 
+.scheduled-section-header.no-date {
+    background: linear-gradient(135deg, #bdc3c7 0%, #a6acaf 100%);
+}
+
 .section-header-text {
     display: flex;
     align-items: center;
@@ -5428,6 +5432,13 @@ body.sidebar-resizing * {
 [data-theme="glass"] .scheduled-section-header.later,
 [data-theme="dark"] .scheduled-section-header.later,
 [data-theme="clear"] .scheduled-section-header.later {
+    background: var(--ios-gray5);
+    color: var(--ios-label-secondary);
+}
+
+[data-theme="glass"] .scheduled-section-header.no-date,
+[data-theme="dark"] .scheduled-section-header.no-date,
+[data-theme="clear"] .scheduled-section-header.no-date {
     background: var(--ios-gray5);
     color: var(--ios-label-secondary);
 }

@@ -215,13 +215,14 @@ export function renderTodos(container, options = {}) {
     let currentDateGroup = null
 
     filteredTodos.forEach(todo => {
-        // Add section header for Scheduled view
-        if (state.selectedGtdStatus === 'scheduled' && todo.due_date) {
-            const dateGroup = getDateGroup(todo.due_date)
+        // Add section header for Scheduled and Project views
+        if (state.selectedGtdStatus === 'scheduled' || state.selectedProjectId !== null) {
+            const dateGroup = todo.due_date ? getDateGroup(todo.due_date) : 'no-date'
             if (dateGroup !== currentDateGroup) {
                 currentDateGroup = dateGroup
                 const header = document.createElement('li')
                 header.className = `scheduled-section-header ${dateGroup}`
+                // Note: getDateGroupLabel returns safe static strings from a fixed map
                 header.innerHTML = `<span class="section-header-text">${escapeHtml(getDateGroupLabel(dateGroup))}</span>`
                 container.appendChild(header)
             }
