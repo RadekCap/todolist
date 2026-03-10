@@ -106,8 +106,12 @@ test.describe('GTD Workflow', () => {
         // Add a todo (defaults to inbox)
         await addTodo(authedPage, name)
 
-        // Badge count should increase by 1
-        await expect(inboxBadge).toHaveText(String(initialCount + 1), { timeout: 5000 })
+        // Badge count should have increased (may be more than +1 if parallel tests add todos)
+        await expect(async () => {
+            const text = await inboxBadge.textContent()
+            const count = parseInt(text)
+            expect(count).toBeGreaterThanOrEqual(initialCount + 1)
+        }).toPass({ timeout: 5000 })
 
         // Cleanup
         await deleteTodo(authedPage, name)
