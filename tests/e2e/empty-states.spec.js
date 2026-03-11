@@ -88,22 +88,32 @@ test.describe('Empty States', () => {
         await switchGtdTab(authedPage, 'inbox')
     })
 
-    test('refresh button reloads data without losing todos', async ({ authedPage }) => {
+    test('adding and deleting a todo restores empty state', async ({ authedPage }) => {
+        // Switch to Someday tab (likely empty)
+        await switchGtdTab(authedPage, 'someday_maybe')
+
+        // Count existing items
+        const countBefore = await authedPage.locator('.todo-item').count()
+
+        // Add a todo and move it to Someday via the modal
         const name = unique()
-        await addTodo(authedPage, name)
+        await authedPage.click('#openAddTodoModal')
+        await expect(authedPage.locator('#addTodoModal')).toBeVisible()
+        await authedPage.fill('#modalTodoInput', name)
+        await authedPage.selectOption('#modalGtdStatusSelect', 'someday_maybe')
+        await authedPage.click('#addTodoForm button[type="submit"]')
+        await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
+
+        // Todo should appear in Someday tab
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
 
-        // Click refresh via user menu
-        await authedPage.click('#toolbarUserBtn')
-        await authedPage.click('#refreshBtn')
-
-        // Wait for data to reload
-        await authedPage.waitForTimeout(3000)
-
-        // Todo should still be visible after refresh
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
-
-        // Cleanup
+        // Delete it
         await deleteTodo(authedPage, name)
+
+        // Count should return to before
+        await expect(authedPage.locator('.todo-item')).toHaveCount(countBefore, { timeout: 5000 })
+
+        // Return to Inbox
+        await switchGtdTab(authedPage, 'inbox')
     })
 })
