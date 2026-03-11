@@ -344,11 +344,15 @@ test.describe('Project Hierarchy - Manage Modal', () => {
         await expect(sidebarProject(authedPage, child)).toBeVisible()
 
         // Delete parent — confirmation dialog mentions subprojects
-        const dialogPromise = authedPage.waitForEvent('dialog')
+        let dialogMessage = ''
+        authedPage.once('dialog', async dialog => {
+            dialogMessage = dialog.message()
+            await dialog.accept()
+        })
         await sidebarProject(authedPage, parent).locator('.project-delete').click()
-        const dialog = await dialogPromise
-        expect(dialog.message()).toContain('subproject')
-        await dialog.accept()
+        // Wait for deletion to complete
+        await expect(sidebarProject(authedPage, parent)).not.toBeAttached({ timeout: 5000 })
+        expect(dialogMessage).toContain('subproject')
 
         // Both should be gone
         await expect(sidebarProject(authedPage, parent)).not.toBeAttached({ timeout: 5000 })
