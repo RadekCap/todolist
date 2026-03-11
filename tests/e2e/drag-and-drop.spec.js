@@ -27,25 +27,47 @@ async function html5DragDrop(page, source, target, opts = {}) {
             const tgt = document.querySelector(tgtSel)
             if (!src || !tgt) throw new Error('Drag source or target not found')
 
-            const dataTransfer = new DataTransfer()
-            if (data) dataTransfer.setData('text/plain', data)
+            // Create a DataTransfer with working getData/setData.
+            // Chromium restricts getData() on DragEvent's native dataTransfer
+            // for synthetic (non-trusted) events. We work around this by
+            // creating a custom object that delegates to a real DataTransfer
+            // but overrides getData to always return stored values.
+            const realDt = new DataTransfer()
+            const store = {}
+            const dt = {
+                setData(type, val) { store[type] = val; realDt.setData(type, val) },
+                getData(type) { return store[type] || '' },
+                get dropEffect() { return realDt.dropEffect },
+                set dropEffect(v) { realDt.dropEffect = v },
+                get effectAllowed() { return realDt.effectAllowed },
+                set effectAllowed(v) { realDt.effectAllowed = v },
+                get files() { return realDt.files },
+                get items() { return realDt.items },
+                get types() { return realDt.types },
+                clearData(type) { delete store[type]; realDt.clearData(type) },
+                setDragImage() {},
+            }
 
-            src.dispatchEvent(new DragEvent('dragstart', {
-                bubbles: true, cancelable: true, dataTransfer
-            }))
-            tgt.dispatchEvent(new DragEvent('dragover', {
-                bubbles: true, cancelable: true, dataTransfer,
+            if (data) dt.setData('text/plain', data)
+
+            function makeDragEvent(type, extra = {}) {
+                const evt = new DragEvent(type, {
+                    bubbles: true, cancelable: true, ...extra
+                })
+                Object.defineProperty(evt, 'dataTransfer', { value: dt })
+                return evt
+            }
+
+            src.dispatchEvent(makeDragEvent('dragstart'))
+            tgt.dispatchEvent(makeDragEvent('dragover', {
                 clientX: tgt.getBoundingClientRect().left + tgtX,
                 clientY: tgt.getBoundingClientRect().top + tgtY,
             }))
-            tgt.dispatchEvent(new DragEvent('drop', {
-                bubbles: true, cancelable: true, dataTransfer,
+            tgt.dispatchEvent(makeDragEvent('drop', {
                 clientX: tgt.getBoundingClientRect().left + tgtX,
                 clientY: tgt.getBoundingClientRect().top + tgtY,
             }))
-            src.dispatchEvent(new DragEvent('dragend', {
-                bubbles: true, cancelable: true, dataTransfer
-            }))
+            src.dispatchEvent(makeDragEvent('dragend'))
 
             // Clean up temporary attributes
             src.removeAttribute('data-dd-id')
