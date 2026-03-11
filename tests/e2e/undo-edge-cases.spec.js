@@ -137,17 +137,14 @@ test.describe('Undo Individual Operations', () => {
         await deleteTodo(authedPage, name)
     })
 
-    test('undo GTD status change', async ({ authedPage }) => {
+    test('undo bulk GTD status change', async ({ authedPage }) => {
         const name = unique()
         await addTodo(authedPage, name)
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
 
-        // Open edit modal and change GTD status to "Waiting For"
-        await todoItem(authedPage, name).locator('.todo-text').click()
-        await expect(authedPage.locator('#addTodoModal')).toBeVisible()
-        await authedPage.selectOption('#modalGtdStatusSelect', 'waiting')
-        await authedPage.click('#addTodoForm button[type="submit"]')
-        await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
+        // Use bulk status change (which pushes undo) to move to "waiting_for"
+        await selectTodo(authedPage, name)
+        await authedPage.selectOption('#selectionGtdStatusSelect', 'waiting_for')
 
         // Todo should disappear from Inbox (moved to Waiting)
         await expect(todoItem(authedPage, name)).not.toBeAttached({ timeout: 5000 })
@@ -162,7 +159,7 @@ test.describe('Undo Individual Operations', () => {
         await deleteTodo(authedPage, name)
     })
 
-    test('undo project assignment change', async ({ authedPage }) => {
+    test('undo bulk project assignment', async ({ authedPage }) => {
         const projName = `Proj-${Date.now()}`
         const name = unique()
 
@@ -170,12 +167,10 @@ test.describe('Undo Individual Operations', () => {
         await addTodo(authedPage, name)
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
 
-        // Open edit modal and assign a project
-        await todoItem(authedPage, name).locator('.todo-text').click()
-        await expect(authedPage.locator('#addTodoModal')).toBeVisible()
-        await authedPage.selectOption('#modalProjectSelect', { label: projName })
-        await authedPage.click('#addTodoForm button[type="submit"]')
-        await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
+        // Use bulk project change (which pushes undo) to assign project
+        await selectTodo(authedPage, name)
+        await authedPage.selectOption('#selectionProjectSelect', { label: projName })
+        await expect(authedPage.locator('#selectionBar')).not.toHaveClass(/visible/, { timeout: 5000 })
 
         // Undo via Ctrl+Z
         await authedPage.keyboard.press('Control+z')
