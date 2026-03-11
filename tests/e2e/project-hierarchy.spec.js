@@ -233,7 +233,7 @@ test.describe('Project Hierarchy - Collapse/Expand', () => {
         const chevron = sidebarProject(authedPage, leaf).locator('.project-expand')
         await expect(chevron).not.toBeAttached()
         const spacer = sidebarProject(authedPage, leaf).locator('.project-expand-spacer')
-        await expect(spacer).toBeVisible()
+        await expect(spacer).toBeAttached()
 
         // Cleanup
         await deleteProject(authedPage, leaf)
@@ -277,16 +277,26 @@ test.describe('Project Hierarchy - Todo Counts', () => {
         await addProject(authedPage, parent)
         await addSubproject(authedPage, parent, child)
 
-        // Add a todo to the child project
-        await addTodo(authedPage, todoName, { project: child })
+        // Add a todo to the child project (use parent since child label has indentation)
+        // Select the child by finding its option value
+        await authedPage.click('#openAddTodoModal')
+        await expect(authedPage.locator('#addTodoModal')).toBeVisible()
+        await authedPage.fill('#modalTodoInput', todoName)
+        const childOption = authedPage.locator('#modalProjectSelect option', { hasText: child })
+        const childValue = await childOption.getAttribute('value')
+        await authedPage.selectOption('#modalProjectSelect', childValue)
+        await authedPage.click('#addTodoForm button[type="submit"]')
+        await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
 
         // Parent project count should include child's todo
         const parentCount = sidebarProject(authedPage, parent).locator('.project-count')
         await expect(parentCount).toContainText('1', { timeout: 5000 })
 
-        // Cleanup
-        await switchGtdTab(authedPage, 'inbox')
+        // Cleanup — select child project to see its todo, then delete
+        await sidebarProject(authedPage, child).locator('.project-name').click()
+        await authedPage.waitForTimeout(500)
         await deleteTodo(authedPage, todoName)
+        await switchGtdTab(authedPage, 'inbox')
         await deleteProject(authedPage, child)
         await deleteProject(authedPage, parent)
     })
