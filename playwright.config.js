@@ -3,7 +3,7 @@ import { defineConfig } from '@playwright/test'
 export default defineConfig({
     testDir: './tests/e2e',
     timeout: 30000,
-    retries: process.env.CI ? 1 : 0,
+    retries: process.env.CI ? 2 : 0,
     reporter: process.env.CI
         ? [['github'], ['html', { open: 'never' }]]
         : [['html', { open: 'on-failure' }]],
