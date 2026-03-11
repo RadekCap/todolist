@@ -15,9 +15,14 @@ export async function login(page, email, password) {
 
     await page.fill('#loginEmail', email)
     await page.fill('#loginPassword', password)
-    await page.click('#loginForm .auth-btn')
+
+    // Click login and wait for the auth network response
+    await Promise.all([
+        page.waitForResponse(resp => resp.url().includes('supabase') && resp.url().includes('token'), { timeout: 30000 }),
+        page.click('#loginForm .auth-btn')
+    ])
 
     // Wait for app to load after login
-    await expect(page.locator('#appContainer')).toHaveClass(/active/, { timeout: 15000 })
-    await expect(page.locator('body')).toHaveClass(/fullscreen-mode/, { timeout: 5000 })
+    await expect(page.locator('#appContainer')).toHaveClass(/active/, { timeout: 30000 })
+    await expect(page.locator('body')).toHaveClass(/fullscreen-mode/, { timeout: 10000 })
 }
