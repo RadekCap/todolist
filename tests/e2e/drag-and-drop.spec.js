@@ -458,17 +458,22 @@ test.describe('Drag and Drop - Area Reorder', () => {
         await openManageAreasModal(authedPage)
         const modal = authedPage.locator('#manageAreasModal')
 
+        // Helper to find area item using page-scoped locators (avoids has-filter scoping issues)
+        const areaItem = (name) => authedPage.locator('.manage-areas-item', {
+            has: authedPage.locator('.manage-areas-name', { hasText: name })
+        })
+
         // Add 3 areas
         for (const name of [area1, area2, area3]) {
-            await modal.locator('#newAreaInput').fill(name)
-            await modal.locator('#addNewAreaBtn').click()
-            await expect(modal.locator('.manage-areas-item', { has: modal.locator('.manage-areas-name', { hasText: name }) })).toBeVisible({ timeout: 5000 })
+            await authedPage.fill('#newAreaInput', name)
+            await authedPage.click('#addNewAreaBtn')
+            await expect(areaItem(name)).toBeVisible({ timeout: 5000 })
         }
 
         // Get order of our test areas
         const getAreaOrder = async () => {
             const names = []
-            const items = modal.locator('.manage-areas-item .manage-areas-name')
+            const items = authedPage.locator('#manageAreasModal .manage-areas-item .manage-areas-name')
             const count = await items.count()
             for (let i = 0; i < count; i++) {
                 const text = (await items.nth(i).textContent()).trim()
@@ -486,8 +491,8 @@ test.describe('Drag and Drop - Area Reorder', () => {
         expect(idx1).toBeLessThan(idx3)
 
         // Drag area3 above area1
-        const area3Item = modal.locator('.manage-areas-item', { has: modal.locator('.manage-areas-name', { hasText: area3 }) })
-        const area1Item = modal.locator('.manage-areas-item', { has: modal.locator('.manage-areas-name', { hasText: area1 }) })
+        const area3Item = areaItem(area3)
+        const area1Item = areaItem(area1)
         const area1Box = await area1Item.boundingBox()
 
         await html5DragDrop(authedPage, area3Item, area1Item, {
@@ -502,7 +507,7 @@ test.describe('Drag and Drop - Area Reorder', () => {
 
         // Cleanup — delete all 3 areas
         for (const name of [area1, area2, area3]) {
-            const item = modal.locator('.manage-areas-item', { has: modal.locator('.manage-areas-name', { hasText: name }) })
+            const item = areaItem(name)
             if (await item.count() > 0) {
                 authedPage.once('dialog', d => d.accept())
                 await item.locator('.manage-areas-delete').click()
