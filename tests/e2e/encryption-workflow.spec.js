@@ -58,8 +58,8 @@ async function deleteProject(page, name) {
 async function waitForApp(page) {
     await expect(page.locator('#appContainer')).toHaveClass(/active/, { timeout: 30000 })
     await expect(page.locator('body')).toHaveClass(/fullscreen-mode/, { timeout: 10000 })
-    // Wait for data to load from Supabase
-    await page.waitForTimeout(2000)
+    // Wait for todo data to load from Supabase
+    await expect(page.locator('.todo-item').first()).toBeVisible({ timeout: 15000 }).catch(() => {})
 }
 
 test.describe('Encryption Workflow', () => {
