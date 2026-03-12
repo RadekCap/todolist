@@ -123,6 +123,12 @@ export const Events = {
     UNDO_PERFORMED: 'undo:performed',
     UNDO_FAILED: 'undo:failed',
 
+    // Project template events
+    PROJECT_TEMPLATES_LOADED: 'projectTemplates:loaded',
+    PROJECT_TEMPLATE_ADDED: 'projectTemplate:added',
+    PROJECT_TEMPLATE_DELETED: 'projectTemplate:deleted',
+    PROJECT_TEMPLATE_APPLIED: 'projectTemplate:applied',
+
     // Render events
     RENDER_TODOS: 'render:todos',
     RENDER_PROJECTS: 'render:projects',

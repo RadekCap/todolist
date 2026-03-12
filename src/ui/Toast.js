@@ -40,7 +40,7 @@ export function initToast() {
  * @param {string} message - The message to display
  * @param {boolean} showUndoButton - Whether to show an undo button
  */
-function showToast(message, showUndoButton = true) {
+export function showToast(message, showUndoButton = true) {
     if (!toastContainer) return
 
     const toast = document.createElement('div')
