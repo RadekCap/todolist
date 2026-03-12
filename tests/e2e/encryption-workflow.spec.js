@@ -50,7 +50,7 @@ test.describe('Encryption Workflow', () => {
         const password = process.env.TEST_USER_PASSWORD
         await authedPage.fill('#unlockPassword', password)
         await authedPage.click('#unlockBtn')
-        await expect(authedPage.locator('#appContainer')).toHaveClass(/active/, { timeout: 15000 })
+        await waitForApp(authedPage)
 
         // The todo should still be readable after key re-derivation
         const item = todoItem(authedPage, name)

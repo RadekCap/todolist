@@ -97,4 +97,6 @@ export async function deleteProject(page, name) {
 export async function waitForApp(page) {
     await expect(page.locator('#appContainer')).toHaveClass(/active/, { timeout: 30000 })
     await expect(page.locator('body')).toHaveClass(/fullscreen-mode/, { timeout: 10000 })
+    // Wait for data to finish loading from Supabase
+    await expect(page.locator('#loadingScreen')).toHaveClass(/hidden/, { timeout: 15000 })
 }
