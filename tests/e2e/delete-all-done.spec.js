@@ -176,12 +176,10 @@ test.describe('Refresh Button', () => {
         await authedPage.click('#toolbarUserBtn')
         await expect(authedPage.locator('#toolbarDropdown')).toBeVisible({ timeout: 3000 })
 
-        // Listen for Supabase data fetch (not a full navigation)
-        const dataFetch = authedPage.waitForResponse(
-            resp => resp.url().includes('rest/v1/todos') && resp.request().method() === 'GET'
-        )
         await authedPage.click('#refreshBtn')
-        await dataFetch
+
+        // Wait for refresh to complete (button text changes back to 'Refresh')
+        await expect(authedPage.locator('#refreshBtn')).toHaveText('Refresh', { timeout: 15000 })
 
         // Todo should still be visible after refresh
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })

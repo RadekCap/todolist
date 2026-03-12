@@ -83,6 +83,9 @@ test.describe('Session Lock and Unlock', () => {
         await expect(authedPage.locator('#appContainer')).toHaveClass(/active/, { timeout: 15000 })
         await expect(authedPage.locator('body')).toHaveClass(/fullscreen-mode/, { timeout: 5000 })
 
+        // Wait for data to finish loading (loading screen hides after all data loads)
+        await expect(authedPage.locator('#loadingScreen')).toHaveClass(/hidden/, { timeout: 15000 })
+
         // Todo created before lock should still be visible
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
 
