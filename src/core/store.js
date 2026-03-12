@@ -17,6 +17,7 @@ class Store {
             priorities: [],
             contexts: [],
             projects: [],
+            projectTemplates: [],
             areas: [],
 
             // Filter/selection state
@@ -131,6 +132,7 @@ class Store {
             priorities: [],
             contexts: [],
             projects: [],
+            projectTemplates: [],
             areas: [],
             selectedCategoryIds: new Set(),
             selectedContextIds: new Set(),

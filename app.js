@@ -21,6 +21,7 @@ import {
 import { loadTodos, addTodo, toggleTodo, deleteTodo, getGtdCount, clearTodoSelection, bulkDeleteTodos } from './src/services/todos.js'
 import { performUndo, clearUndoStack } from './src/services/undo.js'
 import { loadProjects, addProject, deleteProject, selectProject } from './src/services/projects.js'
+import { loadProjectTemplates, addProjectTemplate } from './src/services/project-templates.js'
 import { loadAreas, addArea, selectArea, selectAreaByShortcut, restoreSelectedArea } from './src/services/areas.js'
 import { loadCategories } from './src/services/categories.js'
 import { loadContexts } from './src/services/contexts.js'
@@ -30,6 +31,7 @@ import { initNavigation } from './src/services/navigation.js'
 // UI Components
 import { renderTodos } from './src/ui/TodoList.js'
 import { renderProjects, updateProjectSelect, renderManageProjectsList } from './src/ui/ProjectList.js'
+import { renderTemplatesList } from './src/ui/TemplateList.js'
 import { renderGtdTabBar, updateGtdStatusHeader, selectGtdStatus, selectGtdStatusByShortcut } from './src/ui/GtdList.js'
 import { renderAreasDropdown, updateAreasLabel, updateAreaHeader, renderManageAreasList } from './src/ui/AreasDropdown.js'
 import { TodoModal } from './src/ui/modals/TodoModal.js'
@@ -123,6 +125,15 @@ class TodoApp {
         this.newProjectModalInput = document.getElementById('newProjectModalInput')
         this.addNewProjectBtn = document.getElementById('addNewProjectBtn')
         this.manageProjectsList = document.getElementById('manageProjectsList')
+
+        // Manage Templates modal elements
+        this.manageTemplatesBtn = document.getElementById('manageTemplatesBtn')
+        this.manageTemplatesModal = document.getElementById('manageTemplatesModal')
+        this.closeManageTemplatesModalBtn = document.getElementById('closeManageTemplatesModal')
+        this.closeManageTemplatesModalBtn2 = document.getElementById('closeManageTemplatesModalBtn')
+        this.newTemplateInput = document.getElementById('newTemplateInput')
+        this.addTemplateBtn = document.getElementById('addTemplateBtn')
+        this.templatesList = document.getElementById('templatesList')
 
         // Keyboard shortcuts modal elements
         this.keyboardShortcutsModal = document.getElementById('keyboardShortcutsModal')
@@ -227,6 +238,14 @@ class TodoApp {
             focusOnOpen: this.newProjectModalInput,
             onOpen: () => renderManageProjectsList(this.manageProjectsList),
             onClose: () => { this.newProjectModalInput.value = '' }
+        })
+
+        this.modalManager.register('manageTemplates', {
+            element: this.manageTemplatesModal,
+            closeButtons: [this.closeManageTemplatesModalBtn, this.closeManageTemplatesModalBtn2],
+            focusOnOpen: this.newTemplateInput,
+            onOpen: () => renderTemplatesList(this.templatesList),
+            onClose: () => { this.newTemplateInput.value = '' }
         })
 
         this.modalManager.register('keyboardShortcuts', {
@@ -512,6 +531,15 @@ class TodoApp {
             if (e.key === 'Enter') this.handleAddProjectInModal()
         })
 
+        // Open manage templates modal
+        this.manageTemplatesBtn.addEventListener('click', () => this.modalManager.open('manageTemplates'))
+
+        // Add new template in modal
+        this.addTemplateBtn.addEventListener('click', () => this.handleAddTemplate())
+        this.newTemplateInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.handleAddTemplate()
+        })
+
         // Keyboard shortcuts modal close buttons and backdrop are handled by ModalManager
 
         // Initialize sidebar resize
@@ -704,6 +732,7 @@ class TodoApp {
         loadThemeFromDatabase()
         loadDensityFromDatabase()
         this.loadUserSettingsDisplay()
+        loadProjectTemplates()
 
         this.hideLoadingScreen()
     }
@@ -731,7 +760,8 @@ class TodoApp {
                 loadPriorities(),
                 loadContexts(),
                 loadProjects(),
-                loadTodos()
+                loadTodos(),
+                loadProjectTemplates()
             ])
         } catch (error) {
             console.error('Error refreshing data:', error)
@@ -881,6 +911,25 @@ class TodoApp {
         } finally {
             this.addNewProjectBtn.disabled = false
             this.addNewProjectBtn.textContent = 'Add'
+        }
+    }
+
+    async handleAddTemplate() {
+        const name = this.newTemplateInput.value.trim()
+        if (!name) return
+
+        this.addTemplateBtn.disabled = true
+        this.addTemplateBtn.textContent = 'Adding...'
+
+        try {
+            await addProjectTemplate(name)
+            this.newTemplateInput.value = ''
+            renderTemplatesList(this.templatesList)
+        } catch (error) {
+            console.error('Failed to add template:', error)
+        } finally {
+            this.addTemplateBtn.disabled = false
+            this.addTemplateBtn.textContent = 'Add'
         }
     }
 

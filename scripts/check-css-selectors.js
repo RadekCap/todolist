@@ -177,6 +177,8 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.manage-projects-edit/,
     /\.manage-projects-delete/,
     /\.manage-projects-color/,
+    // Template management (rendered by JavaScript)
+    /\.manage-templates-/,
     // Area color indicators (rendered by JavaScript)
     /\.area-color-dot/,
     // Project tree hierarchy (rendered by JavaScript)
