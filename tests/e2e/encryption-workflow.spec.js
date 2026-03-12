@@ -56,7 +56,8 @@ test.describe('Encryption Workflow', () => {
     })
 
     test('todo text persists correctly after page reload', async ({ authedPage }) => {
-        // Capture existing todo texts before reload
+        // Wait for todos to load, then capture existing texts before reload
+        await expect(authedPage.locator('.todo-item').first()).toBeVisible({ timeout: 10000 })
         const textsBefore = await authedPage.locator('.todo-item .todo-text').allTextContents()
         expect(textsBefore.length).toBeGreaterThan(0)
 
@@ -77,7 +78,8 @@ test.describe('Encryption Workflow', () => {
     })
 
     test('project names survive encryption roundtrip after reload', async ({ authedPage }) => {
-        // Capture existing project names before reload
+        // Wait for projects to load, then capture existing names before reload
+        await expect(authedPage.locator('#projectList .project-item').first()).toBeVisible({ timeout: 10000 })
         const namesBefore = await authedPage.locator('#projectList .project-item .project-name').allTextContents()
         expect(namesBefore.length).toBeGreaterThan(0)
 
