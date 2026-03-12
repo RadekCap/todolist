@@ -37,6 +37,9 @@ export async function addTodo(page, text, opts = {}) {
     if (opts.priority) {
         await page.selectOption('#modalPrioritySelect', { label: opts.priority })
     }
+    if (opts.gtdStatus) {
+        await page.selectOption('#modalGtdStatusSelect', opts.gtdStatus)
+    }
 
     await page.click('#addTodoForm button[type="submit"]')
     await expect(page.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
@@ -88,6 +91,16 @@ export async function deleteProject(page, name) {
     page.once('dialog', dialog => dialog.accept())
     await item.locator('.project-delete').click()
     await expect(item).not.toBeAttached({ timeout: 5000 })
+}
+
+/**
+ * Switch to a GTD tab in the sidebar and wait for it to become active.
+ * @param {import('@playwright/test').Page} page
+ * @param {string} status - GTD tab class name (e.g. 'inbox', 'someday_maybe', 'waiting_for')
+ */
+export async function switchGtdTab(page, status) {
+    await page.click(`.gtd-tab.${status}`)
+    await expect(page.locator(`.gtd-tab.${status}`)).toHaveClass(/active/, { timeout: 3000 })
 }
 
 /**
