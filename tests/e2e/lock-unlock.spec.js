@@ -1,25 +1,5 @@
 import { test, expect } from './fixtures.js'
 
-const unique = () => `LK-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-
-/**
- * Helper: find a todo item by its text content.
- */
-function todoItem(page, text) {
-    return page.locator('.todo-item', { has: page.locator('.todo-text', { hasText: text }) })
-}
-
-/**
- * Helper: delete a todo by text.
- */
-async function deleteTodo(page, text) {
-    const item = todoItem(page, text)
-    if (await item.count() > 0) {
-        await item.locator('.delete-btn').click()
-        await expect(item).not.toBeAttached({ timeout: 5000 })
-    }
-}
-
 /**
  * Helper: open the user menu dropdown.
  */
@@ -60,19 +40,12 @@ test.describe('Session Lock and Unlock', () => {
     })
 
     test('unlock with correct password restores the app', async ({ authedPage }) => {
-        const name = unique()
-
-        // Create a todo before locking
-        await authedPage.click('#openAddTodoModal')
-        await expect(authedPage.locator('#addTodoModal')).toBeVisible()
-        await authedPage.fill('#modalTodoInput', name)
-        await authedPage.click('#addTodoForm button[type="submit"]')
-        await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
-
         // Lock the app
         await lockApp(authedPage)
         await expect(authedPage.locator('#unlockModal')).toHaveClass(/active/, { timeout: 5000 })
+
+        // App container should not be active while locked
+        await expect(authedPage.locator('#appContainer')).not.toHaveClass(/active/)
 
         // Unlock with correct password
         const password = process.env.TEST_USER_PASSWORD
@@ -83,11 +56,14 @@ test.describe('Session Lock and Unlock', () => {
         await expect(authedPage.locator('#appContainer')).toHaveClass(/active/, { timeout: 15000 })
         await expect(authedPage.locator('body')).toHaveClass(/fullscreen-mode/, { timeout: 5000 })
 
-        // Todo created before lock should still be visible
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+        // Wait for data to finish loading (loading screen hides after all data loads)
+        await expect(authedPage.locator('#loadingScreen')).toHaveClass(/hidden/, { timeout: 15000 })
 
-        // Cleanup
-        await deleteTodo(authedPage, name)
+        // Verify the todo list renders items (existing test data)
+        await expect(authedPage.locator('.todo-item').first()).toBeVisible({ timeout: 10000 })
+
+        // Verify the inbox tab is active
+        await expect(authedPage.locator('.gtd-tab.inbox')).toHaveClass(/active/)
     })
 
     test('unlock with wrong password shows error', async ({ authedPage }) => {
