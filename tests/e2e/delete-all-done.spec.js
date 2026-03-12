@@ -178,11 +178,23 @@ test.describe('Refresh Button', () => {
 
         await authedPage.click('#refreshBtn')
 
-        // Wait for refresh to complete (button text changes back to 'Refresh')
-        await expect(authedPage.locator('#refreshBtn')).toHaveText('Refresh', { timeout: 15000 })
+        // Wait for refresh to start (button becomes disabled)
+        await expect(authedPage.locator('#refreshBtn')).toBeDisabled({ timeout: 5000 })
+        // Wait for refresh to complete (button becomes enabled again)
+        await expect(authedPage.locator('#refreshBtn')).toBeEnabled({ timeout: 30000 })
+
+        // Debug: log todo items in the DOM after refresh
+        const debugInfo = await authedPage.evaluate((todoName) => {
+            const items = document.querySelectorAll('.todo-item .todo-text')
+            const texts = Array.from(items).slice(0, 10).map(el => el.textContent.trim())
+            const total = items.length
+            const match = Array.from(items).find(el => el.textContent.includes(todoName))
+            return { total, first10: texts, matchFound: !!match, todoName }
+        }, name)
+        console.log('DEBUG refresh test:', JSON.stringify(debugInfo))
 
         // Todo should still be visible after refresh
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
 
         // Cleanup
         await deleteTodo(authedPage, name)

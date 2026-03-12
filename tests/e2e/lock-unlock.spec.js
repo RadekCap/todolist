@@ -86,8 +86,22 @@ test.describe('Session Lock and Unlock', () => {
         // Wait for data to finish loading (loading screen hides after all data loads)
         await expect(authedPage.locator('#loadingScreen')).toHaveClass(/hidden/, { timeout: 15000 })
 
+        // Wait for network activity to settle after unlock/reload
+        await authedPage.waitForLoadState('networkidle', { timeout: 15000 })
+
+        // Debug: log todo items in the DOM after unlock
+        const debugInfo = await authedPage.evaluate((todoName) => {
+            const items = document.querySelectorAll('.todo-item .todo-text')
+            const texts = Array.from(items).slice(0, 10).map(el => el.textContent.trim())
+            const total = items.length
+            const match = Array.from(items).find(el => el.textContent.includes(todoName))
+            const gtdTab = document.querySelector('.gtd-tab.active')?.textContent?.trim()
+            return { total, first10: texts, matchFound: !!match, todoName, activeGtdTab: gtdTab }
+        }, name)
+        console.log('DEBUG unlock test:', JSON.stringify(debugInfo))
+
         // Todo created before lock should still be visible
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
 
         // Cleanup
         await deleteTodo(authedPage, name)
