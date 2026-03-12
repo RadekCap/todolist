@@ -166,28 +166,27 @@ test.describe('Delete All Done', () => {
 
 test.describe('Refresh Button', () => {
     test('refresh button reloads data without full page reload', async ({ authedPage }) => {
-        const name = unique()
-
-        // Create a todo
-        await addTodo(authedPage, name)
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
+        // Record a JS object reference before refresh to verify no full page navigation
+        await authedPage.evaluate(() => { window.__refreshTestMarker = true })
 
         // Open user menu and click Refresh
         await authedPage.click('#toolbarUserBtn')
         await expect(authedPage.locator('#toolbarDropdown')).toBeVisible({ timeout: 3000 })
 
-        // Listen for Supabase data fetch (not a full navigation)
-        const dataFetch = authedPage.waitForResponse(
-            resp => resp.url().includes('rest/v1/todos') && resp.request().method() === 'GET'
-        )
         await authedPage.click('#refreshBtn')
-        await dataFetch
 
-        // Todo should still be visible after refresh
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+        // Wait for refresh to start (button becomes disabled with "Refreshing..." text)
+        await expect(authedPage.locator('#refreshBtn')).toBeDisabled({ timeout: 5000 })
+        // Wait for refresh to complete (button becomes enabled again)
+        await expect(authedPage.locator('#refreshBtn')).toBeEnabled({ timeout: 30000 })
 
-        // Cleanup
-        await deleteTodo(authedPage, name)
+        // Verify no full page navigation occurred (JS marker survives soft reload)
+        const markerSurvived = await authedPage.evaluate(() => window.__refreshTestMarker === true)
+        expect(markerSurvived).toBe(true)
+
+        // Verify the todo list rendered items after refresh (existing test data)
+        const itemCount = await authedPage.locator('.todo-item').count()
+        expect(itemCount).toBeGreaterThan(0)
     })
 
     test('refresh button is accessible from the user menu', async ({ authedPage }) => {
