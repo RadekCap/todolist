@@ -1,0 +1,127 @@
+import { test, expect } from './fixtures.js'
+import { unique, addTodo, todoItem, deleteTodo, switchGtdTab } from './helpers/todos.js'
+
+test.describe('Daily Quotes (Empty Inbox)', () => {
+    test('empty Inbox shows a motivational quote', async ({ authedPage }) => {
+        const page = authedPage
+
+        // Ensure we are on the Inbox tab
+        await switchGtdTab(page, 'inbox')
+
+        // Delete any existing inbox todos so the zen state appears
+        const existingItems = page.locator('.todo-item')
+        const count = await existingItems.count()
+        for (let i = count - 1; i >= 0; i--) {
+            const deleteBtn = existingItems.nth(i).locator('.delete-btn')
+            await deleteBtn.click()
+            await expect(existingItems.nth(i)).not.toBeAttached({ timeout: 5000 })
+        }
+
+        // The zen state with quote should now be visible
+        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+
+        // Wait for the quote to load asynchronously (container gets .loaded class)
+        const quoteContainer = page.locator('#zenQuoteContainer')
+        await expect(quoteContainer).toHaveClass(/loaded/, { timeout: 10000 })
+
+        // The blockquote with quote text should be visible
+        const quoteText = page.locator('.zen-quote-text')
+        await expect(quoteText).toBeVisible()
+    })
+
+    test('quote is visible text (not empty)', async ({ authedPage }) => {
+        const page = authedPage
+
+        await switchGtdTab(page, 'inbox')
+
+        // Delete any existing inbox todos
+        const existingItems = page.locator('.todo-item')
+        const count = await existingItems.count()
+        for (let i = count - 1; i >= 0; i--) {
+            const deleteBtn = existingItems.nth(i).locator('.delete-btn')
+            await deleteBtn.click()
+            await expect(existingItems.nth(i)).not.toBeAttached({ timeout: 5000 })
+        }
+
+        // Wait for zen state and quote to load
+        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        await expect(page.locator('#zenQuoteContainer')).toHaveClass(/loaded/, { timeout: 10000 })
+
+        // Verify quote text is non-empty and looks like readable text (not raw HTML)
+        const quoteText = page.locator('.zen-quote-text')
+        const textContent = await quoteText.textContent()
+        expect(textContent.length).toBeGreaterThan(0)
+        // Should not contain raw HTML tags
+        expect(textContent).not.toMatch(/<[^>]+>/)
+
+        // Verify author is also present and non-empty
+        const authorText = page.locator('.zen-quote-author')
+        const authorContent = await authorText.textContent()
+        expect(authorContent.length).toBeGreaterThan(0)
+        expect(authorContent).not.toMatch(/<[^>]+>/)
+    })
+
+    test('adding a todo hides the quote', async ({ authedPage }) => {
+        const page = authedPage
+
+        await switchGtdTab(page, 'inbox')
+
+        // Delete any existing inbox todos to ensure zen state is showing
+        const existingItems = page.locator('.todo-item')
+        const count = await existingItems.count()
+        for (let i = count - 1; i >= 0; i--) {
+            const deleteBtn = existingItems.nth(i).locator('.delete-btn')
+            await deleteBtn.click()
+            await expect(existingItems.nth(i)).not.toBeAttached({ timeout: 5000 })
+        }
+
+        // Verify zen state with quote is visible
+        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        await expect(page.locator('#zenQuoteContainer')).toHaveClass(/loaded/, { timeout: 10000 })
+
+        // Add a todo to the Inbox
+        const todoName = unique('DQ')
+        await addTodo(page, todoName, { gtdStatus: 'inbox' })
+
+        // The todo should appear
+        await expect(todoItem(page, todoName)).toBeVisible({ timeout: 5000 })
+
+        // The zen state (and quote) should no longer be visible
+        await expect(page.locator('.inbox-zen-state')).not.toBeVisible()
+
+        // Cleanup: delete the todo
+        await deleteTodo(page, todoName)
+    })
+
+    test('deleting last todo shows the quote again', async ({ authedPage }) => {
+        const page = authedPage
+
+        await switchGtdTab(page, 'inbox')
+
+        // Delete any existing inbox todos first
+        const existingItems = page.locator('.todo-item')
+        const count = await existingItems.count()
+        for (let i = count - 1; i >= 0; i--) {
+            const deleteBtn = existingItems.nth(i).locator('.delete-btn')
+            await deleteBtn.click()
+            await expect(existingItems.nth(i)).not.toBeAttached({ timeout: 5000 })
+        }
+
+        // Verify zen state is visible initially (empty inbox)
+        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+
+        // Add a todo — quote should disappear
+        const todoName = unique('DQ')
+        await addTodo(page, todoName, { gtdStatus: 'inbox' })
+        await expect(todoItem(page, todoName)).toBeVisible({ timeout: 5000 })
+        await expect(page.locator('.inbox-zen-state')).not.toBeVisible()
+
+        // Delete the todo — quote should reappear
+        await deleteTodo(page, todoName)
+
+        // The zen state with the quote should be visible again
+        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        await expect(page.locator('#zenQuoteContainer')).toHaveClass(/loaded/, { timeout: 10000 })
+        await expect(page.locator('.zen-quote-text')).toBeVisible()
+    })
+})
