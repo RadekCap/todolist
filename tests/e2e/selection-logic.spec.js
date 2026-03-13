@@ -34,7 +34,21 @@ async function cleanupTodos(page, names) {
 
 test.describe('Todo Selection Logic', () => {
     test('Select All button selects all visible todos', async ({ authedPage }) => {
-        const names = await createTodos(authedPage, 3)
+        // Use a unique prefix and search filter to isolate test todos
+        const prefix = unique('SLAll')
+        const names = []
+        for (let i = 0; i < 3; i++) {
+            const name = `${prefix}-${i}`
+            await addTodo(authedPage, name)
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
+            names.push(name)
+        }
+
+        // Filter to only show our test todos
+        await authedPage.fill('#searchInput', prefix)
+        for (const name of names) {
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
+        }
 
         // Select one todo first to make the selection bar visible
         await selectTodo(authedPage, names[0])
@@ -56,6 +70,7 @@ test.describe('Todo Selection Logic', () => {
 
         // Cleanup
         await authedPage.click('#clearSelectionBtn')
+        await authedPage.fill('#searchInput', '')
         await cleanupTodos(authedPage, names)
     })
 
