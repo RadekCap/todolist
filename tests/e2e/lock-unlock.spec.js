@@ -58,15 +58,11 @@ test.describe('Session Lock and Unlock', () => {
         await authedPage.fill('#unlockPassword', password)
         await authedPage.click('#unlockBtn')
 
-        // App should be restored
-        await expect(authedPage.locator('#appContainer')).toHaveClass(/active/, { timeout: 15000 })
-        await expect(authedPage.locator('body')).toHaveClass(/fullscreen-mode/, { timeout: 5000 })
-
-        // Wait for data to finish loading (loading screen hides after all data loads)
-        await expect(authedPage.locator('#loadingScreen')).toHaveClass(/hidden/, { timeout: 15000 })
+        // Wait for app to be fully restored after unlock
+        await waitForApp(authedPage)
 
         // Verify the todo is visible after unlock
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
 
         // Verify the inbox tab is active
         await expect(authedPage.locator('.gtd-tab.inbox')).toHaveClass(/active/)

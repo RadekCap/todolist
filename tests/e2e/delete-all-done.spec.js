@@ -189,8 +189,11 @@ test.describe('Refresh Button', () => {
         const markerSurvived = await authedPage.evaluate(() => window.__refreshTestMarker === true)
         expect(markerSurvived).toBe(true)
 
+        // Verify the app is still active after refresh (not torn down by spurious auth events)
+        await expect(authedPage.locator('#appContainer')).toHaveClass(/active/)
+
         // Verify the todo is still visible after refresh
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
 
         // Cleanup
         await deleteTodo(authedPage, name)

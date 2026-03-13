@@ -112,4 +112,6 @@ export async function waitForApp(page) {
     await expect(page.locator('body')).toHaveClass(/fullscreen-mode/, { timeout: 10000 })
     // Wait for data to finish loading from Supabase
     await expect(page.locator('#loadingScreen')).toHaveClass(/hidden/, { timeout: 15000 })
+    // Verify the GTD sidebar is rendered (confirms data loaded and UI is ready)
+    await expect(page.locator('.gtd-tab.inbox')).toBeVisible({ timeout: 5000 })
 }
