@@ -16,11 +16,6 @@ test.describe('Encryption Workflow', () => {
     })
 
     test('todo text persists correctly after page reload', async ({ authedPage }) => {
-        // Capture browser console for diagnostics
-        const consoleLogs = []
-        authedPage.on('console', msg => consoleLogs.push(`[${msg.type()}] ${msg.text()}`))
-        authedPage.on('pageerror', err => consoleLogs.push(`[PAGE_ERROR] ${err.message}`))
-
         // Create a todo to ensure we have test data
         const name = unique('EW')
         await addTodo(authedPage, name)
@@ -29,19 +24,6 @@ test.describe('Encryption Workflow', () => {
         // Reload the page
         await authedPage.reload()
         await waitForApp(authedPage)
-
-        // Diagnostic: capture page state
-        const diag = await authedPage.evaluate(() => {
-            const items = document.querySelectorAll('.todo-item')
-            const texts = Array.from(items).map(i => i.querySelector('.todo-text')?.textContent || '').slice(0, 10)
-            const activeTab = document.querySelector('.gtd-tab.active')?.textContent || 'none'
-            const authVisible = document.getElementById('authContainer')?.classList.contains('active')
-            const unlockVisible = document.getElementById('unlockModal')?.classList.contains('active')
-            return { itemCount: items.length, texts, activeTab, authVisible, unlockVisible }
-        })
-        console.log(`[DIAG] After reload: ${JSON.stringify(diag)}`)
-        console.log(`[DIAG] Looking for: "${name}"`)
-        console.log(`[DIAG] Browser errors: ${JSON.stringify(consoleLogs.filter(l => l.includes('rror')))}`)
 
         // Todo should still be readable after reload (tests decrypt-on-load path)
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
