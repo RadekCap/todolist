@@ -167,6 +167,9 @@ test.describe('Import Edge Cases', () => {
         await authedPage.click('#openImportModal')
         await expect(authedPage.locator('#importModal')).toBeVisible()
 
+        // Wait for the project option to be populated in the dropdown
+        await expect(authedPage.locator('#importProjectSelect option', { hasText: projName })).toBeAttached({ timeout: 5000 })
+
         // Verify the project dropdown has the created project pre-selected
         const selectedOption = authedPage.locator('#importProjectSelect option:checked')
         await expect(selectedOption).toHaveText(new RegExp(projName))
