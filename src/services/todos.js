@@ -20,6 +20,7 @@ export async function loadTodos() {
         .from('todos')
         .select('*')
         .order('created_at', { ascending: true })
+        .limit(10000)
 
     if (error) {
         console.error('Error loading todos:', error)

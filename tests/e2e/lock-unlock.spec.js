@@ -61,14 +61,6 @@ test.describe('Session Lock and Unlock', () => {
         // Wait for app to be fully restored after unlock
         await waitForApp(authedPage)
 
-        // Debug: log page state after unlock
-        const itemCount = await authedPage.locator('.todo-item').count()
-        const hasActive = await authedPage.locator('#appContainer').evaluate(el => el.classList.contains('active'))
-        const inboxActive = await authedPage.locator('.gtd-tab.inbox').evaluate(el => el.classList.contains('active'))
-        const todoTexts = await authedPage.locator('.todo-item .todo-text').allTextContents()
-        console.log(`[DEBUG] After unlock: items=${itemCount}, appActive=${hasActive}, inboxActive=${inboxActive}, texts=${JSON.stringify(todoTexts.slice(0, 5))}`)
-        console.log(`[DEBUG] Looking for todo: "${name}"`)
-
         // Verify the todo is visible after unlock
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
 

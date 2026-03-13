@@ -25,12 +25,6 @@ test.describe('Encryption Workflow', () => {
         await authedPage.reload()
         await waitForApp(authedPage)
 
-        // Debug: log page state after reload
-        const reloadItemCount = await authedPage.locator('.todo-item').count()
-        const reloadTexts = await authedPage.locator('.todo-item .todo-text').allTextContents()
-        console.log(`[DEBUG] After reload: items=${reloadItemCount}, texts=${JSON.stringify(reloadTexts.slice(0, 5))}`)
-        console.log(`[DEBUG] Looking for todo: "${name}"`)
-
         // Todo should still be readable after reload (tests decrypt-on-load path)
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
         await expect(todoItem(authedPage, name).locator('.todo-text')).toContainText(name)
@@ -56,12 +50,6 @@ test.describe('Encryption Workflow', () => {
         await authedPage.fill('#unlockPassword', password)
         await authedPage.click('#unlockBtn')
         await waitForApp(authedPage)
-
-        // Debug: log page state after unlock
-        const unlockItemCount = await authedPage.locator('.todo-item').count()
-        const unlockTexts = await authedPage.locator('.todo-item .todo-text').allTextContents()
-        console.log(`[DEBUG] After lock/unlock: items=${unlockItemCount}, texts=${JSON.stringify(unlockTexts.slice(0, 5))}`)
-        console.log(`[DEBUG] Looking for todo: "${name}"`)
 
         // Todo should still be readable after key re-derivation
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })

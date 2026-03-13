@@ -21,6 +21,7 @@ export async function loadCollection({ table, storeKey, event, orderBy, ascendin
         .from(table)
         .select('*')
         .order(orderBy, { ascending })
+        .limit(10000)
 
     if (error) {
         console.error(`Error loading ${table}:`, error)
