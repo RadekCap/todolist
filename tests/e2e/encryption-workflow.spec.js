@@ -16,27 +16,28 @@ test.describe('Encryption Workflow', () => {
     })
 
     test('todo text persists correctly after page reload', async ({ authedPage }) => {
-        // Wait for existing todos to load
-        await expect(authedPage.locator('.todo-item').first()).toBeVisible({ timeout: 10000 })
+        // Create a todo to ensure we have test data
+        const name = unique('EW')
+        await addTodo(authedPage, name)
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
 
         // Reload the page
         await authedPage.reload()
         await waitForApp(authedPage)
 
-        // Existing todos should still be readable after reload (tests decrypt-on-load path)
-        await expect(authedPage.locator('.todo-item').first()).toBeVisible({ timeout: 15000 })
-        const texts = await authedPage.locator('.todo-item .todo-text').allTextContents()
-        expect(texts.length).toBeGreaterThan(0)
+        // Todo should still be readable after reload (tests decrypt-on-load path)
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+        await expect(todoItem(authedPage, name).locator('.todo-text')).toContainText(name)
 
-        // Verify all items decrypted properly (non-empty, human-readable text)
-        for (const text of texts) {
-            expect(text.trim().length).toBeGreaterThan(0)
-        }
+        // Cleanup
+        await deleteTodo(authedPage, name)
     })
 
     test('todo text is readable after lock and unlock', async ({ authedPage }) => {
-        // Wait for existing todos to load
-        await expect(authedPage.locator('.todo-item').first()).toBeVisible({ timeout: 10000 })
+        // Create a todo to ensure we have test data
+        const name = unique('EW')
+        await addTodo(authedPage, name)
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
 
         // Lock the app
         await authedPage.click('#toolbarUserBtn')
@@ -50,15 +51,12 @@ test.describe('Encryption Workflow', () => {
         await authedPage.click('#unlockBtn')
         await waitForApp(authedPage)
 
-        // Existing todos should still be readable after key re-derivation
-        await expect(authedPage.locator('.todo-item').first()).toBeVisible({ timeout: 15000 })
-        const texts = await authedPage.locator('.todo-item .todo-text').allTextContents()
-        expect(texts.length).toBeGreaterThan(0)
+        // Todo should still be readable after key re-derivation
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+        await expect(todoItem(authedPage, name).locator('.todo-text')).toContainText(name)
 
-        // Verify all items decrypted properly (non-empty, human-readable text)
-        for (const text of texts) {
-            expect(text.trim().length).toBeGreaterThan(0)
-        }
+        // Cleanup
+        await deleteTodo(authedPage, name)
     })
 
     test('project names survive encryption roundtrip after reload', async ({ authedPage }) => {

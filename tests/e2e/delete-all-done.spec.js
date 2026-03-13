@@ -166,6 +166,11 @@ test.describe('Delete All Done', () => {
 
 test.describe('Refresh Button', () => {
     test('refresh button reloads data without full page reload', async ({ authedPage }) => {
+        // Create a todo to ensure we have test data
+        const name = unique()
+        await addTodo(authedPage, name)
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
+
         // Record a JS object reference before refresh to verify no full page navigation
         await authedPage.evaluate(() => { window.__refreshTestMarker = true })
 
@@ -184,9 +189,14 @@ test.describe('Refresh Button', () => {
         const markerSurvived = await authedPage.evaluate(() => window.__refreshTestMarker === true)
         expect(markerSurvived).toBe(true)
 
-        // Verify the todo list rendered items after refresh (existing test data)
-        const itemCount = await authedPage.locator('.todo-item').count()
-        expect(itemCount).toBeGreaterThan(0)
+        // Verify the app is still active after refresh (not torn down by spurious auth events)
+        await expect(authedPage.locator('#appContainer')).toHaveClass(/active/)
+
+        // Verify the todo is still visible after refresh
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+
+        // Cleanup
+        await deleteTodo(authedPage, name)
     })
 
     test('refresh button is accessible from the user menu', async ({ authedPage }) => {

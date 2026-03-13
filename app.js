@@ -263,6 +263,10 @@ class TodoApp {
         // AbortController for document-level listeners (cleaned up on sign-out)
         this.globalAbortController = new AbortController()
 
+        // Guard against spurious SIGNED_OUT events during active auth operations
+        // (e.g., session rotation during signInWithPassword, background token refresh failures)
+        this._suppressSignOut = false
+
         this.initAuth()
         this.initEventListeners()
         this.initSelectionBar()
@@ -331,6 +335,10 @@ class TodoApp {
     }
 
     async initAuth() {
+        // Suppress SIGNED_OUT events during initialization — session recovery
+        // and token refresh can trigger transient SIGNED_OUT events
+        this._suppressSignOut = true
+
         const { session, user } = await getSession()
 
         if (session) {
@@ -356,7 +364,13 @@ class TodoApp {
             this.hideLoadingScreen()
         }
 
-        onAuthStateChange(() => this.handleSignOut())
+        this._suppressSignOut = false
+
+        onAuthStateChange(() => {
+            if (!this._suppressSignOut) {
+                this.handleSignOut()
+            }
+        })
     }
 
     initEventListeners() {
@@ -388,7 +402,10 @@ class TodoApp {
         // Logout
         this.logoutBtn.addEventListener('click', async () => {
             this.closeToolbarMenu()
+            this._suppressSignOut = true
             await logout()
+            this._suppressSignOut = false
+            this.handleSignOut()
         })
 
         // Refresh data
@@ -665,16 +682,19 @@ class TodoApp {
         submitBtn.disabled = true
         submitBtn.textContent = 'Logging in...'
 
+        this._suppressSignOut = true
         const result = await login(email, password)
 
         submitBtn.disabled = false
         submitBtn.textContent = 'Login'
 
         if (!result.success) {
+            this._suppressSignOut = false
             this.showMessage(result.error, 'error')
         } else {
             this.loadingScreen.classList.remove('hidden')
             await this.handleAuthSuccess(result.user)
+            this._suppressSignOut = false
         }
     }
 
@@ -753,6 +773,10 @@ class TodoApp {
         this.refreshBtn.disabled = true
         this.refreshBtn.textContent = 'Refreshing...'
 
+        // Suppress SIGNED_OUT events during refresh — background token refresh
+        // failures can trigger spurious SIGNED_OUT events
+        this._suppressSignOut = true
+
         try {
             await Promise.all([
                 loadAreas(),
@@ -766,6 +790,7 @@ class TodoApp {
         } catch (error) {
             console.error('Error refreshing data:', error)
         } finally {
+            this._suppressSignOut = false
             this.refreshBtn.disabled = false
             this.refreshBtn.textContent = 'Refresh'
         }
@@ -827,6 +852,10 @@ class TodoApp {
         this.unlockBtn.textContent = 'Unlocking...'
         this.unlockError.style.display = 'none'
 
+        // Suppress SIGNED_OUT events during unlock — signInWithPassword can trigger
+        // session rotation which fires a spurious SIGNED_OUT before SIGNED_IN
+        this._suppressSignOut = true
+
         try {
             const result = await unlock(password)
 
@@ -846,6 +875,7 @@ class TodoApp {
             this.unlockError.textContent = 'Failed to unlock. Please try again.'
             this.unlockError.style.display = 'block'
         } finally {
+            this._suppressSignOut = false
             this.unlockBtn.disabled = false
             this.unlockBtn.textContent = 'Unlock'
         }

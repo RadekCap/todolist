@@ -22,7 +22,8 @@ export async function login(page, email, password) {
         page.click('#loginForm .auth-btn')
     ])
 
-    // Wait for app to load after login
+    // Wait for app to fully load after login (including data from Supabase)
     await expect(page.locator('#appContainer')).toHaveClass(/active/, { timeout: 30000 })
     await expect(page.locator('body')).toHaveClass(/fullscreen-mode/, { timeout: 10000 })
+    await expect(page.locator('#loadingScreen')).toHaveClass(/hidden/, { timeout: 15000 })
 }
