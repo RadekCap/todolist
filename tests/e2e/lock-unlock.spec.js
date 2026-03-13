@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { unique, addTodo, todoItem, deleteTodo, waitForApp } from './helpers/todos.js'
 
 /**
  * Helper: open the user menu dropdown.
@@ -40,6 +41,11 @@ test.describe('Session Lock and Unlock', () => {
     })
 
     test('unlock with correct password restores the app', async ({ authedPage }) => {
+        // Create a todo to ensure we have test data
+        const name = unique('LU')
+        await addTodo(authedPage, name)
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
+
         // Lock the app
         await lockApp(authedPage)
         await expect(authedPage.locator('#unlockModal')).toHaveClass(/active/, { timeout: 5000 })
@@ -59,11 +65,14 @@ test.describe('Session Lock and Unlock', () => {
         // Wait for data to finish loading (loading screen hides after all data loads)
         await expect(authedPage.locator('#loadingScreen')).toHaveClass(/hidden/, { timeout: 15000 })
 
-        // Verify the todo list renders items (existing test data)
-        await expect(authedPage.locator('.todo-item').first()).toBeVisible({ timeout: 10000 })
+        // Verify the todo is visible after unlock
+        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
 
         // Verify the inbox tab is active
         await expect(authedPage.locator('.gtd-tab.inbox')).toHaveClass(/active/)
+
+        // Cleanup
+        await deleteTodo(authedPage, name)
     })
 
     test('unlock with wrong password shows error', async ({ authedPage }) => {
