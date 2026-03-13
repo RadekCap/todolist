@@ -166,6 +166,11 @@ test.describe('Delete All Done', () => {
 
 test.describe('Refresh Button', () => {
     test('refresh button reloads data without full page reload', async ({ authedPage }) => {
+        // Capture browser console for diagnostics
+        const consoleLogs = []
+        authedPage.on('console', msg => consoleLogs.push(`[${msg.type()}] ${msg.text()}`))
+        authedPage.on('pageerror', err => consoleLogs.push(`[PAGE_ERROR] ${err.message}`))
+
         // Create a todo to ensure we have test data
         const name = unique()
         await addTodo(authedPage, name)
@@ -191,6 +196,19 @@ test.describe('Refresh Button', () => {
 
         // Verify the app is still active after refresh (not torn down by spurious auth events)
         await expect(authedPage.locator('#appContainer')).toHaveClass(/active/)
+
+        // Diagnostic: capture page state before assertion
+        const diag = await authedPage.evaluate(() => {
+            const items = document.querySelectorAll('.todo-item')
+            const texts = Array.from(items).map(i => i.querySelector('.todo-text')?.textContent || '').slice(0, 10)
+            const appActive = document.getElementById('appContainer')?.classList.contains('active')
+            const activeTab = document.querySelector('.gtd-tab.active')?.textContent || 'none'
+            const loadingHidden = document.getElementById('loadingScreen')?.classList.contains('hidden')
+            return { itemCount: items.length, texts, appActive, activeTab, loadingHidden }
+        })
+        console.log(`[DIAG] Page state after refresh: ${JSON.stringify(diag)}`)
+        console.log(`[DIAG] Looking for: "${name}"`)
+        console.log(`[DIAG] Browser errors: ${JSON.stringify(consoleLogs.filter(l => l.includes('rror')))}`)
 
         // Verify the todo is still visible after refresh
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
