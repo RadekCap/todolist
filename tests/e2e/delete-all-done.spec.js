@@ -192,6 +192,12 @@ test.describe('Refresh Button', () => {
         // Verify the app is still active after refresh (not torn down by spurious auth events)
         await expect(authedPage.locator('#appContainer')).toHaveClass(/active/)
 
+        // Debug: log page state after refresh
+        const refreshItemCount = await authedPage.locator('.todo-item').count()
+        const refreshTexts = await authedPage.locator('.todo-item .todo-text').allTextContents()
+        console.log(`[DEBUG] After refresh: items=${refreshItemCount}, texts=${JSON.stringify(refreshTexts.slice(0, 5))}`)
+        console.log(`[DEBUG] Looking for todo: "${name}"`)
+
         // Verify the todo is still visible after refresh
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
 
