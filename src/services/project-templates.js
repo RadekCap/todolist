@@ -2,7 +2,7 @@ import { supabase } from '../core/supabase.js'
 import { store } from '../core/store.js'
 import { events, Events } from '../core/events.js'
 import { encrypt, decrypt } from './auth.js'
-import { addProject } from './projects.js'
+import { addProject, reorderProjects } from './projects.js'
 import { addTodo } from './todos.js'
 
 /**
@@ -209,6 +209,14 @@ export async function createProjectFromTemplate(templateId) {
 
     // Create project with template name
     const project = await addProject(template.name)
+
+    // Move new project to the top of the root project list
+    const allProjects = store.get('projects')
+    const rootProjects = allProjects
+        .filter(p => !p.parent_id)
+        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+    const reorderedIds = [project.id, ...rootProjects.filter(p => p.id !== project.id).map(p => p.id)]
+    await reorderProjects(reorderedIds)
 
     // Create todos from template items
     for (const item of template.items) {
