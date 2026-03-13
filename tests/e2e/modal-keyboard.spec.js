@@ -80,12 +80,12 @@ test.describe('Modal Keyboard Interactions', () => {
         await authedPage.keyboard.press('Tab')
         await expect(authedPage.locator('#modalCommentInput')).toBeFocused({ timeout: 2000 })
 
-        // Second Tab: focus moves to the next focusable element (due date input)
+        // Second Tab: focus moves away from the comment field
         await authedPage.keyboard.press('Tab')
-        const activeId = await authedPage.evaluate(() => document.activeElement?.id)
-        expect(activeId).toBeTruthy()
-        // Focus should have moved away from the comment input
-        expect(activeId).not.toBe('modalCommentInput')
+        await expect(authedPage.locator('#modalCommentInput')).not.toBeFocused({ timeout: 2000 })
+        // Verify focus is still inside the modal
+        const insideModal = await authedPage.evaluate(() => document.activeElement?.closest('#addTodoModal') !== null)
+        expect(insideModal).toBe(true)
 
         // Cleanup — close modal
         await authedPage.click('#cancelModal')
