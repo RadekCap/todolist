@@ -52,6 +52,14 @@ export class ImportModal extends BaseModal {
     onOpen() {
         this.textarea.value = ''
         this.dueDateInput.value = ''
+
+        // Populate select options first (rebuilds <option> elements)
+        this.updateProjectSelect()
+        this.updateCategorySelect()
+        this.updateContextSelect()
+        this.updatePrioritySelect()
+
+        // Set defaults after options are populated
         this.gtdStatusSelect.value = 'inbox'
         this.projectSelect.value = ''
         this.categorySelect.value = ''
@@ -69,12 +77,6 @@ export class ImportModal extends BaseModal {
         if (state.selectedGtdStatus && state.selectedGtdStatus !== 'all') {
             this.gtdStatusSelect.value = state.selectedGtdStatus
         }
-
-        // Update select options
-        this.updateProjectSelect()
-        this.updateCategorySelect()
-        this.updateContextSelect()
-        this.updatePrioritySelect()
     }
 
     /**
