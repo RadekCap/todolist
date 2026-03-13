@@ -115,9 +115,9 @@ export async function clearInboxViaApi(page) {
         const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
 
-        // Get the session token from localStorage
-        const storageKey = Object.keys(localStorage).find(k => k.includes('supabase') && k.includes('auth'))
-        if (!storageKey) throw new Error('No Supabase auth session found')
+        // Get the session token from localStorage (Supabase v2 uses 'sb-<ref>-auth-token' key)
+        const storageKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
+        if (!storageKey) throw new Error('No Supabase auth session found in localStorage')
         const session = JSON.parse(localStorage.getItem(storageKey))
         const token = session?.access_token || session?.currentSession?.access_token
 
@@ -171,7 +171,7 @@ export async function restoreInboxViaApi(page, ids) {
         const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
 
-        const storageKey = Object.keys(localStorage).find(k => k.includes('supabase') && k.includes('auth'))
+        const storageKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
         const session = JSON.parse(localStorage.getItem(storageKey))
         const token = session?.access_token || session?.currentSession?.access_token
 
