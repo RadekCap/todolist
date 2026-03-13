@@ -166,32 +166,10 @@ test.describe('Delete All Done', () => {
 
 test.describe('Refresh Button', () => {
     test('refresh button reloads data without full page reload', async ({ authedPage }) => {
-        // Intercept Supabase responses to diagnose empty data issues
-        const supabaseResponses = []
-        authedPage.on('response', async (response) => {
-            if (response.url().includes('supabase') && response.url().includes('todos')) {
-                try {
-                    const body = await response.text()
-                    supabaseResponses.push({
-                        url: response.url().replace(/https:\/\/[^/]+/, ''),
-                        status: response.status(),
-                        bodyLength: body.length,
-                        itemCount: body.startsWith('[') ? JSON.parse(body).length : 'not-array',
-                        headers: {
-                            contentRange: response.headers()['content-range'] || 'none',
-                        }
-                    })
-                } catch { /* ignore */ }
-            }
-        })
-
         // Create a todo to ensure we have test data
         const name = unique()
         await addTodo(authedPage, name)
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
-
-        // Clear responses from initial load
-        supabaseResponses.length = 0
 
         // Record a JS object reference before refresh to verify no full page navigation
         await authedPage.evaluate(() => { window.__refreshTestMarker = true })
@@ -213,14 +191,6 @@ test.describe('Refresh Button', () => {
 
         // Verify the app is still active after refresh (not torn down by spurious auth events)
         await expect(authedPage.locator('#appContainer')).toHaveClass(/active/)
-
-        // Diagnostic: Supabase responses and page state
-        const pageState = await authedPage.evaluate(() => ({
-            itemCount: document.querySelectorAll('.todo-item').length,
-            firstTexts: Array.from(document.querySelectorAll('.todo-item .todo-text')).slice(0, 3).map(e => e.textContent),
-        }))
-        console.log(`[DIAG] Supabase /todos responses: ${JSON.stringify(supabaseResponses)}`)
-        console.log(`[DIAG] Page state: ${JSON.stringify(pageState)}, looking for: "${name}"`)
 
         // Verify the todo is still visible after refresh
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })

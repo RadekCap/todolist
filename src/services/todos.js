@@ -12,20 +12,33 @@ export * from './todos-bulk.js'
 export * from './todos-recurrence.js'
 
 /**
- * Load all todos for the current user
+ * Load all todos for the current user.
+ * Uses pagination to fetch beyond PostgREST's server-side row limit.
  * @returns {Promise<Array>} Array of decrypted todos
  */
 export async function loadTodos() {
-    const { data, error } = await supabase
-        .from('todos')
-        .select('*')
-        .order('created_at', { ascending: true })
-        .limit(10000)
+    const PAGE_SIZE = 1000
+    let allData = []
+    let from = 0
 
-    if (error) {
-        console.error('Error loading todos:', error)
-        throw error
+    while (true) {
+        const { data, error } = await supabase
+            .from('todos')
+            .select('*')
+            .order('created_at', { ascending: true })
+            .range(from, from + PAGE_SIZE - 1)
+
+        if (error) {
+            console.error('Error loading todos:', error)
+            throw error
+        }
+
+        allData = allData.concat(data)
+        if (data.length < PAGE_SIZE) break
+        from += PAGE_SIZE
     }
+
+    const data = allData
 
     // Filter out template todos (they're not shown in the list)
     const visibleTodos = data.filter(todo => !todo.is_template)
