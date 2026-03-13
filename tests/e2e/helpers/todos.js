@@ -104,6 +104,96 @@ export async function switchGtdTab(page, status) {
 }
 
 /**
+ * Bulk-move all inbox todos to 'someday_maybe' via Supabase REST API,
+ * then reload the app so the UI reflects the change.
+ * Returns the IDs of moved todos so they can be restored later.
+ * @param {import('@playwright/test').Page} page
+ * @returns {Promise<string[]>} IDs of todos that were moved
+ */
+export async function clearInboxViaApi(page) {
+    const movedIds = await page.evaluate(async () => {
+        const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
+
+        // Get the session token from localStorage
+        const storageKey = Object.keys(localStorage).find(k => k.includes('supabase') && k.includes('auth'))
+        if (!storageKey) throw new Error('No Supabase auth session found')
+        const session = JSON.parse(localStorage.getItem(storageKey))
+        const token = session?.access_token || session?.currentSession?.access_token
+
+        // Fetch all inbox todo IDs
+        const listResp = await fetch(
+            `${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox&select=id`,
+            {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+        )
+        const inboxTodos = await listResp.json()
+        if (!inboxTodos.length) return []
+
+        const ids = inboxTodos.map(t => t.id)
+
+        // Bulk-update all inbox todos to someday_maybe
+        await fetch(
+            `${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({ gtd_status: 'someday_maybe' })
+            }
+        )
+
+        return ids
+    })
+
+    // Reload app to pick up the changes
+    await page.reload()
+    await waitForApp(page)
+    return movedIds
+}
+
+/**
+ * Restore previously moved todos back to inbox via Supabase REST API.
+ * @param {import('@playwright/test').Page} page
+ * @param {string[]} ids - Todo IDs to restore
+ */
+export async function restoreInboxViaApi(page, ids) {
+    if (!ids.length) return
+    await page.evaluate(async (todoIds) => {
+        const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
+
+        const storageKey = Object.keys(localStorage).find(k => k.includes('supabase') && k.includes('auth'))
+        const session = JSON.parse(localStorage.getItem(storageKey))
+        const token = session?.access_token || session?.currentSession?.access_token
+
+        // Build filter for the specific IDs
+        const idFilter = todoIds.map(id => `"${id}"`).join(',')
+        await fetch(
+            `${SUPABASE_URL}/rest/v1/todos?id=in.(${idFilter})`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({ gtd_status: 'inbox' })
+            }
+        )
+    }, ids)
+}
+
+/**
  * Wait for app to be fully ready after page load/reload.
  * @param {import('@playwright/test').Page} page
  */
