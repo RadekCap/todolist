@@ -111,53 +111,69 @@ export async function switchGtdTab(page, status) {
  * @returns {Promise<string[]>} IDs of todos that were moved
  */
 export async function clearInboxViaApi(page) {
-    const movedIds = await page.evaluate(async () => {
-        const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
+    const allMovedIds = []
 
-        // Get the session token from localStorage (Supabase v2 uses 'sb-<ref>-auth-token' key)
-        const storageKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
-        if (!storageKey) throw new Error('No Supabase auth session found in localStorage')
-        const session = JSON.parse(localStorage.getItem(storageKey))
-        const token = session?.access_token || session?.currentSession?.access_token
+    // Retry clearing up to 3 times — other parallel test groups may add
+    // inbox todos between our API clear and the page reload.
+    for (let attempt = 0; attempt < 3; attempt++) {
+        const movedIds = await page.evaluate(async () => {
+            const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
 
-        // Fetch all inbox todo IDs
-        const listResp = await fetch(
-            `${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox&select=id`,
-            {
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${token}`
+            // Get the session token from localStorage (Supabase v2 uses 'sb-<ref>-auth-token' key)
+            const storageKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
+            if (!storageKey) throw new Error('No Supabase auth session found in localStorage')
+            const session = JSON.parse(localStorage.getItem(storageKey))
+            const token = session?.access_token || session?.currentSession?.access_token
+
+            // Fetch all inbox todo IDs
+            const listResp = await fetch(
+                `${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox&select=id`,
+                {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${token}`
+                    }
                 }
-            }
-        )
-        const inboxTodos = await listResp.json()
-        if (!inboxTodos.length) return []
+            )
+            const inboxTodos = await listResp.json()
+            if (!inboxTodos.length) return []
 
-        const ids = inboxTodos.map(t => t.id)
+            const ids = inboxTodos.map(t => t.id)
 
-        // Bulk-update all inbox todos to someday_maybe
-        await fetch(
-            `${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox`,
-            {
-                method: 'PATCH',
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify({ gtd_status: 'someday_maybe' })
-            }
-        )
+            // Bulk-update all inbox todos to someday_maybe
+            await fetch(
+                `${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ gtd_status: 'someday_maybe' })
+                }
+            )
 
-        return ids
-    })
+            return ids
+        })
 
-    // Reload app to pick up the changes
-    await page.reload()
-    await waitForApp(page)
-    return movedIds
+        allMovedIds.push(...movedIds)
+
+        // Reload app to pick up the changes
+        await page.reload()
+        await waitForApp(page)
+
+        // Switch to inbox and verify it's actually empty
+        await page.click('.gtd-tab.inbox')
+        await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 3000 })
+
+        const remainingCount = await page.locator('.todo-item').count()
+        if (remainingCount === 0) break
+    }
+
+    return allMovedIds
 }
 
 /**
