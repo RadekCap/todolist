@@ -1,6 +1,18 @@
 import { test, expect } from './fixtures.js'
 import { unique, addTodo, todoItem, deleteTodo, switchGtdTab, clearInboxViaApi, restoreInboxViaApi } from './helpers/todos.js'
 
+/**
+ * Wait for inbox to finish rendering after clearing todos.
+ * The todo list renders asynchronously after data loads, so we need to wait
+ * for either todos or the zen state to appear before making assertions.
+ */
+async function waitForInboxZenState(page) {
+    await switchGtdTab(page, 'inbox')
+    // Wait for the todo list to finish rendering (either todos or zen state must appear)
+    await expect(page.locator('#todoList').locator('li')).not.toHaveCount(0, { timeout: 15000 })
+    await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 5000 })
+}
+
 test.describe('Daily Quotes (Empty Inbox)', () => {
     test('empty Inbox shows a motivational quote', async ({ authedPage }) => {
         const page = authedPage
@@ -8,11 +20,8 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
         // Bulk-move all inbox todos out of the way via API (much faster than UI deletion)
         const movedIds = await clearInboxViaApi(page)
 
-        // Ensure we are on the Inbox tab
-        await switchGtdTab(page, 'inbox')
-
-        // The zen state with quote should now be visible
-        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        // Wait for inbox to render and show zen state
+        await waitForInboxZenState(page)
 
         // Wait for the quote to load asynchronously (container gets .loaded class)
         const quoteContainer = page.locator('#zenQuoteContainer')
@@ -30,10 +39,9 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
         const page = authedPage
 
         const movedIds = await clearInboxViaApi(page)
-        await switchGtdTab(page, 'inbox')
 
-        // Wait for zen state and quote to load
-        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        // Wait for inbox to render and show zen state
+        await waitForInboxZenState(page)
         await expect(page.locator('#zenQuoteContainer')).toHaveClass(/loaded/, { timeout: 10000 })
 
         // Verify quote text is non-empty and looks like readable text (not raw HTML)
@@ -57,10 +65,9 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
         const page = authedPage
 
         const movedIds = await clearInboxViaApi(page)
-        await switchGtdTab(page, 'inbox')
 
-        // Verify zen state with quote is visible
-        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        // Wait for inbox to render and show zen state
+        await waitForInboxZenState(page)
         await expect(page.locator('#zenQuoteContainer')).toHaveClass(/loaded/, { timeout: 10000 })
 
         // Add a todo to the Inbox
@@ -82,10 +89,9 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
         const page = authedPage
 
         const movedIds = await clearInboxViaApi(page)
-        await switchGtdTab(page, 'inbox')
 
-        // Verify zen state is visible initially (empty inbox)
-        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        // Wait for inbox to render and show zen state
+        await waitForInboxZenState(page)
 
         // Add a todo — quote should disappear
         const todoName = unique('DQ')
