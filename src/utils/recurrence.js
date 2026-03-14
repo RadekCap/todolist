@@ -132,6 +132,8 @@ export function calculateNextOccurrence(rule, fromDate) {
             let next = new Date(current)
 
             // Move to next interval month
+            // Set day to 1 first to avoid month overflow (e.g., Jan 31 + 1 month → Mar 3)
+            next.setDate(1)
             next.setMonth(next.getMonth() + interval)
 
             if (dayType === 'day_of_month') {
@@ -333,7 +335,7 @@ export function validateRecurrenceRule(rule) {
         if (rule.dayType && !['day_of_month', 'weekday', 'last_day'].includes(rule.dayType)) {
             return { valid: false, error: 'Invalid day type' }
         }
-        if (rule.dayOfMonth && (rule.dayOfMonth < 1 || rule.dayOfMonth > 31)) {
+        if (rule.dayOfMonth !== undefined && (rule.dayOfMonth < 1 || rule.dayOfMonth > 31)) {
             return { valid: false, error: 'Day of month must be between 1 and 31' }
         }
         if (rule.weekday !== undefined && (rule.weekday < 0 || rule.weekday > 6)) {
@@ -345,7 +347,7 @@ export function validateRecurrenceRule(rule) {
     }
 
     if (rule.type === 'yearly') {
-        if (rule.month && (rule.month < 1 || rule.month > 12)) {
+        if (rule.month !== undefined && (rule.month < 1 || rule.month > 12)) {
             return { valid: false, error: 'Month must be between 1 and 12' }
         }
     }
