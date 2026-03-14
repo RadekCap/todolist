@@ -15,7 +15,88 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+        include:
+          - group: auth
+            specs: >-
+              tests/e2e/auth.spec.js
+              tests/e2e/auth-ui.spec.js
+              tests/e2e/smoke-auth.spec.js
+              tests/e2e/encryption-workflow.spec.js
+              tests/e2e/lock-unlock.spec.js
+              tests/e2e/user-settings.spec.js
+              tests/e2e/settings.spec.js
+              tests/e2e/notification-settings.spec.js
+          - group: todos
+            specs: >-
+              tests/e2e/todos.spec.js
+              tests/e2e/todo-fields.spec.js
+              tests/e2e/scheduled-dates.spec.js
+              tests/e2e/delete-all-done.spec.js
+              tests/e2e/undo-edge-cases.spec.js
+              tests/e2e/toast.spec.js
+              tests/e2e/toast-undo.spec.js
+          - group: projects
+            specs: >-
+              tests/e2e/projects.spec.js
+              tests/e2e/project-details.spec.js
+              tests/e2e/project-hierarchy.spec.js
+              tests/e2e/project-updates.spec.js
+              tests/e2e/projects-view.spec.js
+              tests/e2e/project-header-display.spec.js
+              tests/e2e/project-date-grouping.spec.js
+              tests/e2e/delete-project-move.spec.js
+          - group: navigation
+            specs: >-
+              tests/e2e/navigation.spec.js
+              tests/e2e/gtd.spec.js
+              tests/e2e/gtd-tab-navigation.spec.js
+              tests/e2e/sidebar.spec.js
+              tests/e2e/deep-linking.spec.js
+              tests/e2e/app-load.spec.js
+              tests/e2e/accessibility.spec.js
+          - group: selection
+            specs: >-
+              tests/e2e/multiselect.spec.js
+              tests/e2e/selection-logic.spec.js
+              tests/e2e/shift-select.spec.js
+              tests/e2e/bulk-operations.spec.js
+              tests/e2e/context-menu.spec.js
+              tests/e2e/context-menu-ops.spec.js
+              tests/e2e/keyboard-shortcuts.spec.js
+          - group: categories
+            specs: >-
+              tests/e2e/categories-contexts.spec.js
+              tests/e2e/category-context-filtering.spec.js
+              tests/e2e/priority.spec.js
+              tests/e2e/areas.spec.js
+              tests/e2e/area-updates.spec.js
+              tests/e2e/area-persistence.spec.js
+              tests/e2e/combined-filters.spec.js
+          - group: recurrence
+            specs: >-
+              tests/e2e/recurrence-ui.spec.js
+              tests/e2e/recurring.spec.js
+              tests/e2e/recurring-advanced.spec.js
+              tests/e2e/recurrence-conversion.spec.js
+              tests/e2e/daily-quotes.spec.js
+              tests/e2e/zen-state.spec.js
+              tests/e2e/empty-states.spec.js
+          - group: import-search-ui
+            specs: >-
+              tests/e2e/import-export.spec.js
+              tests/e2e/import-advanced.spec.js
+              tests/e2e/import-defaults.spec.js
+              tests/e2e/import-edge-cases.spec.js
+              tests/e2e/export-content.spec.js
+              tests/e2e/search.spec.js
+              tests/e2e/search-filtering.spec.js
+              tests/e2e/search-comments.spec.js
+              tests/e2e/drag-and-drop.spec.js
+              tests/e2e/theme-density.spec.js
+              tests/e2e/xss-prevention.spec.js
+              tests/e2e/modal-keyboard.spec.js
+              tests/e2e/modal-focus-keyboard.spec.js
+    name: test (${{ matrix.group }})
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -24,14 +105,14 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npx playwright install chromium --with-deps
-      - run: npx playwright test --shard=${{ matrix.shard }}/16
+      - run: npx playwright test ${{ matrix.specs }}
         env:
           TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
           TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       - uses: actions/upload-artifact@v5
         if: always()
         with:
-          name: playwright-report-${{ matrix.shard }}
+          name: playwright-report-${{ matrix.group }}
           path: |
             test-results/
             playwright-report/
