@@ -2,7 +2,7 @@
  * Simple event bus for decoupled cross-module communication
  * Allows modules to emit and listen to events without direct dependencies
  */
-class EventBus {
+export class EventBus {
     constructor() {
         this._listeners = new Map()
     }
