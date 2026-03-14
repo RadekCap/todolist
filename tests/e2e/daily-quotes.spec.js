@@ -1,15 +1,12 @@
 import { test, expect } from './fixtures.js'
-import { unique, addTodo, todoItem, deleteTodo, switchGtdTab, clearInboxViaApi, restoreInboxViaApi } from './helpers/todos.js'
+import { unique, addTodo, todoItem, deleteTodo, clearInboxViaApi, restoreInboxViaApi } from './helpers/todos.js'
 
 test.describe('Daily Quotes (Empty Inbox)', () => {
     test('empty Inbox shows a motivational quote', async ({ authedPage }) => {
         const page = authedPage
 
-        // Bulk-move all inbox todos out of the way via API (much faster than UI deletion)
+        // clearInboxViaApi retries until inbox is truly empty (handles parallel test interference)
         const movedIds = await clearInboxViaApi(page)
-
-        // Ensure we are on the Inbox tab
-        await switchGtdTab(page, 'inbox')
 
         // The zen state with quote should now be visible
         await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
@@ -30,7 +27,6 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
         const page = authedPage
 
         const movedIds = await clearInboxViaApi(page)
-        await switchGtdTab(page, 'inbox')
 
         // Wait for zen state and quote to load
         await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
@@ -57,7 +53,6 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
         const page = authedPage
 
         const movedIds = await clearInboxViaApi(page)
-        await switchGtdTab(page, 'inbox')
 
         // Verify zen state with quote is visible
         await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
@@ -82,7 +77,6 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
         const page = authedPage
 
         const movedIds = await clearInboxViaApi(page)
-        await switchGtdTab(page, 'inbox')
 
         // Verify zen state is visible initially (empty inbox)
         await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
