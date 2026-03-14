@@ -43,7 +43,7 @@ import { initToast } from './src/ui/Toast.js'
 import { ModalManager } from './src/ui/ModalManager.js'
 
 // Application version
-const APP_VERSION = '2.2.86'
+const APP_VERSION = '2.2.87'
 
 class TodoApp {
     constructor() {
