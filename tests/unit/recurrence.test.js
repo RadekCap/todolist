@@ -142,17 +142,21 @@ describe('calculateNextOccurrence', () => {
         })
 
         it('clamps day when target month is shorter', () => {
-            // BUG: setMonth() on Jan 31 overflows to March because Feb doesn't
-            // have 31 days. The function then operates on March instead of Feb.
-            // Starting from a date that won't overflow works correctly:
             expect(calculateNextOccurrence(
                 { type: 'monthly', interval: 1, dayType: 'day_of_month', dayOfMonth: 31 },
                 '2025-02-28'
             )).toBe('2025-03-31')
         })
 
+        it('clamps day 31 from Jan to Feb (Feb has 28 days)', () => {
+            // Previously this overflowed: Jan 31 + setMonth(1) → Mar 3
+            expect(calculateNextOccurrence(
+                { type: 'monthly', interval: 1, dayType: 'day_of_month', dayOfMonth: 31 },
+                '2025-01-31'
+            )).toBe('2025-02-28')
+        })
+
         it('handles month with fewer days (from day 15)', () => {
-            // When starting day doesn't cause setMonth overflow, clamping works
             expect(calculateNextOccurrence(
                 { type: 'monthly', interval: 1, dayType: 'day_of_month', dayOfMonth: 30 },
                 '2025-01-15'
@@ -185,11 +189,10 @@ describe('calculateNextOccurrence', () => {
         })
 
         it('computes last day of month', () => {
-            // Start from a non-overflowing date to avoid JS Date setMonth bug
             expect(calculateNextOccurrence(
                 { type: 'monthly', interval: 1, dayType: 'last_day' },
-                '2025-02-28'
-            )).toBe('2025-03-31')
+                '2025-01-31'
+            )).toBe('2025-02-28')
         })
 
         it('last day works across months with same length', () => {
@@ -547,11 +550,9 @@ describe('validateRecurrenceRule', () => {
                 .toEqual({ valid: false, error: 'Day of month must be between 1 and 31' })
         })
 
-        it('does not reject dayOfMonth 0 due to falsy check (known gap)', () => {
-            // BUG: The validation uses `rule.dayOfMonth && (...)` which
-            // treats 0 as falsy and skips the range check entirely.
+        it('rejects dayOfMonth 0 as out of range', () => {
             expect(validateRecurrenceRule({ type: 'monthly', interval: 1, dayOfMonth: 0 }))
-                .toEqual({ valid: true })
+                .toEqual({ valid: false, error: 'Day of month must be between 1 and 31' })
         })
 
         it('rejects weekday > 6', () => {
@@ -574,10 +575,9 @@ describe('validateRecurrenceRule', () => {
                 .toEqual({ valid: false, error: 'Month must be between 1 and 12' })
         })
 
-        it('does not reject month 0 due to falsy check (known gap)', () => {
-            // BUG: Same falsy issue — `rule.month && (...)` skips check when month is 0.
+        it('rejects month 0 as out of range', () => {
             expect(validateRecurrenceRule({ type: 'yearly', interval: 1, month: 0 }))
-                .toEqual({ valid: true })
+                .toEqual({ valid: false, error: 'Month must be between 1 and 12' })
         })
 
         it('accepts valid yearly rule', () => {
