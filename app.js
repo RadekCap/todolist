@@ -875,7 +875,11 @@ class TodoApp {
             this.unlockError.textContent = 'Failed to unlock. Please try again.'
             this.unlockError.style.display = 'block'
         } finally {
-            this._suppressSignOut = false
+            // Delay clearing the suppress flag — Supabase's signInWithPassword
+            // session rotation can fire a spurious SIGNED_OUT event after the
+            // Promise resolves, delivered via an async callback.  Give it time
+            // to settle so we don't accidentally call handleSignOut.
+            setTimeout(() => { this._suppressSignOut = false }, 2000)
             this.unlockBtn.disabled = false
             this.unlockBtn.textContent = 'Unlock'
         }
