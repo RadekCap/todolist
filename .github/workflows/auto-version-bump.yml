@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: version-bump
+  cancel-in-progress: false
+
 jobs:
   bump-version:
     # Only run for PR merges, skip version bump commits to prevent loops
@@ -24,7 +28,22 @@ jobs:
           ref: main
           fetch-depth: 0
 
+      - name: Check if only test files changed
+        id: check_files
+        run: |
+          CHANGED_FILES=$(git diff --name-only HEAD~1)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          NON_TEST_FILES=$(echo "$CHANGED_FILES" | grep -v '^tests/' || true)
+          if [ -z "$NON_TEST_FILES" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "Only test files changed — skipping version bump"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Get current version
+        if: steps.check_files.outputs.skip != 'true'
         id: current_version
         run: |
           CURRENT_VERSION=$(grep "const APP_VERSION = '" app.js | sed -E "s/.*const APP_VERSION = '([0-9]+\.[0-9]+\.[0-9]+)'.*/\1/")
@@ -36,6 +55,7 @@ jobs:
           echo "Current version: $CURRENT_VERSION"
 
       - name: Increment patch version
+        if: steps.check_files.outputs.skip != 'true'
         id: new_version
         run: |
           CURRENT="${{ steps.current_version.outputs.version }}"
@@ -46,6 +66,7 @@ jobs:
           echo "New version: $NEW_VERSION"
 
       - name: Update version in app.js
+        if: steps.check_files.outputs.skip != 'true'
         run: |
           sed -i "s/const APP_VERSION = '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*'/const APP_VERSION = '${{ steps.new_version.outputs.version }}'/" app.js
           if ! grep -q "const APP_VERSION = '${{ steps.new_version.outputs.version }}'" app.js; then
@@ -55,6 +76,7 @@ jobs:
           echo "Updated APP_VERSION to ${{ steps.new_version.outputs.version }}"
 
       - name: Update VERSION.md
+        if: steps.check_files.outputs.skip != 'true'
         run: |
           TODAY=$(date +%Y-%m-%d)
           awk -v ver="${{ steps.new_version.outputs.version }}" -v date="$TODAY" '
@@ -69,6 +91,7 @@ jobs:
           echo "Updated VERSION.md"
 
       - name: Create version bump PR
+        if: steps.check_files.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
