@@ -37,7 +37,13 @@ async function globalSetup() {
         throw new Error(`[global-setup] Auth failed (${authResp.status}): ${body}`)
     }
 
-    const { access_token } = await authResp.json()
+    const authData = await authResp.json()
+    const access_token = authData.access_token
+    const user_id = authData.user?.id
+
+    if (!user_id) {
+        throw new Error('[global-setup] Could not extract user ID from auth response')
+    }
 
     const headers = {
         'apikey': SUPABASE_KEY,
@@ -75,8 +81,8 @@ async function globalSetup() {
     const categories = await fetchRows('categories')
     if (categories.length < 2) {
         const needed = [
-            { name: 'Test Category 1', color: '#4a90d9' },
-            { name: 'Test Category 2', color: '#e74c3c' }
+            { name: 'Test Category 1', color: '#4a90d9', user_id },
+            { name: 'Test Category 2', color: '#e74c3c', user_id }
         ].filter(c => !categories.some(existing => existing.name === c.name))
         if (needed.length > 0) {
             await insertRows('categories', needed)
@@ -91,8 +97,8 @@ async function globalSetup() {
     const contexts = await fetchRows('contexts')
     if (contexts.length < 2) {
         const needed = [
-            { name: 'Test Context 1' },
-            { name: 'Test Context 2' }
+            { name: 'Test Context 1', user_id },
+            { name: 'Test Context 2', user_id }
         ].filter(c => !contexts.some(existing => existing.name === c.name))
         if (needed.length > 0) {
             await insertRows('contexts', needed)
@@ -107,8 +113,8 @@ async function globalSetup() {
     const priorities = await fetchRows('priorities')
     if (priorities.length < 2) {
         const needed = [
-            { name: 'High', color: '#e74c3c', level: 1 },
-            { name: 'Low', color: '#95a5a6', level: 2 }
+            { name: 'High', color: '#e74c3c', level: 1, user_id },
+            { name: 'Low', color: '#95a5a6', level: 2, user_id }
         ].filter(p => !priorities.some(existing => existing.name === p.name))
         if (needed.length > 0) {
             await insertRows('priorities', needed)
