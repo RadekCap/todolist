@@ -183,7 +183,7 @@ export async function updateTodo(todoId, todoData) {
     // Sync completed with gtd_status (unified status)
     const isCompleted = gtdStatus === 'done'
 
-    const { error } = await supabase
+    const { data, error } = await supabase
         .from('todos')
         .update({
             text: encryptedText,
@@ -197,26 +197,21 @@ export async function updateTodo(todoId, todoData) {
             comment: encryptedComment
         })
         .eq('id', todoId)
+        .select()
 
     if (error) {
         console.error('Error updating todo:', error)
         throw error
     }
 
-    // Update local state
+    // Update local state using Supabase-returned data for correct types,
+    // but override text/comment with plaintext (Supabase returns encrypted values)
     const todos = store.get('todos')
     const todoIndex = todos.findIndex(t => t.id === todoId)
     if (todoIndex !== -1) {
         todos[todoIndex] = {
-            ...todos[todoIndex],
+            ...data[0],
             text,
-            category_id: categoryId || null,
-            project_id: projectId || null,
-            priority_id: priorityId || null,
-            gtd_status: gtdStatus || 'inbox',
-            completed: isCompleted,
-            context_id: contextId || null,
-            due_date: dueDate || null,
             comment: comment || null
         }
         store.set('todos', [...todos])

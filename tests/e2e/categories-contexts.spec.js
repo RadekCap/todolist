@@ -164,27 +164,6 @@ test.describe('Categories', () => {
         await authedPage.click('#addTodoForm button[type="submit"]')
         await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
 
-        // Debug: check store state after edit
-        const storeState = await authedPage.evaluate((todoName) => {
-            const mod = window.__testStore || {}
-            try {
-                // Dynamically import store
-                return import('./src/core/store.js').then(({ store }) => {
-                    const todos = store.get('todos')
-                    const todo = todos.find(t => t.text && t.text.includes(todoName))
-                    const categories = store.get('categories')
-                    return {
-                        todoCategoryId: todo ? todo.category_id : 'TODO_NOT_FOUND',
-                        categoryIds: categories.map(c => c.id),
-                        categoryNames: categories.map(c => c.name)
-                    }
-                })
-            } catch (e) {
-                return { error: e.message }
-            }
-        }, name)
-        console.log('Store state after edit:', JSON.stringify(storeState))
-
         // Badge should now show the second category
         const badge = todoItem(authedPage, name).locator('.todo-category-badge')
         await expect(badge).toContainText(cat2.label, { timeout: 10000 })
