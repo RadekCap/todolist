@@ -158,12 +158,43 @@ export async function clearInboxViaApi(page) {
         return movedIds
     })
 
-    // Single reload after API confirms inbox is empty
-    await page.reload()
-    await waitForApp(page)
+    // Reload and verify the inbox is visually empty.
+    // Another parallel E2E group may add an inbox todo between the API clear
+    // and the reload, so retry the full clear-reload cycle if needed.
+    for (let uiAttempt = 0; uiAttempt < 3; uiAttempt++) {
+        await page.reload()
+        await waitForApp(page)
 
-    await page.click('.gtd-tab.inbox')
-    await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 3000 })
+        await page.click('.gtd-tab.inbox')
+        await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 3000 })
+
+        // Check if inbox is truly empty in the UI
+        const todoCount = await page.locator('.todo-item').count()
+        if (todoCount === 0) return allMovedIds
+
+        // Inbox still has items — clear again via API then retry reload
+        const extraIds = await page.evaluate(async () => {
+            const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
+            const storageKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
+            const session = JSON.parse(localStorage.getItem(storageKey))
+            const token = session?.access_token || session?.currentSession?.access_token
+            const headers = {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${token}`
+            }
+            const resp = await fetch(`${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox&select=id`, { headers })
+            const todos = await resp.json()
+            if (!todos.length) return []
+            await fetch(`${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox`, {
+                method: 'PATCH',
+                headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+                body: JSON.stringify({ gtd_status: 'someday_maybe' })
+            })
+            return todos.map(t => t.id)
+        })
+        allMovedIds.push(...extraIds)
+    }
 
     return allMovedIds
 }
