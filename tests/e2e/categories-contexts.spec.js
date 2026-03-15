@@ -148,6 +148,9 @@ test.describe('Categories', () => {
         await addTodo(authedPage, name, { category: cat1.label })
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
 
+        // Verify initial badge shows cat1
+        await expect(todoItem(authedPage, name).locator('.todo-category-badge')).toContainText(cat1.label, { timeout: 5000 })
+
         // Open edit modal
         await todoItem(authedPage, name).locator('.todo-text').click()
         await expect(authedPage.locator('#addTodoModal')).toBeVisible()
@@ -155,11 +158,32 @@ test.describe('Categories', () => {
         // Verify current category is pre-selected
         await expect(authedPage.locator('#modalCategorySelect')).toHaveValue(cat1.value)
 
-        // Change to second category (use value to avoid label/textContent mismatch)
+        // Change to second category
         await authedPage.selectOption('#modalCategorySelect', cat2.value)
         await expect(authedPage.locator('#modalCategorySelect')).toHaveValue(cat2.value)
         await authedPage.click('#addTodoForm button[type="submit"]')
         await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
+
+        // Debug: check store state after edit
+        const storeState = await authedPage.evaluate((todoName) => {
+            const mod = window.__testStore || {}
+            try {
+                // Dynamically import store
+                return import('./src/core/store.js').then(({ store }) => {
+                    const todos = store.get('todos')
+                    const todo = todos.find(t => t.text && t.text.includes(todoName))
+                    const categories = store.get('categories')
+                    return {
+                        todoCategoryId: todo ? todo.category_id : 'TODO_NOT_FOUND',
+                        categoryIds: categories.map(c => c.id),
+                        categoryNames: categories.map(c => c.name)
+                    }
+                })
+            } catch (e) {
+                return { error: e.message }
+            }
+        }, name)
+        console.log('Store state after edit:', JSON.stringify(storeState))
 
         // Badge should now show the second category
         const badge = todoItem(authedPage, name).locator('.todo-category-badge')
