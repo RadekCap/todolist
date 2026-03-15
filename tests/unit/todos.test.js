@@ -352,7 +352,7 @@ describe('todos', () => {
 
     describe('updateTodo', () => {
         it('updates Supabase with encrypted text', async () => {
-            mockSupabase._queueResult(null)
+            mockSupabase._queueResult([{ id: 'todo-1', user_id: 'user-1', text: 'enc:Updated', completed: false, gtd_status: 'inbox', category_id: null, project_id: null, priority_id: null, context_id: null, due_date: null, comment: null }])
 
             await updateTodo('todo-1', { text: 'Updated', gtdStatus: 'inbox' })
 
@@ -363,7 +363,7 @@ describe('todos', () => {
         })
 
         it('updates local store by finding todo index', async () => {
-            mockSupabase._queueResult(null)
+            mockSupabase._queueResult([{ id: 'todo-1', user_id: 'user-1', text: 'enc:Updated milk', completed: false, gtd_status: 'next', category_id: null, project_id: null, priority_id: null, context_id: null, due_date: null, comment: null }])
 
             await updateTodo('todo-1', { text: 'Updated milk', gtdStatus: 'next' })
 
@@ -376,7 +376,7 @@ describe('todos', () => {
         it('emits TODO_UPDATED event', async () => {
             const handler = vi.fn()
             events.on(Events.TODO_UPDATED, handler)
-            mockSupabase._queueResult(null)
+            mockSupabase._queueResult([{ id: 'todo-1', user_id: 'user-1', text: 'enc:Updated', completed: false, gtd_status: 'inbox', category_id: null, project_id: null, priority_id: null, context_id: null, due_date: null, comment: null }])
 
             await updateTodo('todo-1', { text: 'Updated', gtdStatus: 'inbox' })
 
@@ -385,7 +385,7 @@ describe('todos', () => {
         })
 
         it('sets completed=true when gtdStatus is done', async () => {
-            mockSupabase._queueResult(null)
+            mockSupabase._queueResult([{ id: 'todo-1', user_id: 'user-1', text: 'enc:Done now', completed: true, gtd_status: 'done', category_id: null, project_id: null, priority_id: null, context_id: null, due_date: null, comment: null }])
 
             await updateTodo('todo-1', { text: 'Done now', gtdStatus: 'done' })
 
@@ -398,7 +398,7 @@ describe('todos', () => {
         })
 
         it('handles todo not found in local store gracefully', async () => {
-            mockSupabase._queueResult(null)
+            mockSupabase._queueResult([{ id: 'nonexistent', user_id: 'user-1', text: 'enc:Ghost', completed: false, gtd_status: 'inbox', category_id: null, project_id: null, priority_id: null, context_id: null, due_date: null, comment: null }])
 
             // Should not throw even if todo isn't in store
             await updateTodo('nonexistent', { text: 'Ghost', gtdStatus: 'inbox' })
@@ -415,7 +415,7 @@ describe('todos', () => {
         })
 
         it('encrypts comment when provided', async () => {
-            mockSupabase._queueResult(null)
+            mockSupabase._queueResult([{ id: 'todo-1', user_id: 'user-1', text: 'enc:Task', completed: false, gtd_status: 'inbox', category_id: null, project_id: null, priority_id: null, context_id: null, due_date: null, comment: 'enc:My note' }])
 
             await updateTodo('todo-1', { text: 'Task', gtdStatus: 'inbox', comment: 'My note' })
 
@@ -425,7 +425,7 @@ describe('todos', () => {
         })
 
         it('sets comment to null when not provided', async () => {
-            mockSupabase._queueResult(null)
+            mockSupabase._queueResult([{ id: 'todo-1', user_id: 'user-1', text: 'enc:Task', completed: false, gtd_status: 'inbox', category_id: null, project_id: null, priority_id: null, context_id: null, due_date: null, comment: null }])
 
             await updateTodo('todo-1', { text: 'Task', gtdStatus: 'inbox' })
 

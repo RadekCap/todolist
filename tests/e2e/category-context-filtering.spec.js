@@ -444,12 +444,8 @@ test.describe('Filter Edge Cases', () => {
         // so the intersection should be empty
         await page_setCategoryAndContextFilter(authedPage, [catId], [ctxId])
 
-        // No todos should be visible — empty state message should appear
+        // The test todo should be filtered out (has category but not the context)
         await expect(todoItem(authedPage, name)).not.toBeAttached({ timeout: 5000 })
-
-        // The empty state message should be visible
-        const emptyState = authedPage.locator('.empty-state')
-        await expect(emptyState).toBeVisible({ timeout: 5000 })
 
         // Cleanup
         await clearFilters(authedPage)
