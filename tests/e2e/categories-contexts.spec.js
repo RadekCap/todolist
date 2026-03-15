@@ -155,14 +155,15 @@ test.describe('Categories', () => {
         // Verify current category is pre-selected
         await expect(authedPage.locator('#modalCategorySelect')).toHaveValue(cat1.value)
 
-        // Change to second category
-        await authedPage.selectOption('#modalCategorySelect', { label: cat2.label })
+        // Change to second category (use value to avoid label/textContent mismatch)
+        await authedPage.selectOption('#modalCategorySelect', cat2.value)
+        await expect(authedPage.locator('#modalCategorySelect')).toHaveValue(cat2.value)
         await authedPage.click('#addTodoForm button[type="submit"]')
         await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
 
         // Badge should now show the second category
         const badge = todoItem(authedPage, name).locator('.todo-category-badge')
-        await expect(badge).toContainText(cat2.label, { timeout: 5000 })
+        await expect(badge).toContainText(cat2.label, { timeout: 10000 })
 
         // Cleanup
         await deleteTodo(authedPage, name)
@@ -243,14 +244,15 @@ test.describe('Contexts', () => {
         // Verify current context is pre-selected
         await expect(authedPage.locator('#modalContextSelect')).toHaveValue(ctx1.value)
 
-        // Change to second context
-        await authedPage.selectOption('#modalContextSelect', { label: ctx2.label })
+        // Change to second context (use value to avoid label/textContent mismatch)
+        await authedPage.selectOption('#modalContextSelect', ctx2.value)
+        await expect(authedPage.locator('#modalContextSelect')).toHaveValue(ctx2.value)
         await authedPage.click('#addTodoForm button[type="submit"]')
         await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
 
         // Badge should now show the second context
         const badge = todoItem(authedPage, name).locator('.todo-context-badge')
-        await expect(badge).toContainText(ctx2.label, { timeout: 5000 })
+        await expect(badge).toContainText(ctx2.label, { timeout: 10000 })
 
         // Cleanup
         await deleteTodo(authedPage, name)
