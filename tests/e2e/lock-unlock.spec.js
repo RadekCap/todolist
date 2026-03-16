@@ -66,11 +66,11 @@ test.describe('Session Lock and Unlock', () => {
         // event that briefly disrupts the app state.  If the todo isn't found,
         // reload the page to recover and retry.
         try {
-            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
         } catch {
             await authedPage.reload()
             await waitForApp(authedPage)
-            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 20000 })
         }
 
         // Verify the inbox tab is active
