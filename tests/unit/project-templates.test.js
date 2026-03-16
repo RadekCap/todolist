@@ -51,7 +51,7 @@ vi.mock('../../src/core/supabase.js', () => ({
 const {
     loadProjectTemplates, addProjectTemplate, addTemplateItem,
     deleteTemplateItem, deleteProjectTemplate, renameProjectTemplate,
-    createProjectFromTemplate
+    createProjectFromTemplate, reorderTemplateItems
 } = await import('../../src/services/project-templates.js')
 
 const { addProject, reorderProjects } = await import('../../src/services/projects.js')
@@ -517,6 +517,68 @@ describe('project-templates', () => {
             mockSupabase._queueResult(null, { message: 'Update failed' })
 
             await expect(renameProjectTemplate('tmpl-1', 'Fail')).rejects.toEqual({ message: 'Update failed' })
+        })
+    })
+
+    // ─── reorderTemplateItems ──────────────────────────────────────────────
+
+    describe('reorderTemplateItems', () => {
+        it('updates sort_order in store based on ordered IDs', async () => {
+            // Queue results for two update calls
+            mockSupabase._queueResult(null)
+            mockSupabase._queueResult(null)
+
+            await reorderTemplateItems('tmpl-1', ['item-2', 'item-1'])
+
+            const templates = store.get('projectTemplates')
+            const tmpl1 = templates.find(t => t.id === 'tmpl-1')
+            expect(tmpl1.items[0].id).toBe('item-2')
+            expect(tmpl1.items[0].sort_order).toBe(0)
+            expect(tmpl1.items[1].id).toBe('item-1')
+            expect(tmpl1.items[1].sort_order).toBe(1)
+        })
+
+        it('persists each item sort_order to Supabase', async () => {
+            mockSupabase._queueResult(null)
+            mockSupabase._queueResult(null)
+
+            await reorderTemplateItems('tmpl-1', ['item-2', 'item-1'])
+
+            expect(mockSupabase.from).toHaveBeenCalledWith('project_template_items')
+            expect(mockSupabase.update).toHaveBeenCalledWith({ sort_order: 0 })
+            expect(mockSupabase.update).toHaveBeenCalledWith({ sort_order: 1 })
+            expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'item-2')
+            expect(mockSupabase.eq).toHaveBeenCalledWith('id', 'item-1')
+        })
+
+        it('emits PROJECT_TEMPLATES_LOADED event', async () => {
+            mockSupabase._queueResult(null)
+            mockSupabase._queueResult(null)
+            const spy = vi.fn()
+            events.on(Events.PROJECT_TEMPLATES_LOADED, spy)
+
+            await reorderTemplateItems('tmpl-1', ['item-2', 'item-1'])
+
+            expect(spy).toHaveBeenCalledTimes(1)
+            events.off(Events.PROJECT_TEMPLATES_LOADED, spy)
+        })
+
+        it('does not affect other templates', async () => {
+            mockSupabase._queueResult(null)
+            mockSupabase._queueResult(null)
+
+            await reorderTemplateItems('tmpl-1', ['item-2', 'item-1'])
+
+            const templates = store.get('projectTemplates')
+            const tmpl2 = templates.find(t => t.id === 'tmpl-2')
+            expect(tmpl2.items).toEqual([])
+        })
+
+        it('throws on Supabase error', async () => {
+            mockSupabase._queueResult(null, { message: 'Reorder failed' })
+
+            await expect(reorderTemplateItems('tmpl-1', ['item-2', 'item-1']))
+                .rejects.toEqual({ message: 'Reorder failed' })
         })
     })
 

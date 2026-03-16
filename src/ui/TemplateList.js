@@ -2,8 +2,10 @@ import { store } from '../core/store.js'
 import { escapeHtml } from '../utils/security.js'
 import {
     addProjectTemplate, addTemplateItem, deleteTemplateItem,
-    deleteProjectTemplate, renameProjectTemplate, createProjectFromTemplate
+    deleteProjectTemplate, renameProjectTemplate, createProjectFromTemplate,
+    reorderTemplateItems
 } from '../services/project-templates.js'
+import { getIcon } from '../utils/icons.js'
 import { showToast } from './Toast.js'
 
 /**
@@ -25,7 +27,8 @@ export function renderTemplatesList(container) {
         li.dataset.templateId = template.id
 
         const itemsHtml = template.items.map(item => `
-            <li class="manage-templates-todo" data-item-id="${item.id}">
+            <li class="manage-templates-todo" data-item-id="${item.id}" draggable="true">
+                <span class="manage-templates-todo-drag-handle">${getIcon('drag-handle', { size: 14 })}</span>
                 <span class="manage-templates-todo-text">${escapeHtml(item.text)}</span>
                 <button class="manage-templates-todo-delete" data-item-id="${item.id}" title="Remove item">&times;</button>
             </li>
@@ -81,6 +84,50 @@ export function renderTemplatesList(container) {
                     renderTemplatesList(container)
                 } catch (err) {
                     console.error('Failed to delete template item:', err)
+                }
+            })
+        })
+
+        // Wire up drag-and-drop reordering for template items
+        const itemsList = li.querySelector('.manage-templates-items')
+        li.querySelectorAll('.manage-templates-todo').forEach(todoLi => {
+            todoLi.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', todoLi.dataset.itemId)
+                e.dataTransfer.effectAllowed = 'move'
+                todoLi.classList.add('dragging')
+            })
+            todoLi.addEventListener('dragend', () => {
+                todoLi.classList.remove('dragging')
+                itemsList.querySelectorAll('.manage-templates-todo').forEach(item => {
+                    item.classList.remove('drag-over')
+                })
+            })
+            todoLi.addEventListener('dragover', (e) => {
+                e.preventDefault()
+                const dragging = itemsList.querySelector('.dragging')
+                if (dragging && dragging !== todoLi) {
+                    todoLi.classList.add('drag-over')
+                }
+            })
+            todoLi.addEventListener('dragleave', () => {
+                todoLi.classList.remove('drag-over')
+            })
+            todoLi.addEventListener('drop', async (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                todoLi.classList.remove('drag-over')
+                const dragging = itemsList.querySelector('.dragging')
+                if (dragging && dragging !== todoLi) {
+                    const rect = todoLi.getBoundingClientRect()
+                    const midY = rect.top + rect.height / 2
+                    if (e.clientY < midY) {
+                        todoLi.before(dragging)
+                    } else {
+                        todoLi.after(dragging)
+                    }
+                    const orderedIds = [...itemsList.querySelectorAll('.manage-templates-todo')]
+                        .map(item => item.dataset.itemId)
+                    await reorderTemplateItems(template.id, orderedIds)
                 }
             })
         })
