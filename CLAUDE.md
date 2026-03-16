@@ -294,6 +294,32 @@ element.textContent = userInput
 
 **Note:** All users share the same Supabase instance but are isolated by RLS policies.
 
+## Unit Testing
+
+### Overview
+- **Framework:** Vitest with v8 coverage provider
+- **Tests:** ~1,085 tests across 25 files in `tests/unit/`
+- **Coverage:** 92% statements, 83% branches, 95% functions, 93% lines
+- **Run tests:** `npx vitest run tests/unit/`
+- **Run with coverage:** `npm run test:unit:coverage`
+
+### Test Infrastructure
+- **Supabase mock:** `tests/unit/helpers/supabase-mock.js` — shared `createSupabaseMock()` with `_queueResult()` and `_reset()` helpers
+- **Coverage config:** v8 provider, excludes `src/ui/` (UI is covered by E2E)
+
+### Key Patterns and Gotchas
+- `escapeHtml()` uses `document.createElement` → needs `// @vitest-environment jsdom` directive
+- Supabase chained queries need thenable mock: `then: vi.fn((resolve) => resolve(result))`
+- Use `enc:` prefix in encrypt mock for clearer test assertions
+- **Node 22 localStorage issue:** `globalThis.localStorage` is Node's experimental stub (no `.clear()`, `.removeItem()`). Fix: mock localStorage on `globalThis` explicitly
+- `crypto.test.js` uses real Web Crypto API (no mocking needed in Node 18+)
+
+### Remaining Coverage Gaps
+- `recurrence.js` (utils) — 79% stmts, complex edge cases
+- `projects.js` — 77% stmts, some CRUD functions uncovered
+- `supabase.js` / `settings.js` / `index.js` — init/barrel files, not meaningful to test
+- UI components — covered by E2E tests (66 spec files)
+
 ## Pull Request Workflow
 
 When creating PRs:
