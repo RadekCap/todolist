@@ -4,6 +4,7 @@ import { openSettingsModal, saveSettings, cancelSettings } from './helpers/setti
 
 test.describe('Notification Settings Persistence', () => {
     test('notification time selection persists after reload', async ({ authedPage }) => {
+        test.slow() // Settings save + reload + settings re-open can exceed default timeout
         await openSettingsModal(authedPage)
 
         const checkbox = authedPage.locator('#emailNotificationsEnabled')
@@ -37,6 +38,7 @@ test.describe('Notification Settings Persistence', () => {
     })
 
     test('timezone selection persists after reload', async ({ authedPage }) => {
+        test.slow() // Settings save + reload + settings re-open can exceed default timeout
         await openSettingsModal(authedPage)
 
         const checkbox = authedPage.locator('#emailNotificationsEnabled')

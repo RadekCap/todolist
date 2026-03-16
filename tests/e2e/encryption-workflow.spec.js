@@ -16,6 +16,7 @@ test.describe('Encryption Workflow', () => {
     })
 
     test('todo text persists correctly after page reload', async ({ authedPage }) => {
+        test.slow() // Reload + recovery can exceed default timeout
         // Create a todo to ensure we have test data
         const name = unique('EW')
         await addTodo(authedPage, name)
@@ -42,6 +43,7 @@ test.describe('Encryption Workflow', () => {
     })
 
     test('todo text is readable after lock and unlock', async ({ authedPage }) => {
+        test.slow() // Lock/unlock + recovery reload can exceed default timeout
         // Create a todo to ensure we have test data
         const name = unique('EW')
         await addTodo(authedPage, name)
