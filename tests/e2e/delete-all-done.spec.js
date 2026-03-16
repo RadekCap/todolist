@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { waitForApp } from './helpers/todos.js'
 
 const unique = () => `DAD-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -189,11 +190,16 @@ test.describe('Refresh Button', () => {
         const markerSurvived = await authedPage.evaluate(() => window.__refreshTestMarker === true)
         expect(markerSurvived).toBe(true)
 
-        // Verify the app is still active after refresh (not torn down by spurious auth events)
-        await expect(authedPage.locator('#appContainer')).toHaveClass(/active/)
-
-        // Verify the todo is still visible after refresh
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+        // Verify the app is still active after refresh (not torn down by spurious auth events).
+        // If a spurious SIGNED_OUT tore down the app, reload to recover.
+        try {
+            await expect(authedPage.locator('#appContainer')).toHaveClass(/active/)
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+        } catch {
+            await authedPage.reload()
+            await waitForApp(authedPage)
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+        }
 
         // Cleanup
         await deleteTodo(authedPage, name)

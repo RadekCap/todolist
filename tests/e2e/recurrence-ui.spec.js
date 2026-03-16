@@ -184,16 +184,23 @@ test.describe('Weekly Weekday Checkboxes', () => {
         await authedPage.selectOption('#modalRepeatSelect', 'weekly')
         await authedPage.waitForTimeout(300)
 
-        const mondayCheckbox = authedPage.locator('input[name="weekday"][value="1"]')
-        const mondayLabel = authedPage.locator('.weekday-checkbox:has(input[value="1"])')
+        // Pick a weekday that is NOT today to avoid auto-selection interference.
+        // When "weekly" is selected, the app auto-checks today's day of the week.
+        const today = new Date().getDay()
+        const targetDay = today === 3 ? '4' : '3' // use Wed unless today is Wed, then use Thu
+        const checkbox = authedPage.locator(`input[name="weekday"][value="${targetDay}"]`)
+        const label = authedPage.locator(`.weekday-checkbox:has(input[value="${targetDay}"])`)
 
-        // Toggle Monday on (click the label since the input is visually hidden)
-        await mondayLabel.click()
-        await expect(mondayCheckbox).toBeChecked()
+        // Verify the target day starts unchecked (it's not today)
+        await expect(checkbox).not.toBeChecked()
 
-        // Toggle Monday off
-        await mondayLabel.click()
-        await expect(mondayCheckbox).not.toBeChecked()
+        // Toggle on
+        await label.click()
+        await expect(checkbox).toBeChecked()
+
+        // Toggle off
+        await label.click()
+        await expect(checkbox).not.toBeChecked()
 
         await authedPage.keyboard.press('Escape')
     })

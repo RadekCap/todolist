@@ -366,10 +366,32 @@ class TodoApp {
 
         this._suppressSignOut = false
 
-        onAuthStateChange(() => {
-            if (!this._suppressSignOut) {
-                this.handleSignOut()
+        onAuthStateChange(async () => {
+            if (this._suppressSignOut) return
+
+            // If we have a stored password and an active user, try to recover
+            // the session before tearing down the app.  Spurious SIGNED_OUT
+            // events can occur when another client rotates the session (e.g.,
+            // parallel E2E tests sharing one user account, or multiple tabs).
+            const storedPassword = getStoredPassword()
+            const currentUser = store.get('currentUser')
+            if (storedPassword && currentUser) {
+                this._suppressSignOut = true
+                try {
+                    const { error } = await supabase.auth.signInWithPassword({
+                        email: currentUser.email,
+                        password: storedPassword
+                    })
+                    if (!error) {
+                        // Session recovered — wait for rotation events to settle
+                        setTimeout(() => { this._suppressSignOut = false }, 2000)
+                        return
+                    }
+                } catch { /* recovery failed, fall through to sign out */ }
+                this._suppressSignOut = false
             }
+
+            this.handleSignOut()
         })
     }
 

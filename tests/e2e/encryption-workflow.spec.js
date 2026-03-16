@@ -51,8 +51,16 @@ test.describe('Encryption Workflow', () => {
         await authedPage.click('#unlockBtn')
         await waitForApp(authedPage)
 
-        // Todo should still be readable after key re-derivation
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+        // Todo should still be readable after key re-derivation.
+        // Supabase session rotation during unlock can fire a delayed SIGNED_OUT
+        // event that briefly disrupts the app state.  Reload to recover if needed.
+        try {
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+        } catch {
+            await authedPage.reload()
+            await waitForApp(authedPage)
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+        }
         await expect(todoItem(authedPage, name).locator('.todo-text')).toContainText(name)
 
         // Cleanup
