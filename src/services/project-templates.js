@@ -195,6 +195,41 @@ export async function renameProjectTemplate(templateId, newName) {
 }
 
 /**
+ * Reorder items within a project template.
+ * Updates sort_order in both local state and Supabase.
+ * @param {string} templateId - Template ID
+ * @param {Array<string>} orderedItemIds - Item IDs in desired order
+ */
+export async function reorderTemplateItems(templateId, orderedItemIds) {
+    const templates = store.get('projectTemplates')
+    const updated = templates.map(t => {
+        if (t.id !== templateId) return t
+        const reorderedItems = t.items.map(item => {
+            const index = orderedItemIds.indexOf(item.id)
+            if (index !== -1) {
+                return { ...item, sort_order: index }
+            }
+            return item
+        }).sort((a, b) => a.sort_order - b.sort_order)
+        return { ...t, items: reorderedItems }
+    })
+    store.set('projectTemplates', updated)
+    events.emit(Events.PROJECT_TEMPLATES_LOADED, updated)
+
+    for (let i = 0; i < orderedItemIds.length; i++) {
+        const { error } = await supabase
+            .from('project_template_items')
+            .update({ sort_order: i })
+            .eq('id', orderedItemIds[i])
+
+        if (error) {
+            console.error('Error reordering template item:', error)
+            throw error
+        }
+    }
+}
+
+/**
  * Create a new project from a template.
  * Copies template name as project name and all items as inbox todos.
  * @param {string} templateId - Template ID
