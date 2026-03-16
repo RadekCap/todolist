@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { waitForApp } from './helpers/todos.js'
 
 /**
  * Helper: wait for the async loadThemeFromDatabase / loadDensityFromDatabase
@@ -74,9 +75,9 @@ test.describe('Settings - Theme', () => {
         // Change to Dark theme and wait for save
         await changeTheme(authedPage, 'dark')
 
-        // Reload the page
+        // Reload the page and wait for app to fully initialize
         await authedPage.reload()
-        await authedPage.waitForLoadState('networkidle')
+        await waitForApp(authedPage)
 
         // Theme should still be dark after reload
         await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 15000 })
@@ -113,9 +114,9 @@ test.describe('Settings - Density', () => {
         // Change to Compact density and wait for save
         await changeDensity(authedPage, 'compact')
 
-        // Reload the page
+        // Reload the page and wait for app to fully initialize
         await authedPage.reload()
-        await authedPage.waitForLoadState('networkidle')
+        await waitForApp(authedPage)
 
         // Density should still be compact after reload
         await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact', { timeout: 15000 })
@@ -141,10 +142,10 @@ test.describe('Settings - Saved per user', () => {
 
         // Reload — settings should be restored from Supabase
         await authedPage.reload()
-        await authedPage.waitForLoadState('networkidle')
+        await waitForApp(authedPage)
 
-        await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'clear', { timeout: 10000 })
-        await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact', { timeout: 10000 })
+        await expect(authedPage.locator('html')).toHaveAttribute('data-theme', 'clear', { timeout: 15000 })
+        await expect(authedPage.locator('html')).toHaveAttribute('data-density', 'compact', { timeout: 15000 })
 
         // Restore defaults
         await changeTheme(authedPage, 'glass')
