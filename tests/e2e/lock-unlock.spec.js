@@ -41,6 +41,7 @@ test.describe('Session Lock and Unlock', () => {
     })
 
     test('unlock with correct password restores the app', async ({ authedPage }) => {
+        test.slow() // Lock/unlock + recovery reload can exceed default timeout
         // Create a todo to ensure we have test data
         const name = unique('LU')
         await addTodo(authedPage, name)

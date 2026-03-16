@@ -21,6 +21,7 @@ async function ensureZenState(page, movedIds) {
 
 test.describe('Daily Quotes (Empty Inbox)', () => {
     test('empty Inbox shows a motivational quote', async ({ authedPage }) => {
+        test.slow() // clearInboxViaApi with retries can exceed default timeout
         const page = authedPage
 
         // clearInboxViaApi retries until inbox is truly empty (handles parallel test interference)
@@ -45,9 +46,11 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
     })
 
     test('quote is visible text (not empty)', async ({ authedPage }) => {
+        test.slow() // clearInboxViaApi with retries can exceed default timeout
         const page = authedPage
 
-        const movedIds = await clearInboxViaApi(page)
+        let movedIds = await clearInboxViaApi(page)
+        movedIds = await ensureZenState(page, movedIds)
 
         // Wait for zen state and quote to load
         await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
@@ -71,6 +74,7 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
     })
 
     test('adding a todo hides the quote', async ({ authedPage }) => {
+        test.slow() // clearInboxViaApi with retries can exceed default timeout
         const page = authedPage
 
         let movedIds = await clearInboxViaApi(page)
@@ -96,6 +100,7 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
     })
 
     test('deleting last todo shows the quote again', async ({ authedPage }) => {
+        test.slow() // clearInboxViaApi with retries can exceed default timeout
         const page = authedPage
 
         let movedIds = await clearInboxViaApi(page)
