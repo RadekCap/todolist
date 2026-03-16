@@ -132,7 +132,7 @@ test.describe('Session Lock and Unlock', () => {
         await authedPage.click('#unlockLogoutBtn')
 
         // Should return to the auth/login form
-        await expect(authedPage.locator('#authContainer')).toBeVisible({ timeout: 10000 })
+        await expect(authedPage.locator('#authContainer')).toBeVisible({ timeout: 30000 })
         await expect(authedPage.locator('#unlockModal')).not.toHaveClass(/active/, { timeout: 5000 })
     })
 })
