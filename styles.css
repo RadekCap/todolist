@@ -2434,6 +2434,29 @@ body.sidebar-resizing * {
     border-bottom: none;
 }
 
+.manage-templates-todo.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.manage-templates-todo.drag-over {
+    border-top: 2px solid var(--ios-blue, #007AFF);
+}
+
+.manage-templates-todo-drag-handle {
+    color: var(--ios-label-tertiary, #999);
+    cursor: grab;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.manage-templates-todo-drag-handle svg {
+    width: 14px;
+    height: 14px;
+}
+
 .manage-templates-todo-text {
     flex: 1;
     font-size: 14px;

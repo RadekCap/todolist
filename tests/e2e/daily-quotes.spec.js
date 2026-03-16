@@ -1,15 +1,33 @@
 import { test, expect } from './fixtures.js'
 import { unique, addTodo, todoItem, deleteTodo, clearInboxViaApi, restoreInboxViaApi } from './helpers/todos.js'
 
+/**
+ * Helper: ensure the inbox zen state is visible, retrying the clear if parallel
+ * tests added inbox items between the clear and the UI check.
+ */
+async function ensureZenState(page, movedIds) {
+    for (let attempt = 0; attempt < 3; attempt++) {
+        await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 5000 })
+        const zenVisible = await page.locator('.inbox-zen-state').isVisible()
+        if (zenVisible) return movedIds
+        // Parallel test may have added inbox items — clear again
+        const extraIds = await clearInboxViaApi(page)
+        movedIds.push(...extraIds)
+    }
+    // Final assertion — let it fail if still not visible
+    await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 15000 })
+    return movedIds
+}
+
 test.describe('Daily Quotes (Empty Inbox)', () => {
     test('empty Inbox shows a motivational quote', async ({ authedPage }) => {
         const page = authedPage
 
         // clearInboxViaApi retries until inbox is truly empty (handles parallel test interference)
-        const movedIds = await clearInboxViaApi(page)
+        let movedIds = await clearInboxViaApi(page)
 
-        // Ensure inbox tab is active before checking zen state
-        await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 5000 })
+        // Ensure zen state is visible, retrying clear if parallel tests interfered
+        movedIds = await ensureZenState(page, movedIds)
 
         // The zen state with quote should now be visible
         await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 15000 })
@@ -55,10 +73,8 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
     test('adding a todo hides the quote', async ({ authedPage }) => {
         const page = authedPage
 
-        const movedIds = await clearInboxViaApi(page)
-
-        // Ensure inbox tab is active before checking zen state
-        await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 5000 })
+        let movedIds = await clearInboxViaApi(page)
+        movedIds = await ensureZenState(page, movedIds)
 
         // Verify zen state with quote is visible
         await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 15000 })
@@ -82,10 +98,8 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
     test('deleting last todo shows the quote again', async ({ authedPage }) => {
         const page = authedPage
 
-        const movedIds = await clearInboxViaApi(page)
-
-        // Ensure inbox tab is active before checking zen state
-        await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 5000 })
+        let movedIds = await clearInboxViaApi(page)
+        movedIds = await ensureZenState(page, movedIds)
 
         // Verify zen state is visible initially (empty inbox)
         await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 15000 })

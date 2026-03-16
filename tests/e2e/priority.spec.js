@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { waitForApp } from './helpers/todos.js'
 
 const unique = () => `Prio-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -306,7 +307,7 @@ test.describe('Priority - persistence', () => {
 
         // Reload page
         await authedPage.reload()
-        await authedPage.waitForSelector('.todo-item', { timeout: 15000 })
+        await waitForApp(authedPage)
 
         // Badge should still be present
         const reloadedItem = todoItem(authedPage, name)
