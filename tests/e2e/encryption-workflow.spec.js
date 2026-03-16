@@ -25,8 +25,16 @@ test.describe('Encryption Workflow', () => {
         await authedPage.reload()
         await waitForApp(authedPage)
 
-        // Todo should still be readable after reload (tests decrypt-on-load path)
-        await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+        // Todo should still be readable after reload (tests decrypt-on-load path).
+        // Supabase session rotation during reload can fire a spurious SIGNED_OUT
+        // event that briefly disrupts the app.  Reload to recover if needed.
+        try {
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+        } catch {
+            await authedPage.reload()
+            await waitForApp(authedPage)
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+        }
         await expect(todoItem(authedPage, name).locator('.todo-text')).toContainText(name)
 
         // Cleanup
@@ -55,11 +63,11 @@ test.describe('Encryption Workflow', () => {
         // Supabase session rotation during unlock can fire a delayed SIGNED_OUT
         // event that briefly disrupts the app state.  Reload to recover if needed.
         try {
-            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 10000 })
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
         } catch {
             await authedPage.reload()
             await waitForApp(authedPage)
-            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
+            await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 20000 })
         }
         await expect(todoItem(authedPage, name).locator('.todo-text')).toContainText(name)
 

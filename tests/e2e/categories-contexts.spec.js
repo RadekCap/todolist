@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { waitForApp } from './helpers/todos.js'
 
 const unique = () => `CC-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -359,7 +360,7 @@ test.describe('Categories and Contexts combined', () => {
 
         // Reload the page
         await authedPage.reload()
-        await authedPage.waitForSelector('.todo-item', { timeout: 15000 })
+        await waitForApp(authedPage)
 
         // Badges should still be present after reload
         const reloadedItem = todoItem(authedPage, name)

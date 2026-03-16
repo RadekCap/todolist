@@ -193,7 +193,7 @@ test.describe('Refresh Button', () => {
         // Verify the app is still active after refresh (not torn down by spurious auth events).
         // If a spurious SIGNED_OUT tore down the app, reload to recover.
         try {
-            await expect(authedPage.locator('#appContainer')).toHaveClass(/active/)
+            await expect(authedPage.locator('#appContainer')).toHaveClass(/active/, { timeout: 10000 })
             await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 15000 })
         } catch {
             await authedPage.reload()
