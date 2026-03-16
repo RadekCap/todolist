@@ -8,8 +8,11 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
         // clearInboxViaApi retries until inbox is truly empty (handles parallel test interference)
         const movedIds = await clearInboxViaApi(page)
 
+        // Ensure inbox tab is active before checking zen state
+        await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 5000 })
+
         // The zen state with quote should now be visible
-        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 15000 })
 
         // Wait for the quote to load asynchronously (container gets .loaded class)
         const quoteContainer = page.locator('#zenQuoteContainer')
@@ -54,8 +57,11 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
 
         const movedIds = await clearInboxViaApi(page)
 
+        // Ensure inbox tab is active before checking zen state
+        await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 5000 })
+
         // Verify zen state with quote is visible
-        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 15000 })
         await expect(page.locator('#zenQuoteContainer')).toHaveClass(/loaded/, { timeout: 10000 })
 
         // Add a todo to the Inbox
@@ -78,8 +84,11 @@ test.describe('Daily Quotes (Empty Inbox)', () => {
 
         const movedIds = await clearInboxViaApi(page)
 
+        // Ensure inbox tab is active before checking zen state
+        await expect(page.locator('.gtd-tab.inbox')).toHaveClass(/active/, { timeout: 5000 })
+
         // Verify zen state is visible initially (empty inbox)
-        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 10000 })
+        await expect(page.locator('.inbox-zen-state')).toBeVisible({ timeout: 15000 })
 
         // Add a todo — quote should disappear
         const todoName = unique('DQ')

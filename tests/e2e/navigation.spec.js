@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { waitForApp } from './helpers/todos.js'
 
 const unique = () => `NAV-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -58,7 +59,7 @@ async function addProject(page, name) {
  */
 async function navigateTo(page, path) {
     await page.goto(path)
-    await expect(page.locator('#appContainer')).toHaveClass(/active/, { timeout: 15000 })
+    await waitForApp(page)
 }
 
 /**
