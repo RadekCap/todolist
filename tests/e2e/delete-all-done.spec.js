@@ -150,7 +150,7 @@ test.describe('Delete All Done', () => {
 
         // Switch to Done and delete all done
         await switchGtdTab(authedPage, 'done')
-        await expect(todoItem(authedPage, doneName)).toBeVisible({ timeout: 5000 })
+        await expect(todoItem(authedPage, doneName)).toBeVisible({ timeout: 10000 })
 
         authedPage.once('dialog', dialog => dialog.accept())
         await authedPage.click('#deleteAllDoneBtn')

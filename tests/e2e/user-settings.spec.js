@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { waitForApp } from './helpers/todos.js'
 
 /**
  * Helper: open the user menu and click Settings, waiting for async data load.
@@ -77,10 +78,9 @@ test.describe('User Settings - Display Name', () => {
 
         await expect(authedPage.locator('#toolbarUsername')).toContainText(displayName, { timeout: 5000 })
 
-        // Reload
+        // Reload and wait for app to fully initialize
         await authedPage.reload()
-        await authedPage.waitForLoadState('networkidle')
-        await expect(authedPage.locator('#appContainer')).toHaveClass(/active/, { timeout: 15000 })
+        await waitForApp(authedPage)
 
         // Verify a display name persisted by checking the settings modal input
         // (toolbar may be overwritten by parallel tests sharing the same user account)
