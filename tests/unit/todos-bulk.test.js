@@ -167,6 +167,16 @@ describe('todos-bulk', () => {
             const todos = store.get('todos')
             expect(todos.some(t => t.id === 't1-new')).toBe(true)
         })
+
+        it('undo callback throws on Supabase error during restore', async () => {
+            await bulkDeleteTodos(['t1'])
+
+            const undoCallback = pushUndo.mock.calls[0][1]
+
+            mockSupabase._setError({ message: 'Restore insert failed' })
+
+            await expect(undoCallback()).rejects.toEqual({ message: 'Restore insert failed' })
+        })
     })
 
     // ─── bulkUpdateTodosStatus ────────────────────────────────────────────────
