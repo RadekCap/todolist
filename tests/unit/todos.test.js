@@ -537,6 +537,25 @@ describe('todos', () => {
 
             await expect(toggleTodo('todo-1')).rejects.toEqual({ message: 'toggle error' })
         })
+
+        it('undo callback reverses the toggle', async () => {
+            mockSupabase._queueResult(null) // toggle to done
+
+            await toggleTodo('todo-1')
+
+            const todo = store.get('todos').find(t => t.id === 'todo-1')
+            expect(todo.completed).toBe(true)
+
+            const undoFn = pushUndo.mock.calls[0][1]
+
+            mockSupabase._queueResult(null) // toggle back to inbox
+
+            await undoFn()
+
+            const restored = store.get('todos').find(t => t.id === 'todo-1')
+            expect(restored.completed).toBe(false)
+            expect(restored.gtd_status).toBe('inbox')
+        })
     })
 
     // ─── deleteTodo ───────────────────────────────────────────────────────────
@@ -602,6 +621,39 @@ describe('todos', () => {
 
             const todos = store.get('todos')
             expect(todos.some(t => t.id === 'todo-1-restored')).toBe(true)
+        })
+
+        it('undo callback throws on Supabase error during restore', async () => {
+            mockSupabase._queueResult(null) // delete
+
+            await deleteTodo('todo-1')
+
+            const undoFn = pushUndo.mock.calls[0][1]
+
+            mockSupabase._reset()
+            mockSupabase._queueResult(null, { message: 'restore failed' })
+
+            await expect(undoFn()).rejects.toEqual({ message: 'restore failed' })
+        })
+
+        it('undo callback encrypts comment when restoring', async () => {
+            store.set('todos', [
+                { id: 'todo-c', text: 'Task', comment: 'A note', completed: false, gtd_status: 'inbox', user_id: 'user-1' }
+            ])
+            mockSupabase._queueResult(null) // delete
+
+            await deleteTodo('todo-c')
+
+            const undoFn = pushUndo.mock.calls[0][1]
+
+            mockSupabase._reset()
+            mockSupabase._queueResult([{ id: 'todo-c-new', user_id: 'user-1' }])
+
+            await undoFn()
+
+            expect(mockSupabase.insert).toHaveBeenCalledWith(
+                expect.objectContaining({ comment: 'enc:A note' })
+            )
         })
 
         it('does not push undo when todo not found in store', async () => {
@@ -793,6 +845,22 @@ describe('todos', () => {
 
             await expect(updateTodoGtdStatus('todo-1', 'next'))
                 .rejects.toEqual({ message: 'status error' })
+        })
+
+        it('undo callback reverts to previous status', async () => {
+            mockSupabase._queueResult(null) // move to next
+
+            await updateTodoGtdStatus('todo-1', 'next')
+
+            expect(store.get('todos').find(t => t.id === 'todo-1').gtd_status).toBe('next')
+
+            const undoFn = pushUndo.mock.calls[0][1]
+
+            mockSupabase._queueResult(null) // revert to inbox
+
+            await undoFn()
+
+            expect(store.get('todos').find(t => t.id === 'todo-1').gtd_status).toBe('inbox')
         })
     })
 
