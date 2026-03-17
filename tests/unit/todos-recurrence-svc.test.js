@@ -508,6 +508,45 @@ describe('todos-recurrence', () => {
             expect(result.comment).toBe('encrypted-comment')
         })
 
+        it('throws on Supabase error during instance creation', async () => {
+            mockSupabase._queueResult(null, { message: 'insert instance error' })
+
+            await expect(generateNextRecurrence('tmpl-1', '2026-01-01'))
+                .rejects.toEqual({ message: 'insert instance error' })
+        })
+
+        it('returns null when count would exceed limit (count at end_count - 1)', async () => {
+            // recurrence_count=2, end_count=3: isRecurrenceEnded returns false (2 < 3)
+            // but newCount=3 which is NOT > 3, so it should proceed
+            store.set('templates', [{
+                id: 'tmpl-near-limit',
+                recurrence_rule: { type: 'daily', interval: 1 },
+                recurrence_count: 2,
+                recurrence_end_type: 'after_count',
+                recurrence_end_count: 3,
+                text: 'near-limit',
+                comment: null,
+                category_id: null,
+                project_id: null,
+                priority_id: null,
+                context_id: null
+            }])
+
+            const instanceData = {
+                id: 'inst-near',
+                text: 'near-limit',
+                comment: null,
+                template_id: 'tmpl-near-limit'
+            }
+            mockSupabase._queueResult([instanceData])
+            mockSupabase._queueResult(null)
+
+            const result = await generateNextRecurrence('tmpl-near-limit', '2026-01-01')
+
+            expect(result).not.toBeNull()
+            expect(result.id).toBe('inst-near')
+        })
+
         it('allows next date on exact end date boundary', async () => {
             store.set('templates', [{
                 id: 'tmpl-boundary',
