@@ -931,4 +931,332 @@ describe('projects', () => {
             expect(projects).toHaveLength(5)
         })
     })
+
+    // ─── undo/restore operations ─────────────────────────────────────────────
+
+    describe('deleteProject undo callbacks', () => {
+        beforeEach(() => {
+            store.set('currentUser', { id: 'user-1' })
+            store.set('todos', [
+                { id: 't1', text: 'Task in p1', project_id: 'p1', gtd_status: 'next', user_id: 'user-1' },
+                { id: 't2', text: 'Done in p1', project_id: 'p1', gtd_status: 'done', user_id: 'user-1' },
+                { id: 't3', text: 'Task in p4', project_id: 'p4', gtd_status: 'inbox', user_id: 'user-1' }
+            ])
+            store.set('selectedProjectId', null)
+        })
+
+        async function deleteAndGetUndoCallback(...args) {
+            await deleteProject(...args)
+            const undoCall = pushUndo.mock.calls[pushUndo.mock.calls.length - 1]
+            return undoCall[1] // the undo callback
+        }
+
+        // ─── restoreProjects ──────────────────────────────────────────────
+
+        describe('restoreProjects (via undo)', () => {
+            it('restores a single deleted project', async () => {
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p4')
+
+                expect(store.get('projects').find(p => p.id === 'p4')).toBeUndefined()
+
+                // Undo: insert project back
+                mockChain._queueResult(null) // insert project
+
+                await undoFn()
+
+                const restored = store.get('projects').find(p => p.id === 'p4')
+                expect(restored).toBeDefined()
+                expect(restored.name).toBe('Root B')
+            })
+
+            it('restores a project hierarchy (parent before children)', async () => {
+                // Delete p1 which has descendants p2, p3
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1')
+
+                expect(store.get('projects').find(p => p.id === 'p1')).toBeUndefined()
+                expect(store.get('projects').find(p => p.id === 'p2')).toBeUndefined()
+                expect(store.get('projects').find(p => p.id === 'p3')).toBeUndefined()
+
+                // Undo: insert 3 projects (sorted by depth: p1 first, then p2, then p3)
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+
+                await undoFn()
+
+                expect(store.get('projects').find(p => p.id === 'p1')).toBeDefined()
+                expect(store.get('projects').find(p => p.id === 'p2')).toBeDefined()
+                expect(store.get('projects').find(p => p.id === 'p3')).toBeDefined()
+            })
+
+            it('encrypts project names during restore', async () => {
+                mockChain._queueResult(null) // delete
+                const undoFn = await deleteAndGetUndoCallback('p4')
+
+                mockChain._queueResult(null) // insert
+
+                await undoFn()
+
+                expect(mockChain.insert).toHaveBeenCalledWith(
+                    expect.objectContaining({ name: 'enc:Root B' })
+                )
+            })
+
+            it('encrypts project descriptions during restore', async () => {
+                store.set('projects', [
+                    ...store.get('projects').filter(p => p.id !== 'p4'),
+                    { id: 'p4', name: 'Root B', description: 'A description', parent_id: null, area_id: null, sort_order: 1 }
+                ])
+
+                mockChain._queueResult(null) // delete
+                const undoFn = await deleteAndGetUndoCallback('p4')
+
+                mockChain._queueResult(null) // insert
+
+                await undoFn()
+
+                expect(mockChain.insert).toHaveBeenCalledWith(
+                    expect.objectContaining({ description: 'enc:A description' })
+                )
+            })
+
+            it('handles null descriptions during restore', async () => {
+                mockChain._queueResult(null) // delete
+                const undoFn = await deleteAndGetUndoCallback('p4')
+
+                mockChain._queueResult(null) // insert
+
+                await undoFn()
+
+                expect(mockChain.insert).toHaveBeenCalledWith(
+                    expect.objectContaining({ description: null })
+                )
+            })
+
+            it('emits PROJECTS_LOADED after restoring', async () => {
+                mockChain._queueResult(null) // delete
+                const undoFn = await deleteAndGetUndoCallback('p4')
+
+                const handler = vi.fn()
+                events.on(Events.PROJECTS_LOADED, handler)
+
+                mockChain._queueResult(null) // insert
+
+                await undoFn()
+
+                expect(handler).toHaveBeenCalledTimes(1)
+                events.off(Events.PROJECTS_LOADED)
+            })
+
+            it('throws on Supabase insert error during restore', async () => {
+                mockChain._queueResult(null) // delete
+                const undoFn = await deleteAndGetUndoCallback('p4')
+
+                mockChain._queueResult(null, { message: 'Insert failed' })
+
+                await expect(undoFn()).rejects.toEqual({ message: 'Insert failed' })
+            })
+
+            it('restores selectedProjectId if deleted project was selected', async () => {
+                store.set('selectedProjectId', 'p4')
+
+                mockChain._queueResult(null) // delete
+                const undoFn = await deleteAndGetUndoCallback('p4')
+
+                expect(store.get('selectedProjectId')).toBeNull()
+
+                mockChain._queueResult(null) // insert
+
+                await undoFn()
+
+                expect(store.get('selectedProjectId')).toBe('p4')
+            })
+        })
+
+        // ─── restoreTodoProjectAssignments ────────────────────────────────
+
+        describe('restoreTodoProjectAssignments (via undo)', () => {
+            it('restores todo project assignments after move', async () => {
+                // Delete p1 with moveToProjectId: move todos to p5
+                mockChain._queueResult(null) // move todos
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1', { moveToProjectId: 'p5' })
+
+                // t1 was moved from p1 to p5
+                expect(store.get('todos').find(t => t.id === 't1').project_id).toBe('p5')
+
+                // Undo: restore projects (p1, p2, p3) + restore todo assignments
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+                mockChain._queueResult(null) // update t1 project_id back
+
+                await undoFn()
+
+                // t1 should be back to p1
+                expect(store.get('todos').find(t => t.id === 't1').project_id).toBe('p1')
+            })
+
+            it('emits TODOS_LOADED after restoring assignments', async () => {
+                mockChain._queueResult(null) // move todos
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1', { moveToProjectId: 'p5' })
+
+                const handler = vi.fn()
+                events.on(Events.TODOS_LOADED, handler)
+
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+                mockChain._queueResult(null) // update todo assignment
+
+                await undoFn()
+
+                expect(handler).toHaveBeenCalled()
+                events.off(Events.TODOS_LOADED)
+            })
+
+            it('throws on Supabase error during assignment restore', async () => {
+                mockChain._queueResult(null) // move todos
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1', { moveToProjectId: 'p5' })
+
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+                mockChain._queueResult(null, { message: 'Update failed' }) // assignment error
+
+                await expect(undoFn()).rejects.toEqual({ message: 'Update failed' })
+            })
+        })
+
+        // ─── restoreDeletedTodos ──────────────────────────────────────────
+
+        describe('restoreDeletedTodos (via undo)', () => {
+            it('restores deleted todos when deleteTodos was used', async () => {
+                mockChain._queueResult(null) // delete todos
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1', { deleteTodos: true })
+
+                // t1 and t2 were in p1 and should be deleted
+                expect(store.get('todos').find(t => t.id === 't1')).toBeUndefined()
+                expect(store.get('todos').find(t => t.id === 't2')).toBeUndefined()
+
+                // Undo: restore projects (p1, p2, p3) then restore todos (t1, t2)
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+                // Each todo restore returns data from .select()
+                mockChain._queueResult([{ id: 't1-new', user_id: 'user-1', text: 'enc:Task in p1' }]) // insert todo t1
+                mockChain._queueResult([{ id: 't2-new', user_id: 'user-1', text: 'enc:Done in p1' }]) // insert todo t2
+
+                await undoFn()
+
+                const todos = store.get('todos')
+                // Restored todos should be in the store with decrypted text
+                expect(todos.find(t => t.id === 't1-new')).toBeDefined()
+                expect(todos.find(t => t.id === 't2-new')).toBeDefined()
+            })
+
+            it('encrypts todo text during restore', async () => {
+                mockChain._queueResult(null) // delete todos
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1', { deleteTodos: true })
+
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+                mockChain._queueResult([{ id: 'r1', user_id: 'user-1' }])
+                mockChain._queueResult([{ id: 'r2', user_id: 'user-1' }])
+
+                await undoFn()
+
+                // insert should have been called with encrypted text
+                const insertCalls = mockChain.insert.mock.calls
+                const todoInserts = insertCalls.filter(call =>
+                    call[0] && call[0].text && call[0].text.startsWith('enc:')
+                )
+                expect(todoInserts.length).toBeGreaterThanOrEqual(2)
+            })
+
+            it('encrypts todo comments during restore', async () => {
+                store.set('todos', [
+                    { id: 't1', text: 'Task', comment: 'A comment', project_id: 'p1', gtd_status: 'next', user_id: 'user-1' },
+                    { id: 't3', text: 'Other', project_id: 'p4', gtd_status: 'inbox', user_id: 'user-1' }
+                ])
+
+                mockChain._queueResult(null) // delete todos
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1', { deleteTodos: true })
+
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+                mockChain._queueResult([{ id: 'r1', user_id: 'user-1' }])
+
+                await undoFn()
+
+                const insertCalls = mockChain.insert.mock.calls
+                const commentInsert = insertCalls.find(call =>
+                    call[0] && call[0].comment === 'enc:A comment'
+                )
+                expect(commentInsert).toBeDefined()
+            })
+
+            it('handles null comments during restore', async () => {
+                mockChain._queueResult(null) // delete todos
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1', { deleteTodos: true })
+
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+                mockChain._queueResult([{ id: 'r1', user_id: 'user-1' }])
+                mockChain._queueResult([{ id: 'r2', user_id: 'user-1' }])
+
+                await undoFn()
+
+                const insertCalls = mockChain.insert.mock.calls
+                const nullCommentInsert = insertCalls.find(call =>
+                    call[0] && call[0].hasOwnProperty('comment') && call[0].comment === null && call[0].hasOwnProperty('text')
+                )
+                expect(nullCommentInsert).toBeDefined()
+            })
+
+            it('emits TODOS_LOADED after restoring todos', async () => {
+                mockChain._queueResult(null) // delete todos
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1', { deleteTodos: true })
+
+                const handler = vi.fn()
+                events.on(Events.TODOS_LOADED, handler)
+
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+                mockChain._queueResult([{ id: 'r1', user_id: 'user-1' }])
+                mockChain._queueResult([{ id: 'r2', user_id: 'user-1' }])
+
+                await undoFn()
+
+                expect(handler).toHaveBeenCalled()
+                events.off(Events.TODOS_LOADED)
+            })
+
+            it('throws on Supabase error during todo restore', async () => {
+                mockChain._queueResult(null) // delete todos
+                mockChain._queueResult(null) // delete project
+                const undoFn = await deleteAndGetUndoCallback('p1', { deleteTodos: true })
+
+                mockChain._queueResult(null) // insert p1
+                mockChain._queueResult(null) // insert p2
+                mockChain._queueResult(null) // insert p3
+                mockChain._queueResult(null, { message: 'Insert todo failed' }) // todo insert error
+
+                await expect(undoFn()).rejects.toEqual({ message: 'Insert todo failed' })
+            })
+        })
+    })
 })
