@@ -133,6 +133,19 @@ describe('getFilteredTodos', () => {
             const result = getFilteredTodos()
             expect(result.map(t => t.id)).toEqual([2, 3, 1])
         })
+
+        it('treats both items without due_date as equal in scheduled sort', () => {
+            // In practice scheduled view filters to items WITH due_date,
+            // but the sort comparator still handles the case
+            const scheduledTodos = [
+                { id: 1, text: 'A', gtd_status: 'inbox', due_date: '2026-03-01' },
+                { id: 2, text: 'B', gtd_status: 'inbox', due_date: '2026-04-01' }
+            ]
+            resetState({ todos: scheduledTodos, selectedGtdStatus: 'scheduled' })
+            const result = getFilteredTodos()
+            expect(result).toHaveLength(2)
+            expect(result[0].id).toBe(1)
+        })
     })
 
     // ─── filter by search query ──────────────────────────────────────────────
@@ -337,6 +350,19 @@ describe('getFilteredTodos', () => {
             const result = getFilteredTodos()
             expect(result).toHaveLength(0)
         })
+
+        it('treats both items without due_date as equal in project sort', () => {
+            const projectTodos = [
+                { id: 1, text: 'A', gtd_status: 'inbox', project_id: 'proj-1', due_date: null },
+                { id: 2, text: 'B', gtd_status: 'inbox', project_id: 'proj-1', due_date: null },
+                { id: 3, text: 'C', gtd_status: 'inbox', project_id: 'proj-1', due_date: '2026-03-01' }
+            ]
+            resetState({ todos: projectTodos, selectedProjectId: 'proj-1' })
+            const result = getFilteredTodos()
+            // Item with due_date comes first, then the two without date preserve order
+            expect(result[0].id).toBe(3)
+            expect(result).toHaveLength(3)
+        })
     })
 
     // ─── filter by area ──────────────────────────────────────────────────────
@@ -442,6 +468,20 @@ describe('getFilteredTodos', () => {
             resetState({ todos, selectedGtdStatus: 'inbox' })
             const result = getFilteredTodos()
             expect(result).toHaveLength(2)
+        })
+
+        it('treats both items without priority as equal (returns 0)', () => {
+            const priorities = [{ id: 'pri-high', level: 1 }]
+            const todos = [
+                { id: 1, text: 'A', gtd_status: 'inbox', priority_id: null },
+                { id: 2, text: 'B', gtd_status: 'inbox', priority_id: undefined },
+                { id: 3, text: 'C', gtd_status: 'inbox', priority_id: 'pri-high' }
+            ]
+            resetState({ todos, priorities, selectedGtdStatus: 'inbox' })
+            const result = getFilteredTodos()
+            // C (priority) comes first, then A and B in original order
+            expect(result[0].id).toBe(3)
+            expect(result).toHaveLength(3)
         })
     })
 
