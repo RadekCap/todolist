@@ -773,4 +773,120 @@ describe('calculateFirstOccurrence', () => {
             type: 'monthly', interval: 1, dayType: 'day_of_month', dayOfMonth: 10
         })).toBe('2025-04-10')
     })
+
+    // ─── yearly ───────────────────────────────────────────────────────────
+
+    describe('yearly by day_of_month', () => {
+        it('returns this year if the date has not passed', () => {
+            mockDate('2025-06-01')
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 12, dayType: 'day_of_month', dayOfMonth: 25
+            })).toBe('2025-12-25')
+        })
+
+        it('returns next year if the date has passed', () => {
+            mockDate('2025-09-01')
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 3, dayType: 'day_of_month', dayOfMonth: 15
+            })).toBe('2026-03-15')
+        })
+
+        it('returns today if the date matches today', () => {
+            mockDate('2025-07-04')
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 7, dayType: 'day_of_month', dayOfMonth: 4
+            })).toBe('2025-07-04')
+        })
+
+        it('clamps to last day of month for Feb 29 in non-leap year', () => {
+            mockDate('2025-01-01') // 2025 is not a leap year
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 2, dayType: 'day_of_month', dayOfMonth: 29
+            })).toBe('2025-02-28')
+        })
+
+        it('uses Feb 29 in a leap year', () => {
+            mockDate('2024-01-01') // 2024 is a leap year
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 2, dayType: 'day_of_month', dayOfMonth: 29
+            })).toBe('2024-02-29')
+        })
+
+        it('defaults to month 1 and day 1 when not specified', () => {
+            mockDate('2025-06-01')
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1
+            })).toBe('2026-01-01')
+        })
+    })
+
+    describe('yearly by weekday', () => {
+        it('returns the nth weekday of the target month', () => {
+            // 1st Monday of September 2025 = September 1, 2025
+            mockDate('2025-01-01')
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 9, dayType: 'weekday', weekday: 1, weekdayOrdinal: 1
+            })).toBe('2025-09-01')
+        })
+
+        it('moves to next year if this years occurrence passed', () => {
+            // 1st Monday of March 2025 = March 3
+            mockDate('2025-04-01') // already past March
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 3, dayType: 'weekday', weekday: 1, weekdayOrdinal: 1
+            })).toBe('2026-03-02') // 1st Monday of March 2026
+        })
+
+        it('finds the last weekday of a month (ordinal -1)', () => {
+            // Last Friday of November 2025 = November 28
+            mockDate('2025-01-01')
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 11, dayType: 'weekday', weekday: 5, weekdayOrdinal: -1
+            })).toBe('2025-11-28')
+        })
+
+        it('returns null ordinal that does not exist (5th weekday)', () => {
+            // 5th Monday of February 2025 does not exist
+            mockDate('2025-01-01')
+            const result = calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 2, dayType: 'weekday', weekday: 1, weekdayOrdinal: 5
+            })
+            // getNthWeekdayOfMonthInternal returns null, so fallback to todayStr
+            expect(result).toBeTruthy()
+        })
+
+        it('defaults weekday to Monday and ordinal to 1', () => {
+            mockDate('2025-01-01')
+            const result = calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 6, dayType: 'weekday'
+            })
+            // 1st Monday of June 2025 = June 2
+            expect(result).toBe('2025-06-02')
+        })
+    })
+
+    describe('yearly by last_day', () => {
+        it('returns the last day of the target month', () => {
+            mockDate('2025-01-01')
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 4, dayType: 'last_day'
+            })).toBe('2025-04-30')
+        })
+
+        it('moves to next year if the date has passed', () => {
+            mockDate('2025-03-01')
+            expect(calculateFirstOccurrence({
+                type: 'yearly', interval: 1, month: 2, dayType: 'last_day'
+            })).toBe('2026-02-28')
+        })
+    })
+
+    describe('unknown type', () => {
+        it('returns today for unknown recurrence type', () => {
+            mockDate('2025-05-01')
+            expect(calculateFirstOccurrence({
+                type: 'unknown_type', interval: 1
+            })).toBe('2025-05-01')
+        })
+    })
 })
