@@ -149,15 +149,7 @@ export async function generateNextRecurrence(templateId, fromDate) {
         }
     }
 
-    // Check if count limit reached
     const newCount = (template.recurrence_count || 0) + 1
-    if (template.recurrence_end_type === 'after_count' && template.recurrence_end_count) {
-        if (newCount > template.recurrence_end_count) {
-            console.log('Recurrence count limit reached')
-            return null
-        }
-    }
-
     const currentUser = store.get('currentUser')
 
     // Create new instance
