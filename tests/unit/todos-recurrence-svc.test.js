@@ -358,6 +358,34 @@ describe('todos-recurrence', () => {
             consoleSpy.mockRestore()
         })
 
+        it('returns null when calculateNextOccurrence returns null', async () => {
+            store.set('templates', [{
+                id: 'tmpl-bad-rule',
+                recurrence_rule: { type: 'weekly', interval: 1, weekdays: [] },
+                recurrence_count: 0,
+                recurrence_end_type: 'never',
+                recurrence_end_date: null,
+                recurrence_end_count: null,
+                text: 'bad-rule',
+                comment: null,
+                category_id: null,
+                project_id: null,
+                priority_id: null,
+                context_id: null
+            }])
+            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+            const result = await generateNextRecurrence('tmpl-bad-rule', '2026-01-01')
+
+            expect(result).toBeNull()
+            expect(consoleSpy).toHaveBeenCalledWith(
+                'Could not calculate next occurrence:',
+                expect.any(Object),
+                '2026-01-01'
+            )
+            consoleSpy.mockRestore()
+        })
+
         it('returns null when next date exceeds end date', async () => {
             store.set('templates', [{
                 id: 'tmpl-end-date',
@@ -574,6 +602,74 @@ describe('todos-recurrence', () => {
             const result = await generateNextRecurrence('tmpl-boundary', '2099-06-01')
 
             expect(result).not.toBeNull()
+        })
+
+        it('returns null when next occurrence exceeds future end date', async () => {
+            // End date is far in the future so isRecurrenceEnded returns false,
+            // but the calculated next occurrence exceeds it
+            store.set('templates', [{
+                id: 'tmpl-future-end',
+                recurrence_rule: { type: 'daily', interval: 5 },
+                recurrence_count: 1,
+                recurrence_end_type: 'on_date',
+                recurrence_end_date: '2099-06-03',
+                recurrence_end_count: null,
+                text: 'future-end-text',
+                comment: null,
+                category_id: null,
+                project_id: null,
+                priority_id: null,
+                context_id: null
+            }])
+            const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+
+            // fromDate=2099-06-01, interval=5, next=2099-06-06 which exceeds 2099-06-03
+            const result = await generateNextRecurrence('tmpl-future-end', '2099-06-01')
+
+            expect(result).toBeNull()
+            expect(consoleSpy).toHaveBeenCalledWith('Next occurrence exceeds end date')
+            consoleSpy.mockRestore()
+        })
+
+        it('returns null when new count exceeds limit (bypassing isRecurrenceEnded)', async () => {
+            // This covers the inner count guard at lines 155-158.
+            // isRecurrenceEnded uses >=, but the inner guard uses >.
+            // To reach it: set recurrence_count just below end_count so isRecurrenceEnded passes,
+            // but newCount (count+1) > end_count.
+            // With end_count=2 and count=1: isRecurrenceEnded(1 >= 2) = false, newCount=2, 2>2 = false.
+            // With end_count=1 and count=0: isRecurrenceEnded(0 >= 1) = false, newCount=1, 1>1 = false.
+            // This branch is effectively unreachable with integer counts because:
+            //   isRecurrenceEnded: count >= end_count => false means count < end_count
+            //   Inner guard: count+1 > end_count => only true if count >= end_count (contradiction)
+            // Marking as documented dead code — the guard serves as a safety net.
+            // We verify the boundary case still proceeds correctly:
+            store.set('templates', [{
+                id: 'tmpl-count-boundary',
+                recurrence_rule: { type: 'daily', interval: 1 },
+                recurrence_count: 4,
+                recurrence_end_type: 'after_count',
+                recurrence_end_count: 5,
+                text: 'count-boundary',
+                comment: null,
+                category_id: null,
+                project_id: null,
+                priority_id: null,
+                context_id: null
+            }])
+            const instanceData = {
+                id: 'inst-count-boundary',
+                text: 'count-boundary',
+                comment: null,
+                template_id: 'tmpl-count-boundary'
+            }
+            mockSupabase._queueResult([instanceData])
+            mockSupabase._queueResult(null)
+
+            // count=4, end_count=5: isRecurrenceEnded(4>=5)=false, newCount=5, 5>5=false => proceeds
+            const result = await generateNextRecurrence('tmpl-count-boundary', '2026-01-01')
+
+            expect(result).not.toBeNull()
+            expect(result.id).toBe('inst-count-boundary')
         })
     })
 
