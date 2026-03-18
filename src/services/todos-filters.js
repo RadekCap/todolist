@@ -70,13 +70,8 @@ export function getFilteredTodos() {
     if (state.selectedGtdStatus === 'scheduled') {
         // Show all items with a due date (excluding done) - this is a virtual/computed view
         filtered = filtered.filter(t => t.due_date && t.gtd_status !== 'done')
-        // Sort by due date (earliest first), items without dates go last
-        return filtered.slice().sort((a, b) => {
-            if (!a.due_date && !b.due_date) return 0
-            if (!a.due_date) return 1
-            if (!b.due_date) return -1
-            return a.due_date.localeCompare(b.due_date)
-        })
+        // Sort by due date (earliest first) — all items guaranteed to have due_date
+        return filtered.slice().sort((a, b) => a.due_date.localeCompare(b.due_date))
     } else if (state.selectedProjectId !== null) {
         // Project view: exclude done, sort by due date (items with dates first, then without)
         filtered = filtered.filter(t => t.gtd_status !== 'done')
