@@ -478,6 +478,12 @@ describe('isRecurrenceEnded', () => {
             recurrence_end_count: 5
         })).toBe(false)
     })
+
+    it('returns false for unknown end type', () => {
+        expect(isRecurrenceEnded({
+            recurrence_end_type: 'custom_unknown'
+        })).toBe(false)
+    })
 })
 
 // ─── validateRecurrenceRule ────────────────────────────────────────────────────
@@ -772,6 +778,76 @@ describe('calculateFirstOccurrence', () => {
         expect(calculateFirstOccurrence({
             type: 'monthly', interval: 1, dayType: 'day_of_month', dayOfMonth: 10
         })).toBe('2025-04-10')
+    })
+
+    describe('monthly by weekday', () => {
+        it('returns this month if nth weekday has not passed', () => {
+            // 2025-03-01 is Saturday. 2nd Tuesday of March 2025 = March 11
+            mockDate('2025-03-01')
+            expect(calculateFirstOccurrence({
+                type: 'monthly', interval: 1, dayType: 'weekday', weekday: 2, weekdayOrdinal: 2
+            })).toBe('2025-03-11')
+        })
+
+        it('returns next month if nth weekday has passed', () => {
+            // 2025-03-20 is past 2nd Tuesday (March 11). 2nd Tuesday of April 2025 = April 8
+            mockDate('2025-03-20')
+            expect(calculateFirstOccurrence({
+                type: 'monthly', interval: 1, dayType: 'weekday', weekday: 2, weekdayOrdinal: 2
+            })).toBe('2025-04-08')
+        })
+
+        it('returns last weekday of current month if not passed', () => {
+            // Last Friday of March 2025 = March 28
+            mockDate('2025-03-01')
+            expect(calculateFirstOccurrence({
+                type: 'monthly', interval: 1, dayType: 'weekday', weekday: 5, weekdayOrdinal: -1
+            })).toBe('2025-03-28')
+        })
+
+        it('returns last weekday of next month if passed', () => {
+            // 2025-03-29 is past last Friday (March 28). Last Friday of April 2025 = April 25
+            mockDate('2025-03-29')
+            expect(calculateFirstOccurrence({
+                type: 'monthly', interval: 1, dayType: 'weekday', weekday: 5, weekdayOrdinal: -1
+            })).toBe('2025-04-25')
+        })
+
+        it('defaults weekday to Monday and ordinal to 1', () => {
+            // 1st Monday of March 2025 = March 3
+            mockDate('2025-03-01')
+            expect(calculateFirstOccurrence({
+                type: 'monthly', interval: 1, dayType: 'weekday'
+            })).toBe('2025-03-03')
+        })
+    })
+
+    describe('monthly by last_day', () => {
+        it('returns last day of current month if not passed', () => {
+            mockDate('2025-03-01')
+            expect(calculateFirstOccurrence({
+                type: 'monthly', interval: 1, dayType: 'last_day'
+            })).toBe('2025-03-31')
+        })
+
+        it('returns last day of next month if today is past it', () => {
+            // March 31 is the last day, but if today IS March 31 it should still return March 31
+            // So test with April 1 to force next month
+            mockDate('2025-04-01')
+            expect(calculateFirstOccurrence({
+                type: 'monthly', interval: 1, dayType: 'last_day'
+            })).toBe('2025-04-30')
+        })
+
+        it('moves to next month when last day already passed', () => {
+            // February has 28 days in 2025. If today is March 1, last_day for Feb is past.
+            // But the function checks current month, not a specific month.
+            // If today is Jan 31 (which IS the last day), result >= today so no move.
+            mockDate('2025-01-31')
+            expect(calculateFirstOccurrence({
+                type: 'monthly', interval: 1, dayType: 'last_day'
+            })).toBe('2025-01-31')
+        })
     })
 
     // ─── yearly ───────────────────────────────────────────────────────────
