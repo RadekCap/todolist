@@ -631,18 +631,7 @@ describe('todos-recurrence', () => {
             consoleSpy.mockRestore()
         })
 
-        it('returns null when new count exceeds limit (bypassing isRecurrenceEnded)', async () => {
-            // This covers the inner count guard at lines 155-158.
-            // isRecurrenceEnded uses >=, but the inner guard uses >.
-            // To reach it: set recurrence_count just below end_count so isRecurrenceEnded passes,
-            // but newCount (count+1) > end_count.
-            // With end_count=2 and count=1: isRecurrenceEnded(1 >= 2) = false, newCount=2, 2>2 = false.
-            // With end_count=1 and count=0: isRecurrenceEnded(0 >= 1) = false, newCount=1, 1>1 = false.
-            // This branch is effectively unreachable with integer counts because:
-            //   isRecurrenceEnded: count >= end_count => false means count < end_count
-            //   Inner guard: count+1 > end_count => only true if count >= end_count (contradiction)
-            // Marking as documented dead code — the guard serves as a safety net.
-            // We verify the boundary case still proceeds correctly:
+        it('proceeds when count is one below the limit', async () => {
             store.set('templates', [{
                 id: 'tmpl-count-boundary',
                 recurrence_rule: { type: 'daily', interval: 1 },
