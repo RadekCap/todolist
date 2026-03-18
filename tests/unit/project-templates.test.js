@@ -366,6 +366,16 @@ describe('project-templates', () => {
 
             await expect(addTemplateItem('tmpl-1', 'Fail')).rejects.toEqual({ message: 'Item insert failed' })
         })
+
+        it('defaults sort_order to 0 when template is not found in store', async () => {
+            mockSupabase._queueResult([{ id: 'itm-orphan', template_id: 'tmpl-unknown', text: 'enc:Orphan', sort_order: 0 }])
+
+            await addTemplateItem('tmpl-unknown', 'Orphan')
+
+            expect(mockSupabase.insert).toHaveBeenCalledWith(expect.objectContaining({
+                sort_order: 0
+            }))
+        })
     })
 
     // ─── deleteTemplateItem ───────────────────────────────────────────────
@@ -580,6 +590,21 @@ describe('project-templates', () => {
             await expect(reorderTemplateItems('tmpl-1', ['item-2', 'item-1']))
                 .rejects.toEqual({ message: 'Reorder failed' })
         })
+
+        it('preserves items not included in orderedItemIds', async () => {
+            // Only reorder item-2, leaving item-1 out of the ordered list
+            mockSupabase._queueResult(null) // one update for item-2
+
+            await reorderTemplateItems('tmpl-1', ['item-2'])
+
+            const templates = store.get('projectTemplates')
+            const tmpl1 = templates.find(t => t.id === 'tmpl-1')
+            // item-2 should have sort_order 0, item-1 keeps its original sort_order
+            const item1 = tmpl1.items.find(i => i.id === 'item-1')
+            const item2 = tmpl1.items.find(i => i.id === 'item-2')
+            expect(item2.sort_order).toBe(0)
+            expect(item1.sort_order).toBe(0) // original sort_order preserved
+        })
     })
 
     // ─── createProjectFromTemplate ────────────────────────────────────────
@@ -648,6 +673,31 @@ describe('project-templates', () => {
             expect(addProject).toHaveBeenCalledWith('Empty Template')
             expect(addTodo).not.toHaveBeenCalled()
             expect(result).toEqual(expect.objectContaining({ id: 'proj-new' }))
+        })
+
+        it('sorts root projects by sort_order with fallback to 0', async () => {
+            store.set('projects', [
+                { id: 'proj-2', name: 'Second', parent_id: null, sort_order: 2 },
+                { id: 'proj-no-order', name: 'No order', parent_id: null }
+            ])
+
+            await createProjectFromTemplate('tmpl-2')
+
+            // proj-no-order has no sort_order, defaults to 0, so comes first
+            expect(reorderProjects).toHaveBeenCalledWith(['proj-new', 'proj-no-order', 'proj-2'])
+        })
+
+        it('excludes child projects (with parent_id) from root reordering', async () => {
+            store.set('projects', [
+                { id: 'proj-1', name: 'Root', parent_id: null, sort_order: 0 },
+                { id: 'proj-child', name: 'Child', parent_id: 'proj-1', sort_order: 1 },
+                { id: 'proj-2', name: 'Root 2', parent_id: null, sort_order: 2 }
+            ])
+
+            await createProjectFromTemplate('tmpl-2')
+
+            // reorderProjects should only include root projects (no parent_id)
+            expect(reorderProjects).toHaveBeenCalledWith(['proj-new', 'proj-1', 'proj-2'])
         })
     })
 })
