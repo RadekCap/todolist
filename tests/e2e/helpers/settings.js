@@ -24,8 +24,21 @@ export async function openSettingsModal(page) {
  * @param {import('@playwright/test').Page} page
  */
 export async function saveSettings(page) {
+    // Capture any error alert from the save operation
+    let alertMessage = null
+    const dialogHandler = dialog => {
+        alertMessage = dialog.message()
+        dialog.dismiss()
+    }
+    page.on('dialog', dialogHandler)
+
     await page.click('#saveSettingsBtn')
     await expect(page.locator('#settingsModal')).not.toHaveClass(/active/, { timeout: 10000 })
+
+    page.off('dialog', dialogHandler)
+    if (alertMessage) {
+        throw new Error(`Settings save failed with alert: ${alertMessage}`)
+    }
 }
 
 /**
