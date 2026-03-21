@@ -5,6 +5,9 @@ CREATE TABLE IF NOT EXISTS user_settings (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     color_theme VARCHAR(20) DEFAULT 'purple',
+    email_notifications_enabled BOOLEAN DEFAULT FALSE,
+    email_notification_time TIME DEFAULT '08:00:00',
+    timezone TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id)
@@ -55,6 +58,7 @@ CREATE POLICY "Users can delete own settings"
 
 -- Create index for faster lookups by user_id
 CREATE INDEX idx_user_settings_user_id ON user_settings(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_settings_notifications ON user_settings(user_id) WHERE email_notifications_enabled = TRUE;
 
 -- Add comment to table
 COMMENT ON TABLE user_settings IS 'Stores user preferences like color theme selection';
