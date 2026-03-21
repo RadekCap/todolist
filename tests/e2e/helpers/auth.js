@@ -18,7 +18,7 @@ export async function login(page, email, password) {
 
     // Click login and wait for the auth network response
     await Promise.all([
-        page.waitForResponse(resp => resp.url().includes('supabase') && resp.url().includes('token'), { timeout: 30000 }),
+        page.waitForResponse(resp => resp.url().includes('token') && resp.status() === 200, { timeout: 30000 }),
         page.click('#loginForm .auth-btn')
     ])
 

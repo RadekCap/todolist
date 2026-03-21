@@ -2,6 +2,16 @@ name: E2E Tests
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '*.html'
+      - '*.js'
+      - '*.css'
+      - 'src/**'
+      - 'tests/e2e/**'
+      - 'playwright.config.js'
+      - 'package.json'
+      - 'migrations/**'
+      - '.github/workflows/e2e-tests.yml'
   merge_group:
     branches: [main]
 
@@ -103,12 +113,51 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+
+      # Start local Supabase to avoid production egress
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start local Supabase
+        run: |
+          mkdir -p supabase/migrations
+          for f in migrations/*.sql; do
+            cp "$f" "supabase/migrations/$(basename "$f")"
+          done
+          supabase start
+      - name: Create test user and export config
+        run: |
+          ANON_KEY=$(supabase status -o json | jq -r '."ANON_KEY"')
+          API_URL=$(supabase status -o json | jq -r '."API_URL"')
+          SERVICE_ROLE_KEY=$(supabase status -o json | jq -r '."SERVICE_ROLE_KEY"')
+
+          # Create test user and get their ID
+          USER_RESP=$(curl -sf -X POST "${API_URL}/auth/v1/admin/users" \
+            -H "apikey: ${SERVICE_ROLE_KEY}" \
+            -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"email": "test@e2e.local", "password": "testpass123", "email_confirm": true}')
+          USER_ID=$(echo "$USER_RESP" | jq -r '.id')
+
+          # Pre-seed user_settings row so upsert updates (not insert) like production
+          curl -sf -X POST "${API_URL}/rest/v1/user_settings" \
+            -H "apikey: ${SERVICE_ROLE_KEY}" \
+            -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            -d "{\"user_id\": \"${USER_ID}\", \"color_theme\": \"purple\"}"
+
+          echo "SUPABASE_URL=${API_URL}" >> "$GITHUB_ENV"
+          echo "SUPABASE_KEY=${ANON_KEY}" >> "$GITHUB_ENV"
+
       - run: npm ci
       - run: npx playwright install chromium --with-deps
       - run: npx playwright test ${{ matrix.specs }}
         env:
-          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+          SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ env.SUPABASE_KEY }}
+          TEST_USER_EMAIL: test@e2e.local
+          TEST_USER_PASSWORD: testpass123
       - uses: actions/upload-artifact@v5
         if: always()
         with:

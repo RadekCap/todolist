@@ -6,9 +6,7 @@
  * before inserting anything.
  */
 
-const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
-const SUPABASE_KEY =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
+import { SUPABASE_URL, SUPABASE_KEY } from './helpers/supabase-config.js'
 
 async function globalSetup() {
     const email = process.env.TEST_USER_EMAIL
@@ -123,6 +121,16 @@ async function globalSetup() {
         }
     } else {
         console.log(`[global-setup] ${priorities.length} priorities already exist — skipping`)
+    }
+
+    // --- Projects ---------------------------------------------------------------
+    const projects = await fetchRows('projects')
+    if (projects.length === 0) {
+        await insertRows('projects', [
+            { name: 'Test Project', color: '#4a90d9', user_id }
+        ])
+    } else {
+        console.log(`[global-setup] ${projects.length} projects already exist — skipping`)
     }
 
     console.log('[global-setup] Data seeding complete')

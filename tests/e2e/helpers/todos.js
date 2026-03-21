@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test'
+import { SUPABASE_URL, SUPABASE_KEY } from './supabase-config.js'
 
 /**
  * Generate a unique string for test data isolation.
@@ -117,17 +118,14 @@ export async function switchGtdTab(page, status) {
 export async function clearInboxViaApi(page) {
     // Clear and verify via API in a tight loop (no page reload in between).
     // This shrinks the race window from ~3s (reload) to ~50ms (API call).
-    const allMovedIds = await page.evaluate(async () => {
-        const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
-
+    const allMovedIds = await page.evaluate(async ({ url, key }) => {
         const storageKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
         if (!storageKey) throw new Error('No Supabase auth session found in localStorage')
         const session = JSON.parse(localStorage.getItem(storageKey))
         const token = session?.access_token || session?.currentSession?.access_token
 
         const headers = {
-            'apikey': SUPABASE_KEY,
+            'apikey': key,
             'Authorization': `Bearer ${token}`
         }
 
@@ -136,7 +134,7 @@ export async function clearInboxViaApi(page) {
         for (let attempt = 0; attempt < 5; attempt++) {
             // Fetch inbox todos
             const listResp = await fetch(
-                `${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox&select=id`,
+                `${url}/rest/v1/todos?gtd_status=eq.inbox&select=id`,
                 { headers }
             )
             const inboxTodos = await listResp.json()
@@ -146,7 +144,7 @@ export async function clearInboxViaApi(page) {
 
             // Move them out of inbox
             await fetch(
-                `${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox`,
+                `${url}/rest/v1/todos?gtd_status=eq.inbox`,
                 {
                     method: 'PATCH',
                     headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
@@ -156,7 +154,7 @@ export async function clearInboxViaApi(page) {
         }
 
         return movedIds
-    })
+    }, { url: SUPABASE_URL, key: SUPABASE_KEY })
 
     // Reload and verify the inbox is visually empty.
     // Another parallel E2E group may add an inbox todo between the API clear
@@ -173,26 +171,24 @@ export async function clearInboxViaApi(page) {
         if (todoCount === 0) return allMovedIds
 
         // Inbox still has items — clear again via API then retry reload
-        const extraIds = await page.evaluate(async () => {
-            const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
-            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
+        const extraIds = await page.evaluate(async ({ url, key }) => {
             const storageKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
             const session = JSON.parse(localStorage.getItem(storageKey))
             const token = session?.access_token || session?.currentSession?.access_token
             const headers = {
-                'apikey': SUPABASE_KEY,
+                'apikey': key,
                 'Authorization': `Bearer ${token}`
             }
-            const resp = await fetch(`${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox&select=id`, { headers })
+            const resp = await fetch(`${url}/rest/v1/todos?gtd_status=eq.inbox&select=id`, { headers })
             const todos = await resp.json()
             if (!todos.length) return []
-            await fetch(`${SUPABASE_URL}/rest/v1/todos?gtd_status=eq.inbox`, {
+            await fetch(`${url}/rest/v1/todos?gtd_status=eq.inbox`, {
                 method: 'PATCH',
                 headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
                 body: JSON.stringify({ gtd_status: 'someday_maybe' })
             })
             return todos.map(t => t.id)
-        })
+        }, { url: SUPABASE_URL, key: SUPABASE_KEY })
         allMovedIds.push(...extraIds)
     }
 
@@ -206,10 +202,7 @@ export async function clearInboxViaApi(page) {
  */
 export async function restoreInboxViaApi(page, ids) {
     if (!ids.length) return
-    await page.evaluate(async (todoIds) => {
-        const SUPABASE_URL = 'https://rkvmujdayjmszmyzbhal.supabase.co'
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrdm11amRheWptc3pteXpiaGFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxODc2MDcsImV4cCI6MjA3OTc2MzYwN30.55RoV1mmHeykVz9waU7Jz6-JSkrRqlNa-ABBE8SN-jA'
-
+    await page.evaluate(async ({ todoIds, url, key }) => {
         const storageKey = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'))
         const session = JSON.parse(localStorage.getItem(storageKey))
         const token = session?.access_token || session?.currentSession?.access_token
@@ -217,11 +210,11 @@ export async function restoreInboxViaApi(page, ids) {
         // Build filter for the specific IDs
         const idFilter = todoIds.map(id => `"${id}"`).join(',')
         await fetch(
-            `${SUPABASE_URL}/rest/v1/todos?id=in.(${idFilter})`,
+            `${url}/rest/v1/todos?id=in.(${idFilter})`,
             {
                 method: 'PATCH',
                 headers: {
-                    'apikey': SUPABASE_KEY,
+                    'apikey': key,
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                     'Prefer': 'return=minimal'
@@ -229,7 +222,7 @@ export async function restoreInboxViaApi(page, ids) {
                 body: JSON.stringify({ gtd_status: 'inbox' })
             }
         )
-    }, ids)
+    }, { todoIds: ids, url: SUPABASE_URL, key: SUPABASE_KEY })
 }
 
 /**
