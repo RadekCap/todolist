@@ -123,6 +123,16 @@ async function globalSetup() {
         console.log(`[global-setup] ${priorities.length} priorities already exist — skipping`)
     }
 
+    // --- Projects ---------------------------------------------------------------
+    const projects = await fetchRows('projects')
+    if (projects.length === 0) {
+        await insertRows('projects', [
+            { name: 'Test Project', color: '#4a90d9', user_id }
+        ])
+    } else {
+        console.log(`[global-setup] ${projects.length} projects already exist — skipping`)
+    }
+
     console.log('[global-setup] Data seeding complete')
 }
 
