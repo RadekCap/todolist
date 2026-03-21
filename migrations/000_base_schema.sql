@@ -77,13 +77,6 @@ CREATE POLICY "Users can insert own priorities" ON priorities FOR INSERT WITH CH
 CREATE POLICY "Users can update own priorities" ON priorities FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can delete own priorities" ON priorities FOR DELETE USING (auth.uid() = user_id);
 
--- ─── user_settings extras (columns added outside of numbered migrations) ────────
-
-ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS email_notifications_enabled BOOLEAN DEFAULT FALSE;
-ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS email_notification_time TIME DEFAULT '08:00:00';
-ALTER TABLE user_settings ADD COLUMN IF NOT EXISTS timezone TEXT;
-CREATE INDEX IF NOT EXISTS idx_user_settings_notifications ON user_settings(user_id) WHERE email_notifications_enabled = TRUE;
-
 -- ─── foreign keys (added after all tables exist) ────────────────────────────────
 
 ALTER TABLE todos ADD CONSTRAINT todos_category_id_fkey FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL;
