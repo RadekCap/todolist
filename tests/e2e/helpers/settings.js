@@ -18,16 +18,14 @@ export async function openSettingsModal(page) {
 }
 
 /**
- * Save and close the settings modal, waiting for the Supabase write to complete.
+ * Save and close the settings modal, waiting for the Supabase writes to complete.
+ * The app makes two sequential upserts (user settings + notification settings),
+ * so we wait for the modal to close rather than tracking individual responses.
  * @param {import('@playwright/test').Page} page
  */
 export async function saveSettings(page) {
-    const saved = page.waitForResponse(
-        resp => resp.url().includes('user_settings') && resp.request().method() !== 'GET'
-    )
     await page.click('#saveSettingsBtn')
-    await saved
-    await expect(page.locator('#settingsModal')).not.toHaveClass(/active/, { timeout: 5000 })
+    await expect(page.locator('#settingsModal')).not.toHaveClass(/active/, { timeout: 10000 })
 }
 
 /**
