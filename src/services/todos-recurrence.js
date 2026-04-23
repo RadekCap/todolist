@@ -76,10 +76,15 @@ export async function createRecurringTodo(todoData, recurrenceRule, endCondition
     }
 
     // Update template recurrence count
-    await supabase
+    const { error: countError } = await supabase
         .from('todos')
         .update({ recurrence_count: 1 })
         .eq('id', template.id)
+
+    if (countError) {
+        console.error('Error updating recurrence count:', countError)
+        throw countError
+    }
 
     // Add instance to local state
     const instance = { ...instanceData[0], text, comment }
@@ -177,10 +182,15 @@ export async function generateNextRecurrence(templateId, fromDate) {
     }
 
     // Update template recurrence count
-    await supabase
+    const { error: countError } = await supabase
         .from('todos')
         .update({ recurrence_count: newCount })
         .eq('id', template.id)
+
+    if (countError) {
+        console.error('Error updating recurrence count:', countError)
+        throw countError
+    }
 
     // Update template in store
     template.recurrence_count = newCount
