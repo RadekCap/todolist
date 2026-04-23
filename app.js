@@ -755,14 +755,21 @@ class TodoApp {
         document.body.classList.add('fullscreen-mode')
 
         // Load all data
-        await Promise.all([
-            loadAreas(),
-            loadCategories(),
-            loadPriorities(),
-            loadContexts(),
-            loadProjects(),
-            loadTodos()
-        ])
+        try {
+            await Promise.all([
+                loadAreas(),
+                loadCategories(),
+                loadPriorities(),
+                loadContexts(),
+                loadProjects(),
+                loadTodos()
+            ])
+        } catch (error) {
+            console.error('Failed to load application data:', error)
+            this.showMessage('Failed to load your data. Please refresh the page.', 'error')
+            this.hideLoadingScreen()
+            return
+        }
 
         // Restore persisted UI state
         restoreSelectedArea()
