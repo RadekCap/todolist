@@ -238,14 +238,20 @@ export async function deleteProject(projectId, { deleteTodos = false, moveToProj
         store.set('todos', todos)
     }
 
-    const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', projectId)
+    let deleteError
+    try {
+        const { error } = await supabase
+            .from('projects')
+            .delete()
+            .eq('id', projectId)
+        deleteError = error
+    } catch (e) {
+        deleteError = e
+    }
 
-    if (error) {
-        console.error('Error deleting project:', error)
-        throw error
+    if (deleteError) {
+        console.error('Error deleting project (todos may have already been moved/deleted):', deleteError)
+        throw deleteError
     }
 
     // Remove project and all descendants from local store
