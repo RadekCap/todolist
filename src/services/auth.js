@@ -205,7 +205,11 @@ export function lock() {
  * @returns {Promise<{session: Object|null, user: Object|null}>}
  */
 export async function getSession() {
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { session }, error } = await supabase.auth.getSession()
+    if (error) {
+        console.error('Failed to retrieve session:', error)
+        throw error
+    }
     return { session, user: session?.user || null }
 }
 
