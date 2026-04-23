@@ -165,10 +165,15 @@ export async function reorderAreas(orderedIds) {
 
     // Update database
     for (let i = 0; i < orderedIds.length; i++) {
-        await supabase
+        const { error } = await supabase
             .from('areas')
             .update({ sort_order: i })
             .eq('id', orderedIds[i])
+
+        if (error) {
+            console.error('Error updating area sort order:', error)
+            throw error
+        }
     }
 
     events.emit(Events.AREAS_LOADED, store.get('areas'))
