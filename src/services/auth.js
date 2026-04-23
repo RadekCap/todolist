@@ -196,7 +196,9 @@ export function onAuthStateChange(onSignOut) {
  */
 export async function encrypt(plaintext) {
     const encryptionKey = store.get('encryptionKey')
-    if (!encryptionKey) return plaintext
+    if (!encryptionKey) {
+        throw new Error('Encryption key not available. Please log out and log in again.')
+    }
     return await CryptoUtils.encrypt(plaintext, encryptionKey)
 }
 
