@@ -539,12 +539,12 @@ describe('auth', () => {
             expect(CryptoUtils.encrypt).toHaveBeenCalledWith('hello', 'mock-key')
         })
 
-        it('returns plaintext when no encryptionKey (passthrough)', async () => {
+        it('throws when no encryptionKey is available', async () => {
             // No encryptionKey set
 
-            const result = await encrypt('hello')
-
-            expect(result).toBe('hello')
+            await expect(encrypt('hello')).rejects.toThrow(
+                'Encryption key not available. Please log out and log in again.'
+            )
             expect(CryptoUtils.encrypt).not.toHaveBeenCalled()
         })
     })
