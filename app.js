@@ -973,6 +973,7 @@ class TodoApp {
             renderManageProjectsList(this.manageProjectsList)
         } catch (error) {
             console.error('Failed to add project:', error)
+            alert('Failed to add project')
         } finally {
             this.addNewProjectBtn.disabled = false
             this.addNewProjectBtn.textContent = 'Add'
@@ -992,6 +993,7 @@ class TodoApp {
             renderTemplatesList(this.templatesList)
         } catch (error) {
             console.error('Failed to add template:', error)
+            alert('Failed to add template')
         } finally {
             this.addTemplateBtn.disabled = false
             this.addTemplateBtn.textContent = 'Add'
