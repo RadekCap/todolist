@@ -11,11 +11,15 @@ import { CryptoUtils } from '../utils/crypto.js'
  */
 export async function initializeEncryption(user, password) {
     // Try to load existing salt from user_settings
-    const { data: settings } = await supabase
+    const { data: settings, error: settingsError } = await supabase
         .from('user_settings')
         .select('encryption_salt')
         .eq('user_id', user.id)
         .single()
+
+    if (settingsError && settingsError.code !== 'PGRST116') {
+        throw new Error('Failed to load encryption settings: ' + settingsError.message)
+    }
 
     let salt
     if (settings && settings.encryption_salt) {
