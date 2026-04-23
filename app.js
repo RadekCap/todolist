@@ -780,10 +780,10 @@ class TodoApp {
         initNavigation()
 
         // Load non-essential items without waiting
-        loadThemeFromDatabase()
-        loadDensityFromDatabase()
-        this.loadUserSettingsDisplay()
-        loadProjectTemplates()
+        loadThemeFromDatabase().catch(e => console.error('Failed to load theme:', e))
+        loadDensityFromDatabase().catch(e => console.error('Failed to load density:', e))
+        this.loadUserSettingsDisplay().catch(e => console.error('Failed to load user settings:', e))
+        loadProjectTemplates().catch(e => console.error('Failed to load templates:', e))
 
         this.hideLoadingScreen()
     }
