@@ -93,8 +93,8 @@ export const CryptoUtils = {
 // Check if a string looks like encrypted data (base64 with IV prefix)
 export function isEncrypted(text) {
     if (!text || text.length < 24) return false
-    // Encrypted data is base64 with at least 12 bytes IV + some ciphertext
-    // Base64 of 24+ bytes = 32+ characters
+    if (/\s/.test(text)) return false
+    if (/^[a-f0-9]+$/i.test(text)) return false
     const base64Regex = /^[A-Za-z0-9+/]+=*$/
     return base64Regex.test(text) && text.length >= 32
 }
