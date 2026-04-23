@@ -3,6 +3,44 @@ import { store } from '../core/store.js'
 import { events, Events } from '../core/events.js'
 import { CryptoUtils } from '../utils/crypto.js'
 
+let _tabKey = null
+
+async function getTabKey() {
+    if (!_tabKey) {
+        _tabKey = await crypto.subtle.generateKey(
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['encrypt', 'decrypt']
+        )
+    }
+    return _tabKey
+}
+
+async function storePasswordSecurely(password) {
+    const key = await getTabKey()
+    const iv = crypto.getRandomValues(new Uint8Array(12))
+    const encoded = new TextEncoder().encode(password)
+    const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded)
+    const combined = new Uint8Array(iv.length + ciphertext.byteLength)
+    combined.set(iv)
+    combined.set(new Uint8Array(ciphertext), iv.length)
+    sessionStorage.setItem('_ep', btoa(String.fromCharCode(...combined)))
+}
+
+async function retrieveStoredPassword() {
+    const stored = sessionStorage.getItem('_ep')
+    if (!stored || !_tabKey) return null
+    try {
+        const combined = Uint8Array.from(atob(stored), c => c.charCodeAt(0))
+        const iv = combined.slice(0, 12)
+        const data = combined.slice(12)
+        const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, _tabKey, data)
+        return new TextDecoder().decode(decrypted)
+    } catch {
+        return null
+    }
+}
+
 /**
  * Initialize encryption key from password and user
  * @param {Object} user - Supabase user object
@@ -67,8 +105,7 @@ export async function login(email, password) {
     }
 
     await initializeEncryption(data.user, password)
-    // Store password in sessionStorage for page reload persistence
-    sessionStorage.setItem('_ep', password)
+    await storePasswordSecurely(password)
 
     store.set('currentUser', data.user)
     events.emit(Events.AUTH_LOGIN, data.user)
@@ -131,8 +168,7 @@ export async function unlock(password) {
     // Initialize encryption with the verified password
     await initializeEncryption(pendingUser, password)
 
-    // Store password in sessionStorage for page reload persistence
-    sessionStorage.setItem('_ep', password)
+    await storePasswordSecurely(password)
 
     store.set('currentUser', pendingUser)
     store.set('pendingUser', null)
@@ -177,8 +213,8 @@ export async function getSession() {
  * Check if there's a stored password for auto-unlock
  * @returns {string|null} The stored password or null
  */
-export function getStoredPassword() {
-    return sessionStorage.getItem('_ep')
+export async function getStoredPassword() {
+    return await retrieveStoredPassword()
 }
 
 /**

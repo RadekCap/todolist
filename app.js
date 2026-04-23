@@ -342,7 +342,7 @@ class TodoApp {
         const { session, user } = await getSession()
 
         if (session) {
-            const storedPassword = getStoredPassword()
+            const storedPassword = await getStoredPassword()
             if (storedPassword) {
                 try {
                     await initializeEncryption(user, storedPassword)
@@ -373,7 +373,7 @@ class TodoApp {
             // the session before tearing down the app.  Spurious SIGNED_OUT
             // events can occur when another client rotates the session (e.g.,
             // parallel E2E tests sharing one user account, or multiple tabs).
-            const storedPassword = getStoredPassword()
+            const storedPassword = await getStoredPassword()
             const currentUser = store.get('currentUser')
             if (storedPassword && currentUser) {
                 this._suppressSignOut = true
