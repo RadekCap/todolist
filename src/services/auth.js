@@ -40,7 +40,7 @@ export async function initializeEncryption(user, password) {
             }, { onConflict: 'user_id' })
 
         if (updateError) {
-            console.error('Error saving encryption salt:', updateError)
+            throw new Error('Failed to save encryption salt: ' + updateError.message)
         }
     }
 
