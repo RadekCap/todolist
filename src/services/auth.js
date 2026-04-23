@@ -136,7 +136,10 @@ export async function signup(email, password) {
  * Logout current user
  */
 export async function logout() {
-    await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+        console.error('Error during sign out:', error)
+    }
     sessionStorage.removeItem('_ep')
     // Clear persisted UI state
     localStorage.removeItem('selectedAreaId')
