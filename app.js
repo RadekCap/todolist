@@ -387,7 +387,9 @@ class TodoApp {
                         setTimeout(() => { this._suppressSignOut = false }, 2000)
                         return
                     }
-                } catch { /* recovery failed, fall through to sign out */ }
+                } catch (recoveryError) {
+                    console.error('Session recovery failed:', recoveryError)
+                }
                 this._suppressSignOut = false
             }
 
