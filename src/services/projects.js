@@ -352,10 +352,15 @@ export async function updateProject(projectId, updates) {
         const descendantIds = getDescendantIds(projectId)
         if (descendantIds.length > 0) {
             for (const childId of descendantIds) {
-                await supabase
+                const { error: childError } = await supabase
                     .from('projects')
                     .update({ area_id: updates.area_id })
                     .eq('id', childId)
+
+                if (childError) {
+                    console.error('Error propagating area to descendant project:', childError)
+                    throw childError
+                }
             }
         }
     }
