@@ -93,6 +93,12 @@ export class ImportModal extends BaseModal {
 
         if (lines.length === 0) return
 
+        const MAX_IMPORT_LINES = 500
+        if (lines.length > MAX_IMPORT_LINES) {
+            alert(`Cannot import more than ${MAX_IMPORT_LINES} items at once. You have ${lines.length} lines.`)
+            return
+        }
+
         // Get shared settings
         const projectId = this.projectSelect.value || null
         const categoryId = this.categorySelect.value || null
