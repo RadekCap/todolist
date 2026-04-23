@@ -552,10 +552,15 @@ export async function reorderProjects(orderedIds) {
 
     // Update database
     for (let i = 0; i < orderedIds.length; i++) {
-        await supabase
+        const { error } = await supabase
             .from('projects')
             .update({ sort_order: i })
             .eq('id', orderedIds[i])
+
+        if (error) {
+            console.error('Error updating project sort order:', error)
+            throw error
+        }
     }
 
     events.emit(Events.PROJECTS_LOADED, store.get('projects'))
