@@ -820,6 +820,7 @@ class TodoApp {
             ])
         } catch (error) {
             console.error('Error refreshing data:', error)
+            alert('Failed to refresh data. Please check your connection and try again.')
         } finally {
             this._suppressSignOut = false
             this.refreshBtn.disabled = false
