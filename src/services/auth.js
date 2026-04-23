@@ -210,13 +210,15 @@ export async function encrypt(plaintext) {
 export async function decrypt(ciphertext) {
     const encryptionKey = store.get('encryptionKey')
     if (!encryptionKey) return ciphertext
-    // Check if this looks like encrypted data (base64 with minimum length for IV + data)
     if (!ciphertext || ciphertext.length < 20) return ciphertext
     try {
         return await CryptoUtils.decrypt(ciphertext, encryptionKey)
     } catch (e) {
-        // If decryption fails, return original (might be unencrypted legacy data)
-        console.warn('Decryption failed, returning original text:', e)
+        const looksEncrypted = /^[A-Za-z0-9+/]+=*$/.test(ciphertext) && ciphertext.length >= 32
+        if (looksEncrypted) {
+            console.error('Decryption failed for data that appears encrypted:', e)
+            throw new Error('Failed to decrypt data. Your encryption key may be incorrect.')
+        }
         return ciphertext
     }
 }

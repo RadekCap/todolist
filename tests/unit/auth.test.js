@@ -584,16 +584,26 @@ describe('auth', () => {
             expect(CryptoUtils.decrypt).not.toHaveBeenCalled()
         })
 
-        it('returns original text when decryption throws (legacy data)', async () => {
+        it('returns original text when decryption throws for non-encrypted-looking data (legacy data)', async () => {
             store.set('encryptionKey', 'mock-key')
             CryptoUtils.decrypt.mockRejectedValueOnce(new Error('bad data'))
-            const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
             const result = await decrypt('this-is-long-enough-to-try-decrypt')
 
             expect(result).toBe('this-is-long-enough-to-try-decrypt')
-            expect(warnSpy).toHaveBeenCalled()
-            warnSpy.mockRestore()
+        })
+
+        it('throws error when decryption fails for encrypted-looking data', async () => {
+            store.set('encryptionKey', 'mock-key')
+            CryptoUtils.decrypt.mockRejectedValueOnce(new Error('bad data'))
+            const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+            // Base64-looking string with length >= 32
+            const encryptedLooking = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
+
+            await expect(decrypt(encryptedLooking)).rejects.toThrow('Failed to decrypt data. Your encryption key may be incorrect.')
+            expect(errorSpy).toHaveBeenCalled()
+            errorSpy.mockRestore()
         })
     })
 })
