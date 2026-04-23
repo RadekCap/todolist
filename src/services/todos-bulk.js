@@ -244,10 +244,15 @@ async function bulkRestorePreviousStates(previousStates, fields) {
             }
         }
 
-        await supabase
+        const { error } = await supabase
             .from('todos')
             .update(updateData)
             .eq('id', prev.id)
+
+        if (error) {
+            console.error('Error restoring previous todo state:', error)
+            throw error
+        }
     }
 
     // Update local state
