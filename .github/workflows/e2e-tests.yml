@@ -125,6 +125,20 @@ jobs:
             cp "$f" "supabase/migrations/$(basename "$f")"
           done
           supabase start
+      - name: Wait for Supabase auth to be ready
+        run: |
+          API_URL=$(supabase status -o json | jq -r '."API_URL"')
+          for i in $(seq 1 30); do
+            if curl -sf "${API_URL}/auth/v1/health" -o /dev/null 2>&1; then
+              echo "Auth service is healthy after ${i} attempt(s)"
+              exit 0
+            fi
+            echo "Waiting for auth service... (${i}/30)"
+            sleep 2
+          done
+          echo "::error::Auth service did not become healthy within 60 seconds"
+          supabase status
+          exit 1
       - name: Create test user and export config
         run: |
           ANON_KEY=$(supabase status -o json | jq -r '."ANON_KEY"')
@@ -152,6 +166,8 @@ jobs:
 
       - run: npm ci
       - run: npx playwright install chromium --with-deps
+      - name: Verify Supabase services
+        run: supabase status
       - run: npx playwright test ${{ matrix.specs }}
         env:
           SUPABASE_URL: ${{ env.SUPABASE_URL }}
