@@ -24,7 +24,7 @@ vi.mock('../../src/utils/crypto.js', () => ({
 const mockAuth = {
     signInWithPassword: vi.fn(),
     signUp: vi.fn(),
-    signOut: vi.fn(() => Promise.resolve()),
+    signOut: vi.fn(() => Promise.resolve({ error: null })),
     getSession: vi.fn(),
     onAuthStateChange: vi.fn()
 }
@@ -144,18 +144,12 @@ describe('auth', () => {
             expect(result).toBe('mock-derived-key')
         })
 
-        it('handles upsert error gracefully (logs but does not throw)', async () => {
+        it('throws on upsert error', async () => {
             mockChain._queueResult(null) // no settings
             mockChain._queueResult(null, { message: 'upsert failed' }) // upsert error
 
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-            // Should not throw
-            const result = await initializeEncryption(testUser, 'password123')
-
-            expect(result).toBe('mock-derived-key')
-            expect(consoleSpy).toHaveBeenCalledWith('Error saving encryption salt:', expect.any(Object))
-            consoleSpy.mockRestore()
+            await expect(initializeEncryption(testUser, 'password123'))
+                .rejects.toThrow('Failed to save encryption salt: upsert failed')
         })
     })
 
@@ -197,7 +191,7 @@ describe('auth', () => {
             expect(result).toEqual({ success: false, error: 'Invalid credentials' })
         })
 
-        it('stores password in sessionStorage', async () => {
+        it('stores password securely in sessionStorage', async () => {
             mockAuth.signInWithPassword.mockResolvedValue({
                 data: { user: testUser }, error: null
             })
@@ -205,7 +199,10 @@ describe('auth', () => {
 
             await login('test@example.com', 'pass123')
 
-            expect(sessionStorage.getItem('_ep')).toBe('pass123')
+            const stored = sessionStorage.getItem('_ep')
+            expect(stored).toBeTruthy()
+            expect(stored).not.toBe('pass123')
+            expect(await getStoredPassword()).toBe('pass123')
         })
 
         it('sets currentUser in store', async () => {
@@ -353,14 +350,17 @@ describe('auth', () => {
             expect(store.get('encryptionKey')).toBe('mock-derived-key')
         })
 
-        it('stores password in sessionStorage', async () => {
+        it('stores password securely in sessionStorage', async () => {
             store.set('pendingUser', testUser)
             mockAuth.signInWithPassword.mockResolvedValue({ error: null })
             mockChain._queueResult({ encryption_salt: 'salt' })
 
             await unlock('pass123')
 
-            expect(sessionStorage.getItem('_ep')).toBe('pass123')
+            const stored = sessionStorage.getItem('_ep')
+            expect(stored).toBeTruthy()
+            expect(stored).not.toBe('pass123')
+            expect(await getStoredPassword()).toBe('pass123')
         })
 
         it('sets currentUser and clears pendingUser', async () => {
@@ -483,14 +483,19 @@ describe('auth', () => {
     // ─── getStoredPassword ────────────────────────────────────────────────
 
     describe('getStoredPassword', () => {
-        it('returns password from sessionStorage', () => {
-            sessionStorage.setItem('_ep', 'stored-pass')
+        it('returns password after secure storage round-trip', async () => {
+            mockAuth.signInWithPassword.mockResolvedValue({
+                data: { user: testUser }, error: null
+            })
+            mockChain._queueResult({ encryption_salt: 'salt' })
 
-            expect(getStoredPassword()).toBe('stored-pass')
+            await login('test@example.com', 'round-trip-pass')
+
+            expect(await getStoredPassword()).toBe('round-trip-pass')
         })
 
-        it('returns null when no stored password', () => {
-            expect(getStoredPassword()).toBeNull()
+        it('returns null when no stored password', async () => {
+            expect(await getStoredPassword()).toBeNull()
         })
     })
 
