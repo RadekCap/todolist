@@ -1,7 +1,7 @@
 import { store } from '../core/store.js'
 import { escapeHtml, validateColor } from '../utils/security.js'
 import { getFilteredProjects, selectProject, deleteProject, addProject, updateProject, reorderProjects, getDescendantIds } from '../services/projects.js'
-import { getProjectTodoCount, updateTodoProject } from '../services/todos.js'
+import { getProjectTodoCount, getProjectUrgentCount, getAllUrgentCount, updateTodoProject } from '../services/todos.js'
 import { getIcon } from '../utils/icons.js'
 
 /**
@@ -147,8 +147,13 @@ export function renderProjects(container) {
     allItem.className = `project-item ${state.selectedProjectId === null ? 'active' : ''}`
     const totalCount = state.todos.filter(t => t.gtd_status !== 'done').length
     const totalCountDisplay = totalCount > 0 ? totalCount : ''
+    const allUrgent = getAllUrgentCount()
+    const allUrgentHtml = allUrgent > 0
+        ? `<span class="project-urgent-count">${allUrgent}</span>`
+        : ''
     allItem.innerHTML = `
         <span class="project-name">All Projects</span>
+        ${allUrgentHtml}
         <span class="project-count">${totalCountDisplay}</span>
     `
     allItem.addEventListener('click', () => selectProject(null))
@@ -211,6 +216,10 @@ function renderProjectTree(container, projects, parentId, depth) {
 
         const count = getProjectTodoCount(project.id)
         const countDisplay = count > 0 ? count : ''
+        const urgentCount = getProjectUrgentCount(project.id)
+        const urgentHtml = urgentCount > 0
+            ? `<span class="project-urgent-count">${urgentCount}</span>`
+            : ''
 
         const hasChildren = projects.some(p => p.parent_id === project.id)
         const isCollapsed = collapsedProjects.has(project.id)
@@ -236,6 +245,7 @@ function renderProjectTree(container, projects, parentId, depth) {
                 <span class="project-color" style="background-color: ${colorStyle}"></span>
                 ${safeName}
             </span>
+            ${urgentHtml}
             <span class="project-count">${countDisplay}</span>
             <button class="project-delete" data-id="${project.id}">${deleteIconHtml}</button>
         `
