@@ -146,3 +146,43 @@ export function getGtdCount(status) {
     }
     return todos.filter(t => t.gtd_status === status).length
 }
+
+function getTodayString() {
+    const now = new Date()
+    const y = now.getFullYear()
+    const m = String(now.getMonth() + 1).padStart(2, '0')
+    const d = String(now.getDate()).padStart(2, '0')
+    return `${y}-${m}-${d}`
+}
+
+export function getProjectUrgentCount(projectId, today) {
+    const todayStr = today || getTodayString()
+    const todos = store.get('todos')
+    const projects = store.get('projects')
+
+    const ids = [projectId]
+    const collect = (pid) => {
+        projects.filter(p => p.parent_id === pid).forEach(child => {
+            ids.push(child.id)
+            collect(child.id)
+        })
+    }
+    collect(projectId)
+
+    return todos.filter(t =>
+        ids.includes(t.project_id) &&
+        t.gtd_status !== 'done' &&
+        t.due_date &&
+        t.due_date <= todayStr
+    ).length
+}
+
+export function getAllUrgentCount(today) {
+    const todayStr = today || getTodayString()
+    const todos = store.get('todos')
+    return todos.filter(t =>
+        t.gtd_status !== 'done' &&
+        t.due_date &&
+        t.due_date <= todayStr
+    ).length
+}

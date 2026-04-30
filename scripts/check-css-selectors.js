@@ -139,6 +139,7 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.project-name/,
     /\.project-color/,
     /\.project-count/,
+    /\.project-urgent-count/,
     /\.project-delete/,
     /\.project-drag-handle/,
     /\.project-card/,

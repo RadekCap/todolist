@@ -694,6 +694,20 @@ body.sidebar-resizing * {
     margin-right: 4px;
 }
 
+.project-urgent-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background-color: #ff3b30;
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
+    border-radius: 9px;
+    text-align: center;
+    padding: 0 4px;
+    box-sizing: border-box;
+}
+
 .project-item.active .project-count {
     color: rgba(255, 255, 255, 0.8);
 }
@@ -5523,6 +5537,12 @@ body.sidebar-resizing * {
 [data-theme="dark"] .project-item.active .project-count,
 [data-theme="clear"] .project-item.active .project-count {
     color: var(--ios-blue);
+}
+
+[data-theme="glass"] .project-urgent-count,
+[data-theme="dark"] .project-urgent-count,
+[data-theme="clear"] .project-urgent-count {
+    background-color: #ff453a;
 }
 
 [data-theme="glass"] .project-expand,

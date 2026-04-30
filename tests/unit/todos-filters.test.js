@@ -21,7 +21,7 @@ vi.mock('../../src/core/store.js', () => {
     }
 })
 
-import { getFilteredTodos, getProjectTodoCount, getGtdCount } from '../../src/services/todos-filters.js'
+import { getFilteredTodos, getProjectTodoCount, getGtdCount, getProjectUrgentCount, getAllUrgentCount } from '../../src/services/todos-filters.js'
 import { store } from '../../src/core/store.js'
 
 /**
@@ -702,5 +702,150 @@ describe('getGtdCount', () => {
         const onlyInbox = [{ id: 1, gtd_status: 'inbox', due_date: null }]
         resetState({ todos: onlyInbox })
         expect(getGtdCount('next_action')).toBe(0)
+    })
+})
+
+// ─── getProjectUrgentCount ──────────────────────────────────────────────────
+
+describe('getProjectUrgentCount', () => {
+    beforeEach(() => {
+        resetState()
+    })
+
+    const today = '2026-04-30'
+
+    it('returns 0 when project has no todos', () => {
+        resetState({ todos: [], projects: [] })
+        expect(getProjectUrgentCount('proj-1', today)).toBe(0)
+    })
+
+    it('counts todos with due_date on today', () => {
+        resetState({
+            todos: [
+                { id: 1, project_id: 'proj-1', gtd_status: 'inbox', due_date: '2026-04-30' },
+                { id: 2, project_id: 'proj-1', gtd_status: 'inbox', due_date: '2026-05-01' }
+            ],
+            projects: []
+        })
+        expect(getProjectUrgentCount('proj-1', today)).toBe(1)
+    })
+
+    it('counts todos with due_date before today (overdue)', () => {
+        resetState({
+            todos: [
+                { id: 1, project_id: 'proj-1', gtd_status: 'inbox', due_date: '2026-04-28' },
+                { id: 2, project_id: 'proj-1', gtd_status: 'inbox', due_date: '2026-04-29' }
+            ],
+            projects: []
+        })
+        expect(getProjectUrgentCount('proj-1', today)).toBe(2)
+    })
+
+    it('excludes done todos', () => {
+        resetState({
+            todos: [
+                { id: 1, project_id: 'proj-1', gtd_status: 'done', due_date: '2026-04-28' },
+                { id: 2, project_id: 'proj-1', gtd_status: 'inbox', due_date: '2026-04-28' }
+            ],
+            projects: []
+        })
+        expect(getProjectUrgentCount('proj-1', today)).toBe(1)
+    })
+
+    it('excludes todos without a due_date', () => {
+        resetState({
+            todos: [
+                { id: 1, project_id: 'proj-1', gtd_status: 'inbox', due_date: null },
+                { id: 2, project_id: 'proj-1', gtd_status: 'inbox', due_date: '2026-04-28' }
+            ],
+            projects: []
+        })
+        expect(getProjectUrgentCount('proj-1', today)).toBe(1)
+    })
+
+    it('includes todos from descendant projects', () => {
+        resetState({
+            todos: [
+                { id: 1, project_id: 'proj-parent', gtd_status: 'inbox', due_date: '2026-04-28' },
+                { id: 2, project_id: 'proj-child', gtd_status: 'inbox', due_date: '2026-04-29' },
+                { id: 3, project_id: 'proj-grandchild', gtd_status: 'inbox', due_date: '2026-04-30' }
+            ],
+            projects: [
+                { id: 'proj-parent', parent_id: null },
+                { id: 'proj-child', parent_id: 'proj-parent' },
+                { id: 'proj-grandchild', parent_id: 'proj-child' }
+            ]
+        })
+        expect(getProjectUrgentCount('proj-parent', today)).toBe(3)
+    })
+
+    it('does not count future-dated todos', () => {
+        resetState({
+            todos: [
+                { id: 1, project_id: 'proj-1', gtd_status: 'inbox', due_date: '2026-05-01' },
+                { id: 2, project_id: 'proj-1', gtd_status: 'inbox', due_date: '2027-01-01' }
+            ],
+            projects: []
+        })
+        expect(getProjectUrgentCount('proj-1', today)).toBe(0)
+    })
+
+    it('does not count todos from other projects', () => {
+        resetState({
+            todos: [
+                { id: 1, project_id: 'proj-1', gtd_status: 'inbox', due_date: '2026-04-28' },
+                { id: 2, project_id: 'proj-2', gtd_status: 'inbox', due_date: '2026-04-28' }
+            ],
+            projects: []
+        })
+        expect(getProjectUrgentCount('proj-1', today)).toBe(1)
+    })
+})
+
+// ─── getAllUrgentCount ───────────────────────────────────────────────────────
+
+describe('getAllUrgentCount', () => {
+    beforeEach(() => {
+        resetState()
+    })
+
+    const today = '2026-04-30'
+
+    it('returns 0 when there are no todos', () => {
+        resetState({ todos: [] })
+        expect(getAllUrgentCount(today)).toBe(0)
+    })
+
+    it('counts all non-done todos with due_date on or before today', () => {
+        resetState({
+            todos: [
+                { id: 1, gtd_status: 'inbox', due_date: '2026-04-28' },
+                { id: 2, gtd_status: 'next_action', due_date: '2026-04-30' },
+                { id: 3, gtd_status: 'inbox', due_date: '2026-05-01' },
+                { id: 4, gtd_status: 'done', due_date: '2026-04-28' },
+                { id: 5, gtd_status: 'inbox', due_date: null }
+            ]
+        })
+        expect(getAllUrgentCount(today)).toBe(2)
+    })
+
+    it('returns 0 when all todos are in the future', () => {
+        resetState({
+            todos: [
+                { id: 1, gtd_status: 'inbox', due_date: '2026-05-01' },
+                { id: 2, gtd_status: 'inbox', due_date: '2027-01-01' }
+            ]
+        })
+        expect(getAllUrgentCount(today)).toBe(0)
+    })
+
+    it('returns 0 when all urgent todos are done', () => {
+        resetState({
+            todos: [
+                { id: 1, gtd_status: 'done', due_date: '2026-04-28' },
+                { id: 2, gtd_status: 'done', due_date: '2026-04-30' }
+            ]
+        })
+        expect(getAllUrgentCount(today)).toBe(0)
     })
 })
