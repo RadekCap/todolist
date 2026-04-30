@@ -8,13 +8,29 @@ import { expect } from '@playwright/test'
  * @param {string} password
  */
 export async function login(page, email, password) {
+    page.on('console', msg => {
+        if (msg.type() === 'error') console.log(`[browser error] ${msg.text()}`)
+    })
+    page.on('requestfailed', req => {
+        console.log(`[request failed] ${req.method()} ${req.url()} — ${req.failure()?.errorText}`)
+    })
+
     await page.goto('/')
 
     // Wait for auth form to be ready
     await page.waitForSelector('#loginForm', { state: 'visible' })
 
+    const appConfig = await page.evaluate(() => window.__APP_CONFIG__)
+    console.log(`[auth debug] __APP_CONFIG__ = ${JSON.stringify(appConfig)}`)
+
     await page.fill('#loginEmail', email)
     await page.fill('#loginPassword', password)
+
+    page.on('response', resp => {
+        if (resp.url().includes('token') || resp.url().includes('auth')) {
+            console.log(`[auth debug] response: ${resp.status()} ${resp.url()}`)
+        }
+    })
 
     // Click login and wait for the auth network response
     await Promise.all([

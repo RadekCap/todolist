@@ -168,6 +168,22 @@ jobs:
       - run: npx playwright install chromium --with-deps
       - name: Verify Supabase services
         run: supabase status
+      - name: Verify auth endpoint from curl
+        run: |
+          API_URL=$(supabase status -o json | jq -r '."API_URL"')
+          ANON_KEY=$(supabase status -o json | jq -r '."ANON_KEY"')
+          echo "Testing login via curl to ${API_URL}/auth/v1/token..."
+          RESP=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "${API_URL}/auth/v1/token?grant_type=password" \
+            -H "apikey: ${ANON_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"email": "test@e2e.local", "password": "testpass123"}')
+          HTTP_STATUS=$(echo "$RESP" | grep "HTTP_STATUS:" | cut -d: -f2)
+          BODY=$(echo "$RESP" | grep -v "HTTP_STATUS:")
+          echo "HTTP status: ${HTTP_STATUS}"
+          echo "Response body (truncated): $(echo "$BODY" | head -c 200)"
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "::warning::Auth login returned non-200 status: ${HTTP_STATUS}"
+          fi
       - run: npx playwright test ${{ matrix.specs }}
         env:
           SUPABASE_URL: ${{ env.SUPABASE_URL }}
