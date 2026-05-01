@@ -11,6 +11,7 @@ export default defineConfig({
     use: {
         baseURL: 'http://localhost:3000',
         headless: true,
+        bypassCSP: true,
         screenshot: 'only-on-failure'
     },
     projects: [
