@@ -1300,7 +1300,7 @@ body.sidebar-resizing * {
     border-radius: 8px;
     display: flex;
     flex-wrap: nowrap; /* Prevent Safari iOS from incorrectly wrapping flex items */
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     transition: background 0.3s, transform 0.3s, opacity 0.3s, box-shadow 0.3s;
     border-left: 4px solid transparent;
