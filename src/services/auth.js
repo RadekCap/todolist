@@ -7,11 +7,19 @@ let _tabKey = null
 
 async function getTabKey() {
     if (!_tabKey) {
-        _tabKey = await crypto.subtle.generateKey(
-            { name: 'AES-GCM', length: 256 },
-            false,
-            ['encrypt', 'decrypt']
-        )
+        const stored = sessionStorage.getItem('_tk')
+        if (stored) {
+            const raw = Uint8Array.from(atob(stored), c => c.charCodeAt(0))
+            _tabKey = await crypto.subtle.importKey('raw', raw, 'AES-GCM', true, ['encrypt', 'decrypt'])
+        } else {
+            _tabKey = await crypto.subtle.generateKey(
+                { name: 'AES-GCM', length: 256 },
+                true,
+                ['encrypt', 'decrypt']
+            )
+            const raw = await crypto.subtle.exportKey('raw', _tabKey)
+            sessionStorage.setItem('_tk', btoa(String.fromCharCode(...new Uint8Array(raw))))
+        }
     }
     return _tabKey
 }
@@ -29,12 +37,13 @@ async function storePasswordSecurely(password) {
 
 async function retrieveStoredPassword() {
     const stored = sessionStorage.getItem('_ep')
-    if (!stored || !_tabKey) return null
+    if (!stored) return null
+    const key = await getTabKey()
     try {
         const combined = Uint8Array.from(atob(stored), c => c.charCodeAt(0))
         const iv = combined.slice(0, 12)
         const data = combined.slice(12)
-        const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, _tabKey, data)
+        const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data)
         return new TextDecoder().decode(decrypted)
     } catch {
         return null
@@ -141,6 +150,8 @@ export async function logout() {
         console.error('Error during sign out:', error)
     }
     sessionStorage.removeItem('_ep')
+    sessionStorage.removeItem('_tk')
+    _tabKey = null
     // Clear persisted UI state
     localStorage.removeItem('selectedAreaId')
     store.reset()
@@ -199,6 +210,8 @@ export function lock() {
         contexts: []
     })
     sessionStorage.removeItem('_ep')
+    sessionStorage.removeItem('_tk')
+    _tabKey = null
 
     events.emit(Events.AUTH_LOCK)
 }
