@@ -186,6 +186,31 @@ export function calculateNextOccurrence(rule, fromDate) {
 }
 
 /**
+ * Calculate the next occurrence that falls on today or a future date.
+ * Advances from `fromDate` by repeated intervals until the result >= today.
+ * @param {Object} rule - Recurrence rule object
+ * @param {string} fromDate - Start date in YYYY-MM-DD format
+ * @returns {string|null} Next future occurrence in YYYY-MM-DD format, or null
+ */
+export function calculateNextFutureOccurrence(rule, fromDate) {
+    if (!rule || !rule.type || !fromDate) return null
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const todayStr = formatDate(today)
+
+    let current = fromDate
+    for (let i = 0; i < 1000; i++) {
+        const next = calculateNextOccurrence(rule, current)
+        if (!next) return null
+        if (next >= todayStr) return next
+        current = next
+    }
+
+    return null
+}
+
+/**
  * Get the next N occurrences for preview display
  * @param {Object} rule - Recurrence rule object
  * @param {number} n - Number of occurrences to generate
