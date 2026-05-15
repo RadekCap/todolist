@@ -2,7 +2,7 @@ import { supabase } from '../core/supabase.js'
 import { store } from '../core/store.js'
 import { events, Events } from '../core/events.js'
 import { encrypt, decrypt } from './auth.js'
-import { calculateNextOccurrence, isRecurrenceEnded } from '../utils/recurrence.js'
+import { calculateNextFutureOccurrence, isRecurrenceEnded } from '../utils/recurrence.js'
 
 export { isRecurrenceEnded }
 
@@ -140,7 +140,7 @@ export async function generateNextRecurrence(templateId, fromDate) {
         return null
     }
 
-    const nextDueDate = calculateNextOccurrence(rule, fromDate)
+    const nextDueDate = calculateNextFutureOccurrence(rule, fromDate)
     if (!nextDueDate) {
         console.error('Could not calculate next occurrence:', rule, fromDate)
         return null
