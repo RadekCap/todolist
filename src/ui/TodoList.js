@@ -269,13 +269,6 @@ export function renderTodos(container, options = {}) {
         }
 
         li.innerHTML = `
-            <input
-                type="checkbox"
-                class="todo-select-checkbox"
-                ${isSelected ? 'checked' : ''}
-                data-id="${todo.id}"
-                aria-label="Select todo"
-            >
             <span class="drag-handle" draggable="true">${getIcon('drag-handle', { size: 14 })}</span>
             <input
                 type="checkbox"
@@ -297,23 +290,13 @@ export function renderTodos(container, options = {}) {
             <button class="delete-btn" data-id="${todo.id}">Delete</button>
         `
 
-        // Selection checkbox events
-        const selectCheckbox = li.querySelector('.todo-select-checkbox')
-        selectCheckbox.addEventListener('click', (e) => {
-            e.stopPropagation()
-            const visibleTodoIds = filteredTodos.map(t => t.id)
-            if (e.shiftKey) {
-                // Shift-click: select range
-                selectTodoRange(todo.id, visibleTodoIds)
-            } else {
-                // Regular click: toggle selection
-                toggleTodoSelection(todo.id)
-            }
-        })
-
-        // Also allow Cmd/Ctrl+click on the todo item itself for selection
         li.addEventListener('click', (e) => {
-            if ((e.metaKey || e.ctrlKey) && !e.target.closest('.todo-checkbox') && !e.target.closest('.delete-btn') && !e.target.closest('.todo-text')) {
+            if (e.target.closest('.todo-checkbox') || e.target.closest('.delete-btn') || e.target.closest('.todo-text') || e.target.closest('.drag-handle')) return
+            if (e.shiftKey) {
+                e.preventDefault()
+                const visibleTodoIds = filteredTodos.map(t => t.id)
+                selectTodoRange(todo.id, visibleTodoIds)
+            } else if (e.metaKey || e.ctrlKey) {
                 e.preventDefault()
                 toggleTodoSelection(todo.id)
             }

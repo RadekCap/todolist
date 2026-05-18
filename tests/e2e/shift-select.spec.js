@@ -58,26 +58,26 @@ test.describe('Shift+Click Range Select', () => {
     test('shift+click selects a range of todos', async ({ authedPage }) => {
         const names = await createTodos(authedPage, 4)
 
-        // Click first todo's checkbox (normal click)
-        await todoItem(authedPage, names[0]).locator('.todo-select-checkbox').click()
+        // Ctrl+click first todo to select it
+        await todoItem(authedPage, names[0]).click({ modifiers: ['Control'] })
 
         // Selection bar should appear with 1 selected
         await expect(authedPage.locator('#selectionBar')).toHaveClass(/visible/)
         await expect(authedPage.locator('#selectionCount')).toContainText('1 selected')
 
-        // Shift+click the third todo's checkbox to select range [0, 1, 2]
-        await todoItem(authedPage, names[2]).locator('.todo-select-checkbox').click({ modifiers: ['Shift'] })
+        // Shift+click the third todo to select range [0, 1, 2]
+        await todoItem(authedPage, names[2]).click({ modifiers: ['Shift'] })
 
         // Should have 3 selected (range from first to third)
         await expect(authedPage.locator('#selectionCount')).toContainText('3 selected', { timeout: 5000 })
 
-        // Verify all three are checked
-        await expect(todoItem(authedPage, names[0]).locator('.todo-select-checkbox')).toBeChecked()
-        await expect(todoItem(authedPage, names[1]).locator('.todo-select-checkbox')).toBeChecked()
-        await expect(todoItem(authedPage, names[2]).locator('.todo-select-checkbox')).toBeChecked()
+        // Verify all three are selected
+        await expect(todoItem(authedPage, names[0])).toHaveClass(/selected/)
+        await expect(todoItem(authedPage, names[1])).toHaveClass(/selected/)
+        await expect(todoItem(authedPage, names[2])).toHaveClass(/selected/)
 
-        // Fourth should NOT be checked
-        await expect(todoItem(authedPage, names[3]).locator('.todo-select-checkbox')).not.toBeChecked()
+        // Fourth should NOT be selected
+        await expect(todoItem(authedPage, names[3])).not.toHaveClass(/selected/)
 
         // Cleanup
         await authedPage.click('#clearSelectionBtn')
@@ -88,11 +88,11 @@ test.describe('Shift+Click Range Select', () => {
         const names = await createTodos(authedPage, 3)
 
         // Shift+click on second todo without any prior selection
-        await todoItem(authedPage, names[1]).locator('.todo-select-checkbox').click({ modifiers: ['Shift'] })
+        await todoItem(authedPage, names[1]).click({ modifiers: ['Shift'] })
 
         // Should select at least the clicked item
         await expect(authedPage.locator('#selectionBar')).toHaveClass(/visible/)
-        await expect(todoItem(authedPage, names[1]).locator('.todo-select-checkbox')).toBeChecked()
+        await expect(todoItem(authedPage, names[1])).toHaveClass(/selected/)
 
         // Cleanup
         await authedPage.click('#clearSelectionBtn')

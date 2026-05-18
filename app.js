@@ -41,6 +41,7 @@ import { GtdGuideModal } from './src/ui/modals/GtdGuideModal.js'
 import { initSelectionBar, updateSelectionBarProjectSelect, updateSelectionBarPrioritySelect } from './src/ui/SelectionBar.js'
 import { initToast } from './src/ui/Toast.js'
 import { ModalManager } from './src/ui/ModalManager.js'
+import { MarqueeSelect } from './src/ui/MarqueeSelect.js'
 
 // Application version
 const APP_VERSION = '2.2.96'
@@ -158,6 +159,8 @@ class TodoApp {
         this.selectionGtdStatusSelect = document.getElementById('selectionGtdStatusSelect')
         this.selectionProjectSelect = document.getElementById('selectionProjectSelect')
         this.selectionPrioritySelect = document.getElementById('selectionPrioritySelect')
+
+        this.marqueeSelect = null
 
         // Initialize TodoModal
         this.todoModal = new TodoModal({
@@ -786,6 +789,14 @@ class TodoApp {
         loadProjectTemplates().catch(e => console.error('Failed to load templates:', e))
 
         this.hideLoadingScreen()
+
+        if (!this.marqueeSelect) {
+            this.marqueeSelect = new MarqueeSelect({
+                container: document.querySelector('.content'),
+                todoList: this.todoList
+            })
+            this.marqueeSelect.init()
+        }
     }
 
     async loadUserSettingsDisplay() {
@@ -829,6 +840,11 @@ class TodoApp {
     }
 
     handleSignOut() {
+        if (this.marqueeSelect) {
+            this.marqueeSelect.destroy()
+            this.marqueeSelect = null
+        }
+
         // Clean up document-level event listeners
         this.globalAbortController.abort()
         this.globalAbortController = new AbortController()
