@@ -4049,10 +4049,6 @@ body.sidebar-resizing * {
         display: none;
     }
 
-    .todo-item .todo-select-checkbox {
-        display: none;
-    }
-
     .todo-checkbox {
         grid-column: 1;
         grid-row: 1;
@@ -4128,8 +4124,7 @@ body.sidebar-resizing * {
         padding: 8px 10px;
     }
 
-    [data-density="compact"] .todo-item .drag-handle,
-    [data-density="compact"] .todo-item .todo-select-checkbox {
+    [data-density="compact"] .todo-item .drag-handle {
         display: none;
     }
 
@@ -6571,23 +6566,6 @@ body.sidebar-resizing * {
    Multi-Select / Selection Bar Styles
    =========================================== */
 
-/* Selection checkbox on todo items */
-.todo-select-checkbox {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: var(--ios-blue);
-    flex-shrink: 0;
-    margin-right: 4px;
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
-}
-
-.todo-item:hover .todo-select-checkbox,
-.todo-item.selected .todo-select-checkbox {
-    opacity: 1;
-}
-
 /* Selected todo item styling */
 .todo-item.selected {
     background: rgba(0, 122, 255, 0.1);
@@ -6768,9 +6746,47 @@ body.sidebar-resizing * {
     font-size: 13px;
 }
 
-[data-density="compact"] .todo-select-checkbox {
-    width: 16px;
-    height: 16px;
+/* Marquee drag-to-select overlay */
+.marquee-select-overlay {
+    position: fixed;
+    border: 2px solid var(--ios-blue, #007aff);
+    background: rgba(0, 122, 255, 0.08);
+    pointer-events: none;
+    z-index: 1000;
+    border-radius: 3px;
+}
+
+.todo-item.marquee-hover {
+    background: rgba(0, 122, 255, 0.08);
+    box-shadow: inset 0 0 0 2px rgba(0, 122, 255, 0.12);
+}
+
+body.marquee-dragging {
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: crosshair;
+}
+
+body.marquee-dragging * {
+    cursor: crosshair;
+}
+
+[data-theme="dark"] .marquee-select-overlay {
+    border-color: #0a84ff;
+    background: rgba(10, 132, 255, 0.12);
+}
+
+[data-theme="dark"] .todo-item.marquee-hover {
+    background: rgba(10, 132, 255, 0.15);
+}
+
+[data-theme="clear"] .marquee-select-overlay {
+    border-color: var(--ios-blue);
+    background: rgba(28, 28, 30, 0.05);
+}
+
+[data-theme="clear"] .todo-item.marquee-hover {
+    background: rgba(28, 28, 30, 0.06);
 }
 
 /* ========================================
