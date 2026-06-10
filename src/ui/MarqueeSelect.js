@@ -203,7 +203,7 @@ export class MarqueeSelect {
             )
 
             if (intersects) {
-                const todoId = item.dataset.todoId
+                const todoId = Number(item.dataset.todoId)
                 if (todoId) {
                     newIntersectedIds.add(todoId)
                     item.classList.add('marquee-hover')
