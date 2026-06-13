@@ -117,7 +117,7 @@ jobs:
       # Start local Supabase to avoid production egress
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.105.0
       - name: Start local Supabase
         run: |
           mkdir -p supabase/migrations
