@@ -291,7 +291,10 @@ export function renderTodos(container, options = {}) {
         `
 
         li.addEventListener('click', (e) => {
-            if (e.target.closest('.todo-checkbox') || e.target.closest('.delete-btn') || e.target.closest('.todo-text') || e.target.closest('.drag-handle')) return
+            if (e.target.closest('.todo-checkbox') || e.target.closest('.delete-btn') || e.target.closest('.drag-handle')) return
+            if (!e.shiftKey && !e.metaKey && !e.ctrlKey) {
+                if (e.target.closest('.todo-text')) return
+            }
             if (e.shiftKey) {
                 e.preventDefault()
                 const visibleTodoIds = filteredTodos.map(t => t.id)
@@ -318,7 +321,8 @@ export function renderTodos(container, options = {}) {
 
         // Click on todo text opens edit modal
         const todoText = li.querySelector('.todo-text')
-        todoText.addEventListener('click', () => {
+        todoText.addEventListener('click', (e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey) return
             if (onEditTodo) onEditTodo(todo.id)
         })
 
