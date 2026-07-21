@@ -1286,14 +1286,21 @@
             }
 
             async deleteTodo(id) {
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from('todos')
                     .delete()
                     .eq('id', id)
+                    .select('id')
 
                 if (error) {
                     console.error('Error deleting todo:', error)
                     alert('Failed to delete todo')
+                    return
+                }
+
+                if (!data || data.length === 0) {
+                    console.error('Delete todo: no rows affected for id', id)
+                    alert('Failed to delete todo. The database did not remove the record — please refresh and try again.')
                     return
                 }
 
