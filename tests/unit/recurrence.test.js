@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
     calculateNextOccurrence,
+    calculateNextFutureOccurrence,
     getNextNOccurrences,
     formatRecurrenceSummary,
     isRecurrenceEnded,
@@ -701,6 +702,141 @@ describe('formatPreviewDate', () => {
         expect(result).toContain('Jan')
         expect(result).toContain('1')
         expect(result).toContain('2025')
+    })
+})
+
+// ─── calculateNextFutureOccurrence ────────────────────────────────────────────
+
+describe('calculateNextFutureOccurrence', () => {
+    let dateSpy
+    const RealDate = Date
+
+    function mockDate(isoDate) {
+        const fixed = new RealDate(isoDate + 'T00:00:00')
+        dateSpy = vi.spyOn(globalThis, 'Date').mockImplementation(function (...args) {
+            if (args.length === 0) {
+                return new RealDate(fixed.getTime())
+            }
+            return new RealDate(...args)
+        })
+        globalThis.Date.now = RealDate.now
+    }
+
+    afterEach(() => {
+        if (dateSpy) {
+            dateSpy.mockRestore()
+            dateSpy = null
+        }
+    })
+
+    describe('edge cases', () => {
+        it('returns null for null rule', () => {
+            expect(calculateNextFutureOccurrence(null, '2025-01-01')).toBeNull()
+        })
+
+        it('returns null for null fromDate', () => {
+            expect(calculateNextFutureOccurrence({ type: 'daily' }, null)).toBeNull()
+        })
+
+        it('returns null for rule without type', () => {
+            expect(calculateNextFutureOccurrence({}, '2025-01-01')).toBeNull()
+        })
+    })
+
+    describe('daily recurrence — overdue skip', () => {
+        it('skips past dates and returns today for a 3-day-overdue daily task', () => {
+            mockDate('2025-03-15')
+            const result = calculateNextFutureOccurrence(
+                { type: 'daily', interval: 1 },
+                '2025-03-12' // 3 days ago
+            )
+            expect(result).toBe('2025-03-15')
+        })
+
+        it('returns today when fromDate is yesterday', () => {
+            mockDate('2025-03-15')
+            const result = calculateNextFutureOccurrence(
+                { type: 'daily', interval: 1 },
+                '2025-03-14'
+            )
+            expect(result).toBe('2025-03-15')
+        })
+
+        it('returns next day when fromDate is today (already in future)', () => {
+            mockDate('2025-03-15')
+            const result = calculateNextFutureOccurrence(
+                { type: 'daily', interval: 1 },
+                '2025-03-15'
+            )
+            expect(result).toBe('2025-03-16')
+        })
+
+        it('returns next occurrence when fromDate is already in the future', () => {
+            mockDate('2025-03-15')
+            const result = calculateNextFutureOccurrence(
+                { type: 'daily', interval: 1 },
+                '2025-03-20'
+            )
+            expect(result).toBe('2025-03-21')
+        })
+
+        it('skips many days with interval > 1', () => {
+            mockDate('2025-03-15')
+            const result = calculateNextFutureOccurrence(
+                { type: 'daily', interval: 3 },
+                '2025-03-01' // 14 days ago, interval 3
+            )
+            // 01→04→07→10→13→16 (first >= 15)
+            expect(result).toBe('2025-03-16')
+        })
+    })
+
+    describe('weekly recurrence — overdue skip', () => {
+        it('skips past weeks and lands on future weekday', () => {
+            // Today is Saturday 2025-03-15, task was due Mon 2025-03-03
+            mockDate('2025-03-15')
+            const result = calculateNextFutureOccurrence(
+                { type: 'weekly', interval: 1, weekdays: [1, 5] }, // Mon, Fri
+                '2025-03-03' // Monday 2 weeks ago
+            )
+            // 03(Mon)→07(Fri)→10(Mon)→14(Fri)→17(Mon) — first >= 2025-03-15
+            expect(result).toBe('2025-03-17')
+        })
+    })
+
+    describe('monthly recurrence — overdue skip', () => {
+        it('skips past months and lands on future date', () => {
+            mockDate('2025-06-10')
+            const result = calculateNextFutureOccurrence(
+                { type: 'monthly', interval: 1, dayType: 'day_of_month', dayOfMonth: 15 },
+                '2025-03-15' // 3 months ago
+            )
+            // 03-15→04-15→05-15→06-15 (first >= 2025-06-10)
+            expect(result).toBe('2025-06-15')
+        })
+    })
+
+    describe('yearly recurrence — overdue skip', () => {
+        it('skips past years and lands on future date', () => {
+            mockDate('2025-06-10')
+            const result = calculateNextFutureOccurrence(
+                { type: 'yearly', interval: 1, month: 3, dayType: 'day_of_month', dayOfMonth: 1 },
+                '2023-03-01' // 2 years ago
+            )
+            // 2023-03-01→2024-03-01→2025-03-01→2026-03-01 (first >= 2025-06-10)
+            expect(result).toBe('2026-03-01')
+        })
+    })
+
+    describe('safety cap', () => {
+        it('returns null for a rule that never produces a future date (empty weekdays)', () => {
+            mockDate('2025-03-15')
+            const result = calculateNextFutureOccurrence(
+                { type: 'weekly', interval: 1, weekdays: [] },
+                '2025-01-01'
+            )
+            expect(result).toBeNull()
+        })
     })
 })
 

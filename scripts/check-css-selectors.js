@@ -116,7 +116,6 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     // Todo items (rendered by JavaScript)
     /\.todo-item/,
     /\.todo-checkbox/,
-    /\.todo-select-checkbox/,
     /\.todo-content/,
     /\.todo-text/,
     /\.todo-comment/,
@@ -199,6 +198,15 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.areas-item-shortcut/,
     // Delete project dialog (rendered by JavaScript)
     /\.delete-project-dialog/,
+    // Recurring-delete confirmation dialog (rendered by JavaScript)
+    /\.recurring-delete-overlay/,
+    /\.recurring-delete-dialog/,
+    /\.recurring-delete-title/,
+    /\.recurring-delete-body/,
+    /\.recurring-delete-actions/,
+    /\.recurring-delete-btn-occurrence/,
+    /\.recurring-delete-btn-series/,
+    /\.recurring-delete-btn-cancel/,
     // Toast notifications (rendered by JavaScript)
     /\.toast/,
     /\.toast-visible/,
@@ -206,6 +214,10 @@ const DYNAMIC_ELEMENT_SELECTORS = [
     /\.toast-message/,
     /\.toast-undo-btn/,
     /\.toast-close-btn/,
+    // Marquee selection (rendered by JavaScript)
+    /\.marquee-select-overlay/,
+    /\.marquee-hover/,
+    /\.marquee-dragging/,
     // Empty/loading states (rendered by JavaScript)
     /\.empty-state/,
     /\.loading-state/,

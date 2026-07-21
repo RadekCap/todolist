@@ -2,11 +2,11 @@ import { test, expect } from './fixtures.js'
 import { unique, addTodo, todoItem, deleteTodo } from './helpers/todos.js'
 
 /**
- * Helper: select a todo's selection checkbox.
+ * Helper: select a todo via Ctrl+click.
  */
 async function selectTodo(page, text) {
     const item = todoItem(page, text)
-    await item.locator('.todo-select-checkbox').check()
+    await item.click({ modifiers: ['Control'] })
 }
 
 /**
@@ -63,9 +63,9 @@ test.describe('Todo Selection Logic', () => {
         // Verify selection bar is visible
         await expect(authedPage.locator('#selectionBar')).toHaveClass(/visible/)
 
-        // Verify all checkboxes are checked
+        // Verify all items are selected
         for (const name of names) {
-            await expect(todoItem(authedPage, name).locator('.todo-select-checkbox')).toBeChecked()
+            await expect(todoItem(authedPage, name)).toHaveClass(/selected/)
         }
 
         // Cleanup
@@ -134,9 +134,9 @@ test.describe('Todo Selection Logic', () => {
         // Verify selection bar hides
         await expect(authedPage.locator('#selectionBar')).not.toHaveClass(/visible/)
 
-        // Verify checkboxes are unchecked
+        // Verify items are not selected
         for (const name of names) {
-            await expect(todoItem(authedPage, name).locator('.todo-select-checkbox')).not.toBeChecked()
+            await expect(todoItem(authedPage, name)).not.toHaveClass(/selected/)
         }
 
         // Cleanup
@@ -164,19 +164,19 @@ test.describe('Todo Selection Logic', () => {
         await cleanupTodos(authedPage, names)
     })
 
-    test('Clicking a todo checkbox toggles its selection', async ({ authedPage }) => {
+    test('Ctrl+clicking a todo toggles its selection', async ({ authedPage }) => {
         const names = await createTodos(authedPage, 1)
-        const checkbox = todoItem(authedPage, names[0]).locator('.todo-select-checkbox')
+        const item = todoItem(authedPage, names[0])
 
-        // Click to select
-        await checkbox.check()
-        await expect(checkbox).toBeChecked()
+        // Ctrl+click to select
+        await item.click({ modifiers: ['Control'] })
+        await expect(item).toHaveClass(/selected/)
         await expect(authedPage.locator('#selectionBar')).toHaveClass(/visible/)
         await expect(authedPage.locator('#selectionCount')).toContainText('1 selected')
 
-        // Click to deselect
-        await checkbox.uncheck()
-        await expect(checkbox).not.toBeChecked()
+        // Ctrl+click to deselect
+        await item.click({ modifiers: ['Control'] })
+        await expect(item).not.toHaveClass(/selected/)
         await expect(authedPage.locator('#selectionBar')).not.toHaveClass(/visible/)
 
         // Cleanup

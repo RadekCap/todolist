@@ -45,11 +45,11 @@ async function deleteTodo(page, text) {
 }
 
 /**
- * Helper: select a todo's checkbox.
+ * Helper: select a todo via Ctrl+click.
  */
 async function selectTodo(page, text) {
     const item = todoItem(page, text)
-    await item.locator('.todo-select-checkbox').check()
+    await item.click({ modifiers: ['Control'] })
 }
 
 /**

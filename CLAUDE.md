@@ -52,71 +52,40 @@ Supabase Auth → User Login → Load All Data → Render UI
 User Actions → Service Function → Update Supabase → Emit Event → Re-render
 ```
 
-## File Reference
+## Build & Test Commands
 
-### Top-Level Files
+```bash
+# No build step — static files served directly
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `index.html` | ~850 | HTML structure: auth forms, sidebar, toolbar, modals |
-| `app.js` | ~1170 | TodoApp orchestrator class |
-| `styles.css` | ~5260 | All CSS: themes (Glass/Dark/Clear), density, responsive |
-| `package.json` | - | Dev dependencies for CSS validation only |
+# Unit tests (Vitest, ~1000+ tests)
+npm run test:unit                          # run all unit tests
+npm run test:unit:coverage                 # run with v8 coverage
+npx vitest run tests/unit/todos.test.js    # run a single test file
+npx vitest run -t "test name pattern"      # run tests matching a name
 
-### src/core/
+# E2E tests (Playwright, requires env vars)
+# Set TEST_USER_EMAIL and TEST_USER_PASSWORD for the Supabase test account
+TEST_USER_EMAIL=... TEST_USER_PASSWORD=... npm test          # run all e2e
+TEST_USER_EMAIL=... TEST_USER_PASSWORD=... npx playwright test tests/e2e/todos.spec.js  # single file
+npx playwright test --headed               # run with visible browser
 
-| File | Purpose |
-|------|---------|
-| `supabase.js` | Supabase client initialization (CDN import) |
-| `store.js` | Reactive state store singleton |
-| `events.js` | Event bus singleton + `Events` enum constants |
+# CSS validation (also runs as pre-commit hook)
+npm run check:css
+```
 
-### src/services/
+### Test Infrastructure
 
-| File | Purpose |
-|------|---------|
-| `auth.js` | Login, signup, logout, encryption key management |
-| `todos.js` | Todo CRUD, filtering, GTD counts, recurrence, selection |
-| `projects.js` | Project CRUD, area assignment |
-| `areas.js` | Area CRUD, keyboard shortcuts (Shift+1-9) |
-| `categories.js` | Category loading |
-| `contexts.js` | Context loading (@home, @work) |
-| `priorities.js` | Priority loading |
-| `settings.js` | User preferences: theme, density, notifications |
-| `export.js` | Export to Text/JSON/CSV/XML |
-| `quotes.js` | Daily motivational quote for empty Inbox |
+- **Unit tests** (`tests/unit/`): Vitest with node environment. Supabase is mocked via `tests/unit/helpers/supabase-mock.js` (`createSupabaseMock()` with `_queueResult()` and `_reset()`).
+- **E2E tests** (`tests/e2e/`): Playwright against a live Supabase instance. Global setup seeds test categories, contexts, priorities, and projects. Uses `npx serve -l 3000` as the local server.
+- **Coverage config**: v8 provider, includes `src/**/*.js`, excludes `src/ui/` (UI is covered by E2E).
 
-### src/ui/
+### Unit Test Gotchas
 
-| File | Purpose |
-|------|---------|
-| `TodoList.js` | Todo list rendering with date grouping, status badges |
-| `GtdList.js` | GTD status sidebar (Inbox, Next, Scheduled, Waiting, Someday, Done) |
-| `ProjectList.js` | Project sidebar, management modal, drag-and-drop reordering |
-| `AreasDropdown.js` | Area toolbar dropdown and management |
-| `SelectionBar.js` | Multi-select bulk operations bar |
-| `modals/TodoModal.js` | Add/edit todo form with recurrence UI |
-| `modals/ExportModal.js` | Export format selection |
-| `modals/ImportModal.js` | Import with file parsing and batch insert |
-
-### src/utils/
-
-| File | Purpose |
-|------|---------|
-| `security.js` | `escapeHtml()` and `validateColor()` for XSS prevention |
-| `crypto.js` | AES-256-GCM encryption with PBKDF2 key derivation |
-| `dates.js` | Date formatting, grouping (Overdue/Today/Tomorrow) |
-| `recurrence.js` | Recurring task rule building and occurrence calculation |
-
-### Other Directories
-
-| Directory | Purpose |
-|-----------|---------|
-| `migrations/` | 14 SQL migration files for progressive schema updates |
-| `mcp-server/` | MCP protocol server for Claude AI integration |
-| `scripts/` | CSS selector validation, git hook setup |
-| `supabase/` | Local dev config, edge functions |
-| `.github/workflows/` | CI/CD: auto version bump, CSS validation, GitHub Pages deploy |
+- `escapeHtml()` uses `document.createElement` → needs `// @vitest-environment jsdom` directive
+- Supabase chained queries need thenable mock: `then: vi.fn((resolve) => resolve(result))`
+- Use `enc:` prefix in encrypt mock for clearer test assertions
+- **Node 22 localStorage issue:** `globalThis.localStorage` is Node's experimental stub (no `.clear()`, `.removeItem()`). Fix: mock localStorage on `globalThis` explicitly
+- `crypto.test.js` uses real Web Crypto API (no mocking needed in Node 18+)
 
 ## Database (Supabase)
 
@@ -156,15 +125,6 @@ To add new database features:
 ```javascript
 import { escapeHtml, validateColor } from './src/utils/security.js'
 
-// Escapes HTML entities to prevent XSS
-escapeHtml(text)
-
-// Validates hex color format, returns default if invalid
-validateColor(color)
-```
-
-**Usage:**
-```javascript
 // CORRECT - Prevents XSS
 li.innerHTML = `<span>${escapeHtml(todo.text)}</span>`
 li.style.color = validateColor(category.color)
@@ -172,6 +132,9 @@ li.style.color = validateColor(category.color)
 // WRONG - Vulnerable to XSS
 li.innerHTML = `<span>${todo.text}</span>`
 li.style.color = category.color
+
+// Setting element properties directly (safe - no HTML parsing)
+element.textContent = userInput
 ```
 
 ### End-to-End Encryption
@@ -187,9 +150,8 @@ li.style.color = category.color
 
 ## Modal Pattern
 
-The application uses modals for adding/editing todos, managing projects, managing areas, import/export, and settings.
+Modals are used for adding/editing todos, managing projects, managing areas, import/export, and settings.
 
-**Key implementation details:**
 - Modals have `role="dialog"`, `aria-modal="true"`, `aria-labelledby` for accessibility
 - ESC key closes modals (event listener added/removed in open/close)
 - Focus returns to trigger button after closing
@@ -202,76 +164,14 @@ The application uses modals for adding/editing todos, managing projects, managin
 4. Implement ESC key handler with cleanup
 5. Manage focus (trap and return)
 
-## Common Development Workflows
-
-### Adding a New Database Column
-
-1. **Create migration file** in `migrations/`:
-   ```sql
-   ALTER TABLE todos ADD COLUMN new_field TYPE;
-   ```
-
-2. **Run migration** in Supabase SQL Editor
-
-3. **Update service** in `src/services/` to read/write the field:
-   ```javascript
-   // In the relevant service function:
-   const { data, error } = await supabase
-       .from('todos')
-       .insert({ ..., new_field: value })
-   ```
-
-4. **Update UI** in `src/ui/` to display the field
-
-### Adding a New Modal Form Field
-
-1. **Add HTML** in `index.html` within the modal's form:
-   ```html
-   <div class="modal-sidebar-field">
-       <label for="modalNewField">
-           <span class="modal-field-label">field name</span>
-       </label>
-       <input type="text" id="modalNewField" class="modal-sidebar-input">
-   </div>
-   ```
-
-2. **Get DOM reference** in the modal class (`src/ui/modals/TodoModal.js`):
-   ```javascript
-   this.newField = document.getElementById('modalNewField')
-   ```
-
-3. **Use in submit handler** and **clear on close**
-
-### Adding a New Service
-
-1. Create `src/services/newservice.js` with async functions
-2. Import `supabase` from `src/core/supabase.js`
-3. Import `store` and `events` as needed
-4. Export from `src/services/index.js`
-5. Import and use in `app.js`
-
-### Handling User Input
-
-**Always sanitize before rendering:**
-```javascript
-import { escapeHtml, validateColor } from './src/utils/security.js'
-
-// Text content in innerHTML
-element.innerHTML = `<span>${escapeHtml(userInput)}</span>`
-
-// Colors from user/database
-element.style.backgroundColor = validateColor(userColor)
-
-// Setting element properties directly (safe - no HTML parsing)
-element.textContent = userInput
-```
-
 ## CI/CD
 
 ### GitHub Actions Workflows
 - **`auto-version-bump.yml`**: Auto-increments PATCH version on merge to main, updates `APP_VERSION` in `app.js` and `VERSION.md`
 - **`css-selector-check.yml`**: Validates CSS selectors in `styles.css` match elements in `index.html`
 - **`deploy-pages.yml`**: Deploys to GitHub Pages from root directory
+- **`e2e-tests.yml`**: Runs Playwright tests in grouped shards (auth, todos, projects, etc.) on PRs
+- **`unit-tests.yml`**: Runs Vitest on PRs
 
 ### Pre-commit Hook
 - Installed via `npm install` (runs `scripts/setup-hooks.js`)
@@ -280,61 +180,21 @@ element.textContent = userInput
 
 ## Deployment
 
-**GitHub Pages:**
-- Deployed from `main` branch, root directory
-- Auto-deploys on push to main
-- No build step required - static files served directly
-
-## Testing Locally
-
-1. Clone repository
-2. Run `npm install` (installs dev dependencies and pre-commit hook)
-3. Open `index.html` in a browser
-4. Application connects to production Supabase (no local DB needed)
-
-**Note:** All users share the same Supabase instance but are isolated by RLS policies.
-
-## Unit Testing
-
-### Overview
-- **Framework:** Vitest with v8 coverage provider
-- **Tests:** ~1,085 tests across 25 files in `tests/unit/`
-- **Coverage:** 92% statements, 83% branches, 95% functions, 93% lines
-- **Run tests:** `npx vitest run tests/unit/`
-- **Run with coverage:** `npm run test:unit:coverage`
-
-### Test Infrastructure
-- **Supabase mock:** `tests/unit/helpers/supabase-mock.js` — shared `createSupabaseMock()` with `_queueResult()` and `_reset()` helpers
-- **Coverage config:** v8 provider, excludes `src/ui/` (UI is covered by E2E)
-
-### Key Patterns and Gotchas
-- `escapeHtml()` uses `document.createElement` → needs `// @vitest-environment jsdom` directive
-- Supabase chained queries need thenable mock: `then: vi.fn((resolve) => resolve(result))`
-- Use `enc:` prefix in encrypt mock for clearer test assertions
-- **Node 22 localStorage issue:** `globalThis.localStorage` is Node's experimental stub (no `.clear()`, `.removeItem()`). Fix: mock localStorage on `globalThis` explicitly
-- `crypto.test.js` uses real Web Crypto API (no mocking needed in Node 18+)
-
-### Remaining Coverage Gaps
-- `recurrence.js` (utils) — 79% stmts, complex edge cases
-- `projects.js` — 77% stmts, some CRUD functions uncovered
-- `supabase.js` / `settings.js` / `index.js` — init/barrel files, not meaningful to test
-- UI components — covered by E2E tests (66 spec files)
-
-## Pull Request Workflow
-
-When creating PRs:
-1. **Security-focused code reviews** - All user input must be sanitized
-2. **Accessibility checks** - ARIA attributes, keyboard navigation
-3. **CSS validation** - Ensure `npm run check:css` passes
-4. **Browser testing** - Test in Chrome, Firefox, Safari, Edge
-5. **Database changes** - Include migration SQL file in `migrations/`
+**GitHub Pages:** Deployed from `main` branch, root directory. Auto-deploys on push to main. No build step — static files served directly.
 
 ## Code Style
 
 - **ES6 modules** - Use `import`/`export`, no CommonJS
 - **Async/await** for all Supabase operations (not `.then()`)
 - **Follow existing patterns** - Services export functions, UI exports render functions
-- **Error handling** - Log to console, show user-friendly messages
 - **Security first** - Always use `escapeHtml()` and `validateColor()`
 - **Accessibility** - Include ARIA attributes for dynamic content
 - **No build step** - All code must work as static files served directly
+
+## Pull Request Workflow
+
+1. **Security-focused code reviews** - All user input must be sanitized
+2. **Accessibility checks** - ARIA attributes, keyboard navigation
+3. **CSS validation** - Ensure `npm run check:css` passes
+4. **Browser testing** - Test in Chrome, Firefox, Safari, Edge
+5. **Database changes** - Include migration SQL file in `migrations/`

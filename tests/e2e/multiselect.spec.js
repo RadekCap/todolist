@@ -40,11 +40,11 @@ async function deleteTodo(page, text) {
 }
 
 /**
- * Helper: select a todo's selection checkbox.
+ * Helper: select a todo via Ctrl+click.
  */
 async function selectTodo(page, text) {
     const item = todoItem(page, text)
-    await item.locator('.todo-select-checkbox').check()
+    await item.click({ modifiers: ['Control'] })
 }
 
 /**
@@ -71,17 +71,17 @@ async function cleanupTodos(page, names) {
 }
 
 test.describe('Multi-select and Selection Bar', () => {
-    test('select multiple todos via checkboxes', async ({ authedPage }) => {
+    test('select multiple todos via Ctrl+click', async ({ authedPage }) => {
         const names = await createTodos(authedPage, 3)
 
         // Select two of the three
         await selectTodo(authedPage, names[0])
         await selectTodo(authedPage, names[1])
 
-        // Verify selection checkboxes are checked
-        await expect(todoItem(authedPage, names[0]).locator('.todo-select-checkbox')).toBeChecked()
-        await expect(todoItem(authedPage, names[1]).locator('.todo-select-checkbox')).toBeChecked()
-        await expect(todoItem(authedPage, names[2]).locator('.todo-select-checkbox')).not.toBeChecked()
+        // Verify selected items have the selected class
+        await expect(todoItem(authedPage, names[0])).toHaveClass(/selected/)
+        await expect(todoItem(authedPage, names[1])).toHaveClass(/selected/)
+        await expect(todoItem(authedPage, names[2])).not.toHaveClass(/selected/)
 
         // Cleanup
         await authedPage.click('#clearSelectionBtn')
@@ -138,7 +138,7 @@ test.describe('Multi-select and Selection Bar', () => {
 
         // All checkboxes should be checked
         for (const name of names) {
-            await expect(todoItem(authedPage, name).locator('.todo-select-checkbox')).toBeChecked()
+            await expect(todoItem(authedPage, name)).toHaveClass(/selected/)
         }
 
         // Click Clear to deselect all

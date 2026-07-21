@@ -183,8 +183,8 @@ test.describe('Keyboard Shortcuts', () => {
         await expect(authedPage.locator('#addTodoModal')).not.toBeVisible({ timeout: 5000 })
         await expect(todoItem(authedPage, name)).toBeVisible({ timeout: 5000 })
 
-        // Select the todo
-        await todoItem(authedPage, name).locator('.todo-select-checkbox').check()
+        // Select the todo via Ctrl+click
+        await todoItem(authedPage, name).click({ modifiers: ['Control'] })
         await expect(authedPage.locator('#selectionBar')).toHaveClass(/visible/)
 
         // Press Escape to clear selection
