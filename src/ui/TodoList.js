@@ -2,6 +2,7 @@ import { store } from '../core/store.js'
 import { escapeHtml, validateColor } from '../utils/security.js'
 import { formatDateBadge, getDateGroup, getDateGroupLabel } from '../utils/dates.js'
 import { getFilteredTodos, toggleTodo, deleteTodo, updateTodoProject, updateTodoGtdStatus, getProjectTodoCount, toggleTodoSelection, selectTodoRange } from '../services/todos.js'
+import { deleteRecurringSeries, generateNextRecurrence } from '../services/todos-recurrence.js'
 import { getProjectPath, selectProject } from '../services/projects.js'
 import { getCategoryById } from '../services/categories.js'
 import { getPriorityById } from '../services/priorities.js'
@@ -327,8 +328,64 @@ export function renderTodos(container, options = {}) {
         })
 
         const deleteBtn = li.querySelector('.delete-btn')
-        deleteBtn.addEventListener('click', () => deleteTodo(todo.id))
+        deleteBtn.addEventListener('click', () => {
+            if (todo.template_id) {
+                showRecurringDeleteDialog(todo)
+            } else {
+                deleteTodo(todo.id)
+            }
+        })
 
         container.appendChild(li)
     })
+}
+
+/**
+ * Show a dialog when deleting a recurring todo instance.
+ * Asks the user whether to delete just this occurrence or the entire series.
+ * "This occurrence" deletes the instance and generates the next one so the
+ * series continues. "Entire series" removes the template and all instances.
+ */
+function showRecurringDeleteDialog(todo) {
+    const overlay = document.createElement('div')
+    overlay.className = 'recurring-delete-overlay'
+    overlay.innerHTML = `
+        <div class="recurring-delete-dialog" role="dialog" aria-modal="true" aria-label="Delete recurring task">
+            <h3 class="recurring-delete-title">Recurring task</h3>
+            <p class="recurring-delete-body">What would you like to delete?</p>
+            <div class="recurring-delete-actions">
+                <button class="recurring-delete-btn-occurrence">This occurrence only</button>
+                <button class="recurring-delete-btn-series">Entire series</button>
+                <button class="recurring-delete-btn-cancel">Cancel</button>
+            </div>
+        </div>
+    `
+
+    const close = () => overlay.remove()
+
+    overlay.querySelector('.recurring-delete-btn-occurrence').addEventListener('click', async () => {
+        close()
+        await deleteTodo(todo.id)
+        // Generate the next occurrence so the series continues and catch-up
+        // logic on next load doesn't regenerate from old completed instances.
+        if (todo.template_id) {
+            const today = new Date().toISOString().split('T')[0]
+            await generateNextRecurrence(todo.template_id, todo.due_date || today)
+        }
+    })
+
+    overlay.querySelector('.recurring-delete-btn-series').addEventListener('click', async () => {
+        close()
+        await deleteRecurringSeries(todo.template_id)
+    })
+
+    overlay.querySelector('.recurring-delete-btn-cancel').addEventListener('click', close)
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close() })
+
+    // Close on Escape
+    const onKey = (e) => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey) } }
+    document.addEventListener('keydown', onKey)
+
+    document.body.appendChild(overlay)
+    overlay.querySelector('.recurring-delete-btn-occurrence').focus()
 }
