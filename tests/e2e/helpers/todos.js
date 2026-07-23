@@ -64,6 +64,11 @@ export async function deleteTodo(page, text) {
     const item = todoItem(page, text)
     if (await item.count() > 0) {
         await item.locator('.delete-btn').click()
+        // Dismiss recurring-delete dialog if it appears (click "Entire series")
+        try {
+            await page.locator('.recurring-delete-overlay').waitFor({ state: 'visible', timeout: 1000 })
+            await page.click('.recurring-delete-btn-series')
+        } catch { /* non-recurring todo — no dialog */ }
         await expect(item).not.toBeAttached({ timeout: 5000 })
     }
 }
