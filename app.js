@@ -44,7 +44,7 @@ import { ModalManager } from './src/ui/ModalManager.js'
 import { MarqueeSelect } from './src/ui/MarqueeSelect.js'
 
 // Application version
-const APP_VERSION = '2.2.102'
+const APP_VERSION = '2.2.103'
 
 class TodoApp {
     constructor() {
