@@ -660,7 +660,8 @@ body.sidebar-resizing * {
     display: inline-block;
 }
 
-.project-delete {
+.project-delete,
+.project-menu-trigger {
     opacity: 0;
     background: none;
     border: none;
@@ -678,11 +679,25 @@ body.sidebar-resizing * {
     height: 12px;
 }
 
-.project-item:hover .project-delete {
+.project-menu-trigger {
+    font-size: 20px;
+    line-height: 12px;
+    width: 22px;
+    padding: 0;
+}
+
+.project-item.template-project .project-delete,
+.project-item.template-project:hover .project-delete {
+    opacity: 1;
+}
+
+.project-item:hover .project-delete,
+.project-item:hover .project-menu-trigger {
     opacity: 0.7;
 }
 
-.project-delete:hover {
+.project-delete:hover,
+.project-menu-trigger:hover {
     opacity: 1 !important;
 }
 

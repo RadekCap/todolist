@@ -208,7 +208,8 @@ function renderProjectTree(container, projects, parentId, depth) {
 
     children.forEach(project => {
         const li = document.createElement('li')
-        li.className = `project-item ${state.selectedProjectId === project.id ? 'active' : ''}`
+        const isTemplateProject = project.created_from_template === true
+        li.className = `project-item ${state.selectedProjectId === project.id ? 'active' : ''} ${isTemplateProject ? 'template-project' : ''}`.trim()
         li.style.paddingLeft = `${12 + depth * 20}px`
         li.dataset.projectId = project.id
         li.dataset.parentId = parentId || ''
@@ -237,6 +238,9 @@ function renderProjectTree(container, projects, parentId, depth) {
         const colorStyle = validateColor(project.color)
         const safeName = escapeHtml(project.name)
         const deleteIconHtml = getIcon('x', { size: 12 })
+        const actionHtml = isTemplateProject
+            ? `<button class="project-delete" aria-label="Delete project ${safeName}" title="Delete project">${deleteIconHtml}</button>`
+            : `<button class="project-menu-trigger" aria-label="Project actions for ${safeName}" aria-haspopup="menu" title="Project actions">⋮</button>`
 
         li.innerHTML = `
             <span class="project-drag-handle">${dragHandleHtml}</span>
@@ -247,7 +251,7 @@ function renderProjectTree(container, projects, parentId, depth) {
             </span>
             ${urgentHtml}
             <span class="project-count">${countDisplay}</span>
-            <button class="project-delete" data-id="${project.id}">${deleteIconHtml}</button>
+            ${actionHtml}
         `
 
         // Expand/collapse toggle
@@ -292,9 +296,17 @@ function renderProjectTree(container, projects, parentId, depth) {
 
         // Click to select project
         li.addEventListener('click', (e) => {
-            if (!e.target.closest('.project-delete') && !e.target.closest('.project-expand') && !e.target.closest('.project-drag-handle')) {
+            if (!e.target.closest('.project-delete') && !e.target.closest('.project-menu-trigger') && !e.target.closest('.project-expand') && !e.target.closest('.project-drag-handle')) {
                 selectProject(project.id)
             }
+        })
+
+        // Open the row menu from the visible overflow control
+        const menuTrigger = li.querySelector('.project-menu-trigger')
+        menuTrigger?.addEventListener('click', (e) => {
+            e.stopPropagation()
+            const rect = menuTrigger.getBoundingClientRect()
+            showProjectContextMenu({ clientX: rect.left, clientY: rect.bottom }, project, depth, container)
         })
 
         // Right-click context menu
@@ -381,7 +393,7 @@ function renderProjectTree(container, projects, parentId, depth) {
 
         // Delete button
         const deleteBtn = li.querySelector('.project-delete')
-        deleteBtn.addEventListener('click', async (e) => {
+        deleteBtn?.addEventListener('click', async (e) => {
             e.stopPropagation()
             const descendantCount = getDescendantIds(project.id).length
             const todoCount = getAllProjectTodoCount(project.id)
@@ -439,7 +451,7 @@ function showProjectContextMenu(event, project, depth, projectContainer) {
 
     // "Delete" option
     const deleteItem = document.createElement('div')
-    deleteItem.className = 'context-menu-item context-menu-item-danger'
+    deleteItem.className = 'context-menu-item context-menu-item-danger project-delete-menu-item'
     deleteItem.setAttribute('role', 'menuitem')
     const descendantCount = getDescendantIds(project.id).length
     deleteItem.innerHTML = `${getIcon('x', { size: 14 })} Delete project`

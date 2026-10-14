@@ -614,10 +614,10 @@ describe('project-templates', () => {
             await expect(createProjectFromTemplate('non-existent')).rejects.toThrow('Template not found')
         })
 
-        it('calls addProject with template name', async () => {
+        it('marks the created project as template-created', async () => {
             await createProjectFromTemplate('tmpl-1')
 
-            expect(addProject).toHaveBeenCalledWith('Sprint Template')
+            expect(addProject).toHaveBeenCalledWith('Sprint Template', null, { createdFromTemplate: true })
         })
 
         it('calls reorderProjects to move new project to top', async () => {

@@ -243,7 +243,7 @@ export async function createProjectFromTemplate(templateId) {
     }
 
     // Create project with template name
-    const project = await addProject(template.name)
+    const project = await addProject(template.name, null, { createdFromTemplate: true })
 
     // Move new project to the top of the root project list
     const allProjects = store.get('projects')
