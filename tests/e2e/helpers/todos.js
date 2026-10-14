@@ -95,8 +95,27 @@ export async function deleteProject(page, name) {
     if (await item.count() === 0) return
 
     page.once('dialog', dialog => dialog.accept())
-    await item.locator('.project-delete').click()
+    await clickProjectDelete(item)
     await expect(item).not.toBeAttached({ timeout: 5000 })
+}
+
+/**
+ * Click the direct delete control for template-created projects or choose Delete from an ordinary project's row menu.
+ * @param {import('@playwright/test').Locator} item
+ */
+export async function clickProjectDelete(item) {
+    const deleteButton = item.locator('.project-delete')
+    if (await deleteButton.count() > 0) {
+        await deleteButton.click()
+        return
+    }
+
+    await item.locator('.project-menu-trigger').click()
+    await item.evaluate(() => {
+        const deleteItem = document.querySelector('.project-context-menu .project-delete-menu-item')
+        if (!deleteItem) throw new Error('Project delete menu item was not rendered')
+        deleteItem.click()
+    })
 }
 
 /**

@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { clickProjectDelete } from './helpers/todos.js'
 
 const unique = () => `PH-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -38,7 +39,7 @@ async function deleteProject(page, name) {
     const item = sidebarProject(page, name)
     if (await item.count() > 0) {
         page.once('dialog', dialog => dialog.accept())
-        await item.locator('.project-delete').click()
+        await clickProjectDelete(item)
         await expect(item).not.toBeAttached({ timeout: 5000 })
     }
 }
@@ -349,7 +350,7 @@ test.describe('Project Hierarchy - Manage Modal', () => {
             dialogMessage = dialog.message()
             await dialog.accept()
         })
-        await sidebarProject(authedPage, parent).locator('.project-delete').click()
+        await clickProjectDelete(sidebarProject(authedPage, parent))
         // Wait for deletion to complete
         await expect(sidebarProject(authedPage, parent)).not.toBeAttached({ timeout: 5000 })
         expect(dialogMessage).toContain('subproject')

@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { clickProjectDelete } from './helpers/todos.js'
 
 const unique = () => `DD-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -161,12 +162,9 @@ function sidebarProject(page, name) {
 async function deleteProject(page, name) {
     const item = sidebarProject(page, name)
     if (await item.count() > 0) {
-        const deleteBtn = item.locator('.project-delete')
-        if (await deleteBtn.count() > 0) {
-            page.once('dialog', dialog => dialog.accept())
-            await deleteBtn.click()
-            await expect(item).not.toBeAttached({ timeout: 5000 })
-        }
+        page.once('dialog', dialog => dialog.accept())
+        await clickProjectDelete(item)
+        await expect(item).not.toBeAttached({ timeout: 5000 })
     }
 }
 

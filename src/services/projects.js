@@ -99,9 +99,11 @@ export async function loadProjects() {
  * Add a new project
  * @param {string} name - Project name
  * @param {string|null} [parentId=null] - Parent project ID for subprojects
+ * @param {Object} [options] - Additional project metadata
+ * @param {boolean} [options.createdFromTemplate=false] - Mark projects created from a template
  * @returns {Promise<Object>} The created project
  */
-export async function addProject(name, parentId = null) {
+export async function addProject(name, parentId = null, { createdFromTemplate = false } = {}) {
     const currentUser = store.get('currentUser')
     const selectedAreaId = store.get('selectedAreaId')
     const projects = store.get('projects')
@@ -146,6 +148,9 @@ export async function addProject(name, parentId = null) {
         area_id: areaId,
         sort_order: maxSortOrder + 1
     }
+    if (createdFromTemplate) {
+        insertData.created_from_template = true
+    }
     if (parentId) {
         insertData.parent_id = parentId
     }
@@ -161,7 +166,11 @@ export async function addProject(name, parentId = null) {
     }
 
     // Overlay decrypted name (DB returns encrypted value)
-    const project = { ...data[0], name }
+    const project = {
+        ...data[0],
+        name,
+        ...(createdFromTemplate ? { created_from_template: true } : {})
+    }
     const updatedProjects = [...store.get('projects'), project]
     store.set('projects', updatedProjects)
     events.emit(Events.PROJECT_ADDED, project)
