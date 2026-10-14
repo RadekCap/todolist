@@ -670,7 +670,7 @@ describe('project-templates', () => {
         it('works with template that has no items', async () => {
             const result = await createProjectFromTemplate('tmpl-2')
 
-            expect(addProject).toHaveBeenCalledWith('Empty Template')
+            expect(addProject).toHaveBeenCalledWith('Empty Template', null, { createdFromTemplate: true })
             expect(addTodo).not.toHaveBeenCalled()
             expect(result).toEqual(expect.objectContaining({ id: 'proj-new' }))
         })
