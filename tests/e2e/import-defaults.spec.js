@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { clickProjectDelete } from './helpers/todos.js'
 
 const unique = () => `ID-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -44,7 +45,7 @@ async function deleteProject(page, name) {
     const item = page.locator('#projectList .project-item', { has: page.locator('.project-name', { hasText: name }) })
     if (await item.count() > 0) {
         page.once('dialog', dialog => dialog.accept())
-        await item.locator('.project-delete').click()
+        await clickProjectDelete(item)
         await expect(item).not.toBeAttached({ timeout: 5000 })
     }
 }

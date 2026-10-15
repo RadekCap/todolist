@@ -472,6 +472,19 @@ describe('projects', () => {
             expect(projects.find(p => p.id === 'new-1').name).toBe('Added')
         })
 
+        it('persists and returns the template-created marker', async () => {
+            mockChain._queueResult([
+                { id: 'new-template', name: 'enc:Template', color: '#667eea', sort_order: 3, parent_id: null, area_id: null, user_id: 'user-1' }
+            ])
+
+            const result = await addProject('Template', null, { createdFromTemplate: true })
+
+            expect(mockChain.insert).toHaveBeenCalledWith(expect.objectContaining({
+                created_from_template: true
+            }))
+            expect(result.created_from_template).toBe(true)
+        })
+
         it('emits PROJECT_ADDED event', async () => {
             const handler = vi.fn()
             events.on(Events.PROJECT_ADDED, handler)

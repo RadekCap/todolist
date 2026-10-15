@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures.js'
-import { unique } from './helpers/todos.js'
+import { unique, clickProjectDelete } from './helpers/todos.js'
 
 /**
  * Helper: add a project via the sidebar.
@@ -38,7 +38,7 @@ async function deleteProject(page, name) {
     if (await item.count() === 0) return
 
     page.once('dialog', dialog => dialog.accept())
-    await item.locator('.project-delete').click()
+    await clickProjectDelete(item)
     await expect(item).not.toBeAttached({ timeout: 5000 })
 }
 
@@ -214,7 +214,7 @@ test.describe('Project Updates & Hierarchy Edge Cases', () => {
         authedPage.once('dialog', async dialog => {
             await dialog.accept()
         })
-        await sidebarProject(authedPage, parent).locator('.project-delete').click()
+        await clickProjectDelete(sidebarProject(authedPage, parent))
 
         // Both parent and child should be gone
         await expect(sidebarProject(authedPage, parent)).not.toBeAttached({ timeout: 5000 })

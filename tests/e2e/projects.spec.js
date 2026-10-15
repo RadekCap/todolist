@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { clickProjectDelete } from './helpers/todos.js'
 
 const unique = () => `Proj-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -53,7 +54,7 @@ async function deleteProjectFromSidebar(page, name) {
 
     // Use dialog handler for window.confirm (project with no todos)
     page.once('dialog', dialog => dialog.accept())
-    await item.locator('.project-delete').click()
+    await clickProjectDelete(item)
     await expect(item).not.toBeAttached({ timeout: 5000 })
 }
 
@@ -154,10 +155,62 @@ test.describe('Projects', () => {
 
         // Accept the confirm dialog
         authedPage.once('dialog', dialog => dialog.accept())
-        await sidebarProject(authedPage, name).locator('.project-delete').click()
+        await clickProjectDelete(sidebarProject(authedPage, name))
 
         // Project should be removed
         await expect(sidebarProject(authedPage, name)).not.toBeAttached({ timeout: 5000 })
+    })
+
+    test('uses a row menu for ordinary projects and a visible X for template-created projects', async ({ authedPage }) => {
+        const ordinaryName = unique()
+        const templateName = unique()
+        await addProject(authedPage, ordinaryName)
+
+        const ordinaryItem = sidebarProject(authedPage, ordinaryName)
+        await expect(ordinaryItem.locator('.project-delete')).toHaveCount(0)
+        await expect(ordinaryItem.locator('.project-menu-trigger')).toBeVisible()
+
+        await ordinaryItem.locator('.project-menu-trigger').click()
+        const ordinaryMenu = authedPage.locator('.project-context-menu')
+        await expect(ordinaryMenu).toBeVisible()
+        const ordinaryDialogMessages = []
+        authedPage.once('dialog', async dialog => {
+            ordinaryDialogMessages.push(dialog.message())
+            await dialog.dismiss()
+        })
+        await ordinaryMenu.locator('.project-delete-menu-item').click()
+        expect(ordinaryDialogMessages).toEqual([`Delete "${ordinaryName}"?`])
+
+        await authedPage.click('#manageTemplatesBtn')
+        await authedPage.fill('#newTemplateInput', templateName)
+        await authedPage.click('#addTemplateBtn')
+        const templateItem = authedPage.locator('.manage-templates-item', { hasText: templateName })
+        await expect(templateItem).toBeVisible()
+        await templateItem.locator('.manage-templates-apply').click()
+        const templateProject = sidebarProject(authedPage, templateName)
+        await expect(templateProject).toBeVisible({ timeout: 5000 })
+        await authedPage.click('#closeManageTemplatesModalBtn')
+
+        const templateDelete = templateProject.locator('.project-delete')
+        await expect(templateDelete).toBeVisible()
+        await expect(templateDelete).toHaveCSS('opacity', '1')
+        const templateDialogMessages = []
+        authedPage.once('dialog', async dialog => {
+            templateDialogMessages.push(dialog.message())
+            await dialog.dismiss()
+        })
+        await templateDelete.click()
+        expect(templateDialogMessages).toEqual([`Delete "${templateName}"?`])
+
+        await deleteProjectFromSidebar(authedPage, templateName)
+        await deleteProjectFromSidebar(authedPage, ordinaryName)
+
+        await authedPage.click('#manageTemplatesBtn')
+        const remainingTemplate = authedPage.locator('.manage-templates-item', { hasText: templateName })
+        authedPage.once('dialog', dialog => dialog.accept())
+        await remainingTemplate.locator('.manage-templates-delete').click()
+        await expect(remainingTemplate).not.toBeAttached()
+        await authedPage.click('#closeManageTemplatesModalBtn')
     })
 
     test('delete a project with todos - remove from project', async ({ authedPage }) => {
@@ -167,7 +220,7 @@ test.describe('Projects', () => {
         await addTodoToProject(authedPage, todoName, projName)
 
         // Delete project — custom dialog should appear
-        await sidebarProject(authedPage, projName).locator('.project-delete').click()
+        await clickProjectDelete(sidebarProject(authedPage, projName))
 
         // Wait for the custom delete dialog
         const dialog = authedPage.locator('.delete-project-dialog-overlay')
@@ -197,7 +250,7 @@ test.describe('Projects', () => {
         await expect(todoItem(authedPage, todoName)).toBeVisible({ timeout: 5000 })
 
         // Delete project — custom dialog should appear
-        await sidebarProject(authedPage, projName).locator('.project-delete').click()
+        await clickProjectDelete(sidebarProject(authedPage, projName))
         const dialog = authedPage.locator('.delete-project-dialog-overlay')
         await expect(dialog).toBeVisible({ timeout: 5000 })
 
@@ -291,7 +344,7 @@ test.describe('Projects', () => {
 
         // Cleanup — delete parent (takes children with it)
         authedPage.once('dialog', dialog => dialog.accept())
-        await sidebarProject(authedPage, parentName).locator('.project-delete').click()
+        await clickProjectDelete(sidebarProject(authedPage, parentName))
         await expect(sidebarProject(authedPage, parentName)).not.toBeAttached({ timeout: 5000 })
     })
 
@@ -301,7 +354,7 @@ test.describe('Projects', () => {
 
         // Delete the project
         authedPage.once('dialog', dialog => dialog.accept())
-        await sidebarProject(authedPage, name).locator('.project-delete').click()
+        await clickProjectDelete(sidebarProject(authedPage, name))
         await expect(sidebarProject(authedPage, name)).not.toBeAttached({ timeout: 5000 })
 
         // Undo via toast button
@@ -348,7 +401,7 @@ test.describe('Projects', () => {
 
         // Cleanup
         authedPage.once('dialog', dialog => dialog.accept())
-        await sidebarProject(authedPage, parentName).locator('.project-delete').click()
+        await clickProjectDelete(sidebarProject(authedPage, parentName))
         await expect(sidebarProject(authedPage, parentName)).not.toBeAttached({ timeout: 5000 })
     })
 })

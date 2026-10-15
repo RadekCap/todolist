@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { clickProjectDelete } from './helpers/todos.js'
 
 const unique = () => `PDG-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -76,7 +77,7 @@ async function deleteProject(page, name) {
     if (await item.count() > 0) {
         // Projects with todos show a custom DOM dialog instead of browser confirm
         page.once('dialog', dialog => dialog.accept())
-        await item.locator('.project-delete').click()
+        await clickProjectDelete(item)
 
         // Handle custom delete dialog (shown when project has todos)
         const customDialog = page.locator('.delete-project-dialog-overlay')

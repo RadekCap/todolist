@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures.js'
+import { clickProjectDelete } from './helpers/todos.js'
 
 const unique = () => `MS-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
 
@@ -278,7 +279,7 @@ test.describe('Bulk Operations', () => {
         await cleanupTodos(authedPage, names)
         // Delete project
         authedPage.once('dialog', dialog => dialog.accept())
-        await projItem.locator('.project-delete').click()
+        await clickProjectDelete(projItem)
         await expect(projItem).not.toBeAttached({ timeout: 5000 })
     })
 
